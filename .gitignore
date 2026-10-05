@@ -47,3 +47,11 @@ Thumbs.db
 # Generated demo output
 CureGenix-output.md
 CureGenix-output.txt
+
+# Next.js
+node_modules/
+.next/
+out/
+
+# Generated parser output
+parse-pdb/output.json

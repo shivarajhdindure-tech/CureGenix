@@ -4,14 +4,7 @@ from qiskit.circuit.library import n_local
 from qiskit.primitives import StatevectorEstimator
 
 
-def create_vqe(
-    num_qubits: int,
-    maxiter: int = 100,
-):
-    """
-    Create and configure the VQE solver.
-    """
-
+def create_vqe(num_qubits: int, maxiter: int = 100):
     ansatz = n_local(
         num_qubits=num_qubits,
         rotation_blocks=["ry"],
@@ -21,16 +14,21 @@ def create_vqe(
     )
 
     optimizer = SLSQP(maxiter=maxiter)
-
     estimator = StatevectorEstimator()
 
-    vqe = VQE(
+    # Deterministic starting point for reproducible VQE runs.
+    initial_point = [
+    0.1 * ((i % 5) - 2)
+    for i in range(ansatz.num_parameters)
+    ]
+
+    return VQE(
         estimator=estimator,
         ansatz=ansatz,
         optimizer=optimizer,
+        initial_point=initial_point,
     )
 
-    return vqe
 
 
 def run_vqe(

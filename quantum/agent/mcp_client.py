@@ -1,5 +1,5 @@
 import asyncio
-
+import sys
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
@@ -8,7 +8,7 @@ class QuantumMCPClient:
 
     def __init__(self):
         self.server_params = StdioServerParameters(
-            command="python",
+            command=sys.executable,
             args=["-m", "quantum.mcp.server"],
         )
 

@@ -55,3 +55,7 @@ out/
 
 # Generated parser output
 parse-pdb/output.json
+
+curegenix_render_free_test.pdb
+test-small.pdb
+test_structure.pdb

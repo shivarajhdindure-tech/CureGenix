@@ -1,0 +1,14 @@
+HEADER    CUREGENIX RENDER FREE TEST PROTEIN
+TITLE     MINIMAL TWO-RESIDUE TEST STRUCTURE
+ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 10.00           N
+ATOM      2  CA  ALA A   1       1.458   0.000   0.000  1.00 10.00           C
+ATOM      3  C   ALA A   1       2.028   1.410   0.000  1.00 10.00           C
+ATOM      4  O   ALA A   1       1.390   2.470   0.000  1.00 10.00           O
+ATOM      5  CB  ALA A   1       1.970  -0.760   1.220  1.00 10.00           C
+ATOM      6  N   ALA A   2       3.310   1.500   0.000  1.00 10.00           N
+ATOM      7  CA  ALA A   2       3.980   2.820   0.000  1.00 10.00           C
+ATOM      8  C   ALA A   2       5.470   2.690   0.000  1.00 10.00           C
+ATOM      9  O   ALA A   2       6.060   1.600   0.000  1.00 10.00           O
+ATOM     10  CB  ALA A   2       3.520   3.550   1.230  1.00 10.00           C
+TER
+END

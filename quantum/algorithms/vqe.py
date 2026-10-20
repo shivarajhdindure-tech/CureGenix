@@ -1,10 +1,15 @@
+
 from qiskit_algorithms import VQE
 from qiskit_algorithms.optimizers import SLSQP
 from qiskit.circuit.library import n_local
 from qiskit.primitives import StatevectorEstimator
 
 
-def create_vqe(num_qubits: int, maxiter: int = 100):
+def create_vqe(
+    num_qubits: int,
+    maxiter: int = 100,
+    initial_point=None,
+):
     ansatz = n_local(
         num_qubits=num_qubits,
         rotation_blocks=["ry"],
@@ -16,38 +21,44 @@ def create_vqe(num_qubits: int, maxiter: int = 100):
     optimizer = SLSQP(maxiter=maxiter)
     estimator = StatevectorEstimator()
 
-    # Deterministic starting point for reproducible VQE runs.
-    initial_point = [
-    0.1 * ((i % 5) - 2)
-    for i in range(ansatz.num_parameters)
-    ]
+    # Preserve the existing deterministic default.
+    if initial_point is None:
+        initial_point = [
+            0.1 * ((i % 5) - 2)
+            for i in range(ansatz.num_parameters)
+        ]
+
+    if len(initial_point) != ansatz.num_parameters:
+        raise ValueError(
+            f"Expected {ansatz.num_parameters} initial parameters, "
+            f"received {len(initial_point)}."
+        )
 
     return VQE(
         estimator=estimator,
         ansatz=ansatz,
         optimizer=optimizer,
-        initial_point=initial_point,
+        initial_point=list(initial_point),
     )
-
 
 
 def run_vqe(
     qubit_hamiltonian,
     num_qubits: int,
     maxiter: int = 100,
+    initial_point=None,
 ):
-    """
-    Run VQE and return the optimized result.
-    """
+    """Run VQE with an optional custom initial parameter vector."""
 
     vqe = create_vqe(
         num_qubits=num_qubits,
         maxiter=maxiter,
+        initial_point=initial_point,
     )
 
-    result = vqe.compute_minimum_eigenvalue(
-        qubit_hamiltonian
-    )
+    result = vqe.compute_minimum_eigenvalue(qubit_hamiltonian)
+
+    optimizer_result = result.optimizer_result
 
     return {
         "electronic_energy": float(result.eigenvalue.real),
@@ -55,6 +66,8 @@ def run_vqe(
         "ansatz": "n_local",
         "max_iterations": maxiter,
         "num_qubits": num_qubits,
+        "evaluations": getattr(optimizer_result, "nfev", None),
+        "iterations": getattr(optimizer_result, "nit", None),
         "raw_result": result,
         "vqe_solver": vqe,
     }

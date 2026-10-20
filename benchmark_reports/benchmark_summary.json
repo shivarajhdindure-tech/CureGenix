@@ -1,0 +1,160 @@
+{
+  "benchmark_name": "CureGenix VQE vs CAQE small active-space benchmark",
+  "configuration": {
+    "trials_per_molecule": 5,
+    "maxiter": 50,
+    "caqe_starts_per_trial": 3,
+    "basis": "STO-3G",
+    "execution": "classical simulator; no quantum hardware"
+  },
+  "molecules": [
+    {
+      "molecule": "Water",
+      "description": "RDKit-generated geometry from SMILES O",
+      "basis": "STO-3G",
+      "original_alpha_beta_electrons": [
+        5,
+        5
+      ],
+      "active_alpha_beta_electrons": [
+        1,
+        1
+      ],
+      "active_spatial_orbitals": 2,
+      "qubits": 4,
+      "ansatz_parameters": 12,
+      "trials": 5,
+      "maxiter": 50,
+      "caqe_starts_per_trial": 3,
+      "seed_base": 2026,
+      "reference_energy_hartree": -1.6632241643879806,
+      "unrestricted_reference_hartree": -1.663224164387983,
+      "sector_reference_difference_hartree": 2.4424906541753444e-15,
+      "sector_reference_check_passed": true,
+      "baseline": {
+        "absolute_error_hartree": {
+          "mean": 0.001001468536816752,
+          "sd": 0.0005596334221147996
+        },
+        "wall_runtime_seconds": {
+          "mean": 1.442522812000243,
+          "sd": 0.7308039041632752
+        },
+        "evaluations": {
+          "mean": 364.2,
+          "sd": 180.0297197687093
+        }
+      },
+      "caqe": {
+        "absolute_error_hartree": {
+          "mean": 0.00047712073136443325,
+          "sd": 0.0006437574785971279
+        },
+        "wall_runtime_seconds": {
+          "mean": 4.33013467660021,
+          "sd": 1.2062349009156408
+        },
+        "optimizer_runtime_seconds": {
+          "mean": 4.3244937639996355,
+          "sd": 1.2055099519535797
+        },
+        "evaluations": {
+          "mean": 1134.0,
+          "sd": 257.7324193810317
+        },
+        "starts_completed": {
+          "mean": 3.0,
+          "sd": 0.0
+        }
+      },
+      "caqe_lower_error_trials": 3,
+      "equal_error_trials": 2,
+      "mean_error_reduction_percent": 52.35789105457075,
+      "limitations": [
+        "Small active-space classical simulator; no quantum hardware execution.",
+        "No quantum advantage is established.",
+        "Only two molecules and five paired trials per molecule are tested.",
+        "CAQE uses up to three starts; baseline uses one, so resource budgets differ.",
+        "Sector check assumes the stated Jordan-Wigner alpha/beta occupation-bit ordering.",
+        "LiH is a two-electron, two-spatial-orbital active-space model, not a full six-electron calculation.",
+        "Wall-clock timings depend on machine load and software environment."
+      ]
+    },
+    {
+      "molecule": "LiH",
+      "description": "Li-H distance 1.600 Angstrom",
+      "basis": "STO-3G",
+      "original_alpha_beta_electrons": [
+        2,
+        2
+      ],
+      "active_alpha_beta_electrons": [
+        1,
+        1
+      ],
+      "active_spatial_orbitals": 2,
+      "qubits": 4,
+      "ansatz_parameters": 12,
+      "trials": 5,
+      "maxiter": 50,
+      "caqe_starts_per_trial": 3,
+      "seed_base": 2030,
+      "reference_energy_hartree": -1.0581165351365391,
+      "unrestricted_reference_hartree": -1.058116535136539,
+      "sector_reference_difference_hartree": 2.220446049250313e-16,
+      "sector_reference_check_passed": true,
+      "baseline": {
+        "absolute_error_hartree": {
+          "mean": 0.00026545830658859516,
+          "sd": 1.2750746949073379e-05
+        },
+        "wall_runtime_seconds": {
+          "mean": 2.2069376953997564,
+          "sd": 0.2639633788349659
+        },
+        "evaluations": {
+          "mean": 529.0,
+          "sd": 63.812224534175265
+        }
+      },
+      "caqe": {
+        "absolute_error_hartree": {
+          "mean": 0.00017121216346795975,
+          "sd": 0.0001164182664957368
+        },
+        "wall_runtime_seconds": {
+          "mean": 5.70313269679973,
+          "sd": 0.5674628521193733
+        },
+        "optimizer_runtime_seconds": {
+          "mean": 5.69754917939863,
+          "sd": 0.5673635490201813
+        },
+        "evaluations": {
+          "mean": 1353.6,
+          "sd": 133.52452958164653
+        },
+        "starts_completed": {
+          "mean": 3.0,
+          "sd": 0.0
+        }
+      },
+      "caqe_lower_error_trials": 4,
+      "equal_error_trials": 1,
+      "mean_error_reduction_percent": 35.50318101994721,
+      "limitations": [
+        "Small active-space classical simulator; no quantum hardware execution.",
+        "No quantum advantage is established.",
+        "Only two molecules and five paired trials per molecule are tested.",
+        "CAQE uses up to three starts; baseline uses one, so resource budgets differ.",
+        "Sector check assumes the stated Jordan-Wigner alpha/beta occupation-bit ordering.",
+        "LiH is a two-electron, two-spatial-orbital active-space model, not a full six-electron calculation.",
+        "Wall-clock timings depend on machine load and software environment."
+      ]
+    }
+  ],
+  "overall_caveats": [
+    "Preliminary results for two small active-space models only.",
+    "No quantum advantage, drug efficacy, or clinical claim is established."
+  ]
+}

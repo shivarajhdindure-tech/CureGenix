@@ -32,9 +32,14 @@ class ScreeningAgent(BaseAgent):
 
             # Approved drugs get a potency proxy boost based on clinical evidence
             potency = 0.5
-            if cat == "approved":
+            verified = (
+                candidate.get("verification_status") == "verified"
+                and candidate.get("target_association_verified") is True
+            )
+
+            if cat == "approved" and verified:
                 potency = 0.85
-            elif cat == "repurposed":
+            elif cat == "repurposed" and verified:
                 potency = 0.70
 
             composite = self.mcp_call("compute", "calculate_composite_score", scores={
@@ -48,6 +53,12 @@ class ScreeningAgent(BaseAgent):
                 "drug_name": candidate["name"],
                 "smiles": smiles,
                 "category": cat,
+                "verification_status": candidate.get(
+                    "verification_status", "not_verified"
+                ),
+                "target_association_verified": candidate.get(
+                    "target_association_verified", False
+                ),
                 "drug_likeness": round(dl_score, 2),
                 "bbb_permeability": round(bbb_score, 2),
                 "potency_proxy": potency,

@@ -158,8 +158,10 @@ class WebMCPServer(BaseMCPServer):
                             known_drugs.append({
                                 "name": w,
                                 "smiles": smiles,
-                                "source": "PubChem Web Retrieval",
-                                "category": "repurposed" if len(known_drugs) % 2 == 0 else "approved"
+                                "source": "PubChem Web Retrieval — identity lookup only",
+                                "category": "unverified",
+                                "verification_status": "structure_lookup_only",
+                                "target_association_verified": False,
                             })
                     except Exception:
                         pass
@@ -167,19 +169,27 @@ class WebMCPServer(BaseMCPServer):
             print(f"Web drug search warning: {e}")
             pass
             
-        # 3. Guaranteed Fallback matching strict criteria if live parsers disconnect
+        # 3. Explicit mock fallback when no compounds were retrieved.
+        # These are demonstration references, not verified drug recommendations.
         if not known_drugs:
-            if "p53" in query.lower() or "tumor antigen" in query.lower():
-                known_drugs = [
-                    {"name": "Nutlin-3", "smiles": "CC1=CC=C(C=C1)NC(=O)N2CCC(CC2)C3=CC=CC=C3", "source": "Fallback P53 Model", "category": "approved"},
-                    {"name": "Idasanutlin", "smiles": "CC(C)N1CCN(CC1)C2=NC=NC3=CC=CC=C23", "source": "Fallback P53 Model", "category": "repurposed"},
-                    {"name": "RG7112", "smiles": "CCN(CC)CCOC1=CC=C(C=C1)C2=NC3=CC=CC=C3N2", "source": "Fallback P53 Model", "category": "novel"}
-                ]
-            else:
-                known_drugs = [
-                    {"name": f"{query} Approved Inhibitor", "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O", "source": "Generic Mock", "category": "approved"},
-                    {"name": f"{query} Experimental Compound", "smiles": "O=C(C1=CC2=C(C=C1)C(=O)N(CC3=CC=C(F)C=C3)C2=O)N4CCOCC4", "source": "Generic Mock", "category": "repurposed"}
-                ]
+            known_drugs = [
+                {
+                    "name": "Mock Reference Compound A",
+                    "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O",
+                    "source": "Generic Mock — demonstration only",
+                    "category": "mock",
+                    "verification_status": "not_verified",
+                    "target_association_verified": False,
+                },
+                {
+                    "name": "Mock Reference Compound B",
+                    "smiles": "O=C(C1=CC2=C(C=C1)C(=O)N(CC3=CC=C(F)C=C3)C2=O)N4CCOCC4",
+                    "source": "Generic Mock — demonstration only",
+                    "category": "mock",
+                    "verification_status": "not_verified",
+                    "target_association_verified": False,
+                },
+            ]
                 
         return {
             "disease": disease,

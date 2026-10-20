@@ -49,11 +49,17 @@ class MoleculeAgent(BaseAgent):
         
         for drug in known_drugs:
             generated_candidates.append({
-                "name": drug.get("name", "Unknown Drug"),
+                "name": drug.get("name", "Unknown Compound"),
                 "smiles": drug.get("smiles", ""),
                 "molecular_properties": {},
                 "source": drug.get("source", "Web Search"),
-                "category": drug.get("category", "approved")
+                "category": drug.get("category", "unverified"),
+                "verification_status": drug.get(
+                    "verification_status", "not_verified"
+                ),
+                "target_association_verified": drug.get(
+                    "target_association_verified", False
+                ),
             })
 
         self.mcp_call("memory", "store", key="molecules", value=generated_candidates)

@@ -2,7 +2,8 @@
 // Every field here was verified against backend/orchestrator.py and the agent
 // sources. Nothing is invented: missing data stays missing.
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // The real quantum run takes ~4 minutes on CPU hosting. Allow far more.
 export const REQUEST_TIMEOUT_MS = 15 * 60 * 1000;
@@ -166,6 +167,8 @@ export function deriveResults(result) {
         confidence: r.confidence,
         screening: r.screening_details || null,
         reasoning: r.reasoning || "",
+        verificationStatus: r.verification_status || "not_verified",
+        targetAssociationVerified: r.target_association_verified === true,
       }))
     : molecules.map((m) => ({
         id: m.name,

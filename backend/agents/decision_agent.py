@@ -44,9 +44,25 @@ class DecisionAgent(BaseAgent):
             risk_penalty = {"low": 0.0, "medium": 0.08, "high": 0.20}.get(risk_level, 0.1)
             adjusted = round(composite - risk_penalty, 3)
 
-            if score_entry.get("category") == "approved":
+            category = score_entry.get("category", "unverified")
+            verification_status = score_entry.get(
+                "verification_status", "not_verified"
+            )
+            target_verified = score_entry.get(
+                "target_association_verified", False
+            )
+
+            if (
+                category == "approved"
+                and verification_status == "verified"
+                and target_verified
+            ):
                 confidence = "high"
-            elif score_entry.get("category") == "repurposed":
+            elif (
+                category == "repurposed"
+                and verification_status == "verified"
+                and target_verified
+            ):
                 confidence = "medium"
             else:
                 confidence = "low"
@@ -67,7 +83,9 @@ class DecisionAgent(BaseAgent):
                     "bbb_permeability": score_entry.get("bbb_permeability", 0),
                     "potency_proxy": score_entry.get("potency_proxy", 0),
                     "toxicity_penalty": score_entry.get("toxicity_penalty", 0)
-                }
+                },
+                "verification_status": verification_status,
+                "target_association_verified": target_verified,
             })
 
         # ── Sort by adjusted score (DETERMINISTIC) ────────────────────────

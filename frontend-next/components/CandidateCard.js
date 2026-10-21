@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { fmt, isNum } from "@/lib/analysis";
+import EvidencePassport from "./EvidencePassport";
 
 export const RISK_STYLES = {
   low: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
@@ -298,6 +299,7 @@ export default function CandidateCard({ candidate: c, featured = false }) {
           )}
         </div>
       )}
+      <EvidencePassport candidate={c} />
     </article>
   );
 }

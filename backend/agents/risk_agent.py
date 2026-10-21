@@ -26,16 +26,30 @@ class RiskAgent(BaseAgent):
             tox_result = self.mcp_call("compute", "calculate_toxicity", smiles=smiles, drug_name=drug_name)
             tox_data = tox_result.get("data", {})
 
-            predicted_level = tox_data.get("predicted_toxicity", "medium")
-            alerts = tox_data.get("structural_alerts", [])
-            flags = alerts if alerts else ["Limited safety data — novel compound"]
+            predicted_level = tox_data.get("predicted_toxicity", "unknown")
+            alerts = tox_data.get("structural_alerts", []) or []
+
+            # Structural alerts are heuristic signals, not a safety assessment.
+            if alerts:
+                evidence_status = "limited"
+                flags = list(alerts)
+            else:
+                evidence_status = "insufficient"
+                flags = ["No structural alerts detected; safety is not established"]
 
             risk_flags.append({
                 "drug_name": drug_name,
                 "risk_level": predicted_level,
+                "structural_alert_count": len(alerts),
+                "structural_alerts": list(alerts),
+                "safety_evidence_status": evidence_status,
                 "flags": flags,
-                "details": f"Computationally predicted risk profile. Structural alerts: {len(alerts)}",
-                "source": "ComputeMCP:calculate_toxicity"
+                "details": (
+                    "Structural-alert screening is heuristic and does not "
+                    "establish safety or predict clinical toxicity. "
+                    "Safety evidence remains limited."
+                ),
+                "source": "ComputeMCP:calculate_toxicity",
             })
 
         self.mcp_call("memory", "store", key="risk_flags", value=risk_flags)

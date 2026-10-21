@@ -168,6 +168,12 @@ export function deriveResults(result) {
     adjustedScore: r.adjusted_score,
     compositeScore: r.composite_score,
     riskLevel: r.risk_level,
+    safetyEvidenceStatus: r.safety_evidence_status || "insufficient",
+    structuralAlertCount: r.structural_alert_count ?? null,
+    structuralAlerts: Array.isArray(r.structural_alerts)
+      ? r.structural_alerts
+      : [],
+    riskDetails: r.risk_details || "",
     riskFlags: Array.isArray(r.risk_flags) ? r.risk_flags : [],
     confidence: r.confidence,
     screening: r.screening_details || null,

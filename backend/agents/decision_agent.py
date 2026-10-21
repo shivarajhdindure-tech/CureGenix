@@ -74,6 +74,12 @@ class DecisionAgent(BaseAgent):
                 "composite_score": composite,
                 "risk_level": risk_level,
                 "risk_penalty": risk_penalty,
+                "safety_evidence_status": risk.get(
+                    "safety_evidence_status", "insufficient"
+                ),
+                "structural_alert_count": risk.get("structural_alert_count"),
+                "structural_alerts": risk.get("structural_alerts", []),
+                "risk_details": risk.get("details", ""),
                 "adjusted_score": adjusted,
                 "confidence": confidence,
                 "reasoning": "",  # Will be filled by LLM

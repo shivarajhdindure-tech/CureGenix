@@ -116,7 +116,8 @@ class ComputeMCPServer(BaseMCPServer):
         if "F" in smiles and smiles.count("F") > 3:
             alerts.append("Multiple fluorine atoms — potential metabolic concerns")
 
-        base_penalty = len(alerts) * 0.15 + random.uniform(0.0, 0.1)
+        # Deterministic rule-based heuristic, not a validated toxicity model.
+        base_penalty = len(alerts) * 0.15
         toxicity_penalty = round(min(1.0, base_penalty), 2)
 
         return {

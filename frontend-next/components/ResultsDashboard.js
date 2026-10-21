@@ -7,6 +7,7 @@ import RiskAnalysis from "./RiskAnalysis";
 import Prioritization from "./Prioritization";
 import TechnicalDetails from "./TechnicalDetails";
 import DiscoveryStrategySimulator from "./DiscoveryStrategySimulator";
+import Molecule3DExplorer from "./Molecule3DExplorer";
 
 function SummaryCard({ label, value, sub, accent }) {
   return (
@@ -174,6 +175,8 @@ export default function ResultsDashboard({ result, derived, onReset }) {
       )}
 
       <DiscoveryStrategySimulator candidates={candidates} />
+
+      <Molecule3DExplorer candidates={[...candidates, ...demonstrationCandidates]} />
 
       <QuantumAnalysis derived={derived} />
       <CandidateComparison derived={derived} />

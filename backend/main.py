@@ -22,6 +22,7 @@ from fastapi.responses import FileResponse
 
 from backend.orchestrator import Orchestrator
 from backend.services.pdb_parser import parse_pdb_file
+from backend.services.molecule_3d import router as molecule_3d_router
 
 PROTEIN_NAME_SCORE_SARS_COV = 8
 PROTEIN_NAME_SCORE_SPIKE_GLYCO = 6
@@ -33,6 +34,8 @@ app = FastAPI(
     description="MCP-powered multi-agent system for intelligent drug discovery from protein structures",
     version="2.0.0"
 )
+
+app.include_router(molecule_3d_router)
 
 app.add_middleware(
     CORSMiddleware,

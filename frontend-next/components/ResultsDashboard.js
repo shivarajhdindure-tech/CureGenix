@@ -6,6 +6,7 @@ import CandidateComparison from "./CandidateComparison";
 import RiskAnalysis from "./RiskAnalysis";
 import Prioritization from "./Prioritization";
 import TechnicalDetails from "./TechnicalDetails";
+import DiscoveryStrategySimulator from "./DiscoveryStrategySimulator";
 
 function SummaryCard({ label, value, sub, accent }) {
   return (
@@ -171,6 +172,8 @@ export default function ResultsDashboard({ result, derived, onReset }) {
           </div>
         </section>
       )}
+
+      <DiscoveryStrategySimulator candidates={candidates} />
 
       <QuantumAnalysis derived={derived} />
       <CandidateComparison derived={derived} />

@@ -4,7 +4,7 @@ Decision Agent — Final ranking and recommendation engine.
 v2: LLM-POWERED. Combines deterministic screening scores and risk flags
     to produce the final output, then uses LLM to generate scientific
     reasoning for the top candidates.
-    
+
     Deterministic: scoring, ranking, composite calculation
     LLM-powered: reasoning, justification, risk interpretation
 """
@@ -91,15 +91,32 @@ class DecisionAgent(BaseAgent):
         # ── Sort by adjusted score (DETERMINISTIC) ────────────────────────
         ranked.sort(key=lambda x: x["adjusted_score"], reverse=True)
 
-        for i, r in enumerate(ranked):
-            r["rank"] = i + 1
+        mock_candidates = [
+            candidate for candidate in ranked
+            if candidate.get("category") == "mock"
+        ]
+        primary_ranked = [
+            candidate for candidate in ranked
+            if candidate.get("category") != "mock"
+        ]
+
+        for i, candidate in enumerate(primary_ranked, start=1):
+            candidate["rank"] = i
+
+        # Mock references are displayed separately and never receive
+        # a primary recommendation rank.
+        for candidate in mock_candidates:
+            candidate["rank"] = None
+            candidate["demonstration_only"] = True
+
+        ranked = primary_ranked
 
         # ── LLM-Powered Reasoning for top candidates ──────────────────────
         # Build a single LLM call for efficiency
         candidates_text = ""
         for r in ranked[:5]:  # Top 5 candidates
             candidates_text += (
-                f"\n- {r['drug_name']} (Category: {r['category']}, "
+                f"\n{r['drug_name']} (Category: {r['category']}, "
                 f"Score: {r['adjusted_score']:.3f}, Risk: {r['risk_level']}, "
                 f"Drug-likeness: {r['screening_details']['drug_likeness']}, "
                 f"BBB: {r['screening_details']['bbb_permeability']}, "
@@ -153,8 +170,21 @@ Be concise and scientifically precise. Do NOT use markdown code blocks."""
         }
 
         # ── Store decisions in memory ─────────────────────────────────────
-        self.mcp_call("memory", "store", key="final_decisions", value=ranked)
-        self.mcp_call("memory", "store", key="highlights", value=highlights)
+        self.mcp_call(
+            "memory", "store",
+            key="final_decisions",
+            value=ranked + mock_candidates
+        )
+        self.mcp_call(
+            "memory", "store",
+            key="mock_reference_candidates",
+            value=mock_candidates
+        )
+        self.mcp_call(
+            "memory", "store",
+            key="highlights",
+            value=highlights
+        )
 
         summary = (f"Final ranking complete for {protein_name}. "
                    f"Top recommendation: {ranked[0]['drug_name'] if ranked else 'None'} ")
@@ -162,15 +192,15 @@ Be concise and scientifically precise. Do NOT use markdown code blocks."""
         return {
             "summary": summary,
             "recommendations": ranked,
+            "demonstration_references": mock_candidates,
             "highlights": highlights,
-            "total_evaluated": len(ranked)
+            "total_evaluated": len(ranked) + len(mock_candidates)
         }
 
     def _extract_candidate_reasoning(self, llm_text: str, drug_name: str, candidate: dict, protein_name: str) -> str:
         """Extract the LLM reasoning block for a specific candidate."""
         import re
         # Try to find a section headed with the drug name
-        # Look for ## Drug Name or **Drug Name** patterns
         patterns = [
             rf"##\s*{re.escape(drug_name)}(.*?)(?=##|\Z)",
             rf"\*\*{re.escape(drug_name)}\*\*(.*?)(?=\*\*|\Z)",
@@ -204,13 +234,30 @@ Be concise and scientifically precise. Do NOT use markdown code blocks."""
         elif dl >= 0.5:
             parts.append(f"It has acceptable drug-likeness ({dl}).")
 
-        risk_level = score.get("risk_level", "medium")
+        risk_level = score.get("risk_level", "unknown")
         flags = score.get("risk_flags", [])
-        if risk_level == "low":
-            parts.append("Safety profile is favorable with low risk.")
-        elif risk_level == "high":
-            parts.append(f"Caution: elevated risk level. Key concerns: {', '.join(flags[:2])}.")
+        if risk_level == "high":
+            parts.append(
+                "The current heuristic flags potential structural concerns. "
+                f"Review: {', '.join(flags[:2]) or 'additional safety assessment required'}."
+            )
+        elif risk_level == "medium":
+            parts.append(
+                "The heuristic indicates an intermediate predicted risk level; "
+                "this is not a validated toxicity assessment."
+            )
+        elif risk_level == "low":
+            parts.append(
+                "Few structural alerts were detected by the current heuristic. "
+                "This does not establish safety or exclude toxicity."
+            )
         else:
-            parts.append(f"Moderate risk profile. Monitor for: {', '.join(flags[:2]) if flags else 'standard adverse effects'}.")
+            parts.append(
+                "Safety risk is undetermined. Further assessment is required."
+            )
+        parts.append(
+            "Safety evidence is limited; computational scores are not clinical "
+            "evidence of safety or effectiveness."
+        )
 
         return " ".join(parts)

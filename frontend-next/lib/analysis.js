@@ -150,31 +150,59 @@ export function deriveResults(result) {
       ? result.decisions
       : [];
 
+  const demonstrationReferences = Array.isArray(
+    decisionData.demonstration_references,
+  )
+    ? decisionData.demonstration_references
+    : [];
+
   const highlights = result?.highlights || decisionData.highlights || {};
   const bestNovelRaw = highlights.best_novel_candidate;
   const bestNovelId = BAD_NAMES.has(bestNovelRaw ?? "") ? null : bestNovelRaw;
 
-  const source = recommendations.length
-    ? recommendations.map((r) => ({
-        id: r.drug_name,
-        smiles: r.smiles,
-        category: r.category,
-        rank: r.rank,
-        adjustedScore: r.adjusted_score,
-        compositeScore: r.composite_score,
-        riskLevel: r.risk_level,
-        riskFlags: Array.isArray(r.risk_flags) ? r.risk_flags : [],
-        confidence: r.confidence,
-        screening: r.screening_details || null,
-        reasoning: r.reasoning || "",
-        verificationStatus: r.verification_status || "not_verified",
-        targetAssociationVerified: r.target_association_verified === true,
-      }))
-    : molecules.map((m) => ({
-        id: m.name,
-        smiles: m.smiles,
-        category: m.category,
-      }));
+  const toCandidate = (r, demonstrationOnly = false) => ({
+    id: r.drug_name,
+    smiles: r.smiles,
+    category: r.category,
+    rank: demonstrationOnly ? null : r.rank,
+    adjustedScore: r.adjusted_score,
+    compositeScore: r.composite_score,
+    riskLevel: r.risk_level,
+    riskFlags: Array.isArray(r.risk_flags) ? r.risk_flags : [],
+    confidence: r.confidence,
+    screening: r.screening_details || null,
+    reasoning: r.reasoning || "",
+    verificationStatus: r.verification_status || "not_verified",
+    targetAssociationVerified: r.target_association_verified === true,
+    demonstrationOnly,
+  });
+
+  const rankedSource = recommendations
+    .filter((r) => r.category !== "mock")
+    .map((r) => toCandidate(r));
+
+  const mockSource = [
+    ...demonstrationReferences,
+    ...recommendations.filter((r) => r.category === "mock"),
+  ]
+    .filter(
+      (candidate, index, all) =>
+        all.findIndex((item) => item.drug_name === candidate.drug_name) ===
+        index,
+    )
+    .map((candidate) => toCandidate(candidate, true));
+
+  const source = rankedSource.length
+    ? rankedSource
+    : recommendations.length
+      ? []
+      : molecules
+          .filter((m) => m.category !== "mock")
+          .map((m) => ({
+            id: m.name,
+            smiles: m.smiles,
+            category: m.category,
+          }));
 
   const candidates = source.map((c) => {
     const q = quantumByName[c.id]?.quantum_analysis || null;
@@ -195,6 +223,14 @@ export function deriveResults(result) {
       isBestNovel: bestNovelId != null && c.id === bestNovelId,
     };
   });
+
+  const demonstrationCandidates = mockSource.map((c) => ({
+    ...c,
+    quantum: quantumByName[c.id]?.quantum_analysis || null,
+    quantumState: "skipped",
+    isNovel: false,
+    isBestNovel: false,
+  }));
 
   const riskDistribution = riskData.risk_distribution || null;
   const proteinInfo = result?.protein_info || {};
@@ -226,5 +262,6 @@ export function deriveResults(result) {
         ? quantumData.quantum_candidates
         : null,
     },
+    demonstrationCandidates,
   };
 }

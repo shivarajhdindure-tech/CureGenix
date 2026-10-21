@@ -22,7 +22,9 @@ export default function Prioritization({ derived }) {
                 {bestNovelId || "—"}
               </p>
               {bestNovel?.smiles && (
-                <p className="font-data mt-3 break-all text-xs leading-5 text-slate-500">{bestNovel.smiles}</p>
+                <p className="font-data mt-3 break-all text-xs leading-5 text-slate-500">
+                  {bestNovel.smiles}
+                </p>
               )}
               {!bestNovelId && (
                 <p className="mt-2 text-sm text-slate-400">
@@ -40,13 +42,16 @@ export default function Prioritization({ derived }) {
               </div>
               <div className="metric">
                 <p className="metric-label">Adjusted score</p>
-                <p className="font-data mt-2 text-xl font-semibold text-white">{fmt(bestNovel?.adjustedScore, 3)}</p>
+                <p className="font-data mt-2 text-xl font-semibold text-white">
+                  {fmt(bestNovel?.adjustedScore, 3)}
+                </p>
               </div>
               <div className="metric">
                 <p className="metric-label">Risk</p>
                 <p className="mt-2">
                   {bestNovel?.riskLevel ? (
-                    <span className={`badge ${RISK_STYLES[bestNovel.riskLevel] || RISK_STYLES.medium}`}>
+                    <span
+                      className={`badge ${RISK_STYLES[bestNovel.riskLevel] || RISK_STYLES.medium}`}>
                       {bestNovel.riskLevel}
                     </span>
                   ) : (
@@ -57,10 +62,12 @@ export default function Prioritization({ derived }) {
             </div>
           </div>
 
-          {topCandidate?.drug_name && (
+          {topCandidate?.drug_name && topCandidate?.category !== "mock" && (
             <p className="mt-5 text-sm text-slate-400">
               Highest-ranked overall:{" "}
-              <span className="font-data text-slate-200">{topCandidate.drug_name}</span>
+              <span className="font-data text-slate-200">
+                {topCandidate.drug_name}
+              </span>
               {topCandidate.category ? ` (${topCandidate.category})` : ""}
             </p>
           )}

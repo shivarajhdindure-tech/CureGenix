@@ -14,8 +14,7 @@ function SummaryCard({ label, value, sub, accent }) {
       <p
         className={`font-data mt-3 break-all text-2xl font-semibold tracking-tight sm:text-3xl ${
           accent || "text-white"
-        }`}
-      >
+        }`}>
         {value}
       </p>
       {sub && <p className="mt-1 text-xs text-slate-500">{sub}</p>}
@@ -24,17 +23,35 @@ function SummaryCard({ label, value, sub, accent }) {
 }
 
 export default function ResultsDashboard({ result, derived, onReset }) {
-  const { summaryCounts, bestNovelId, durationMs, candidates, proteinInfo, lightMolecules, vqeMolecules } = derived;
+  const {
+    summaryCounts,
+    bestNovelId,
+    durationMs,
+    candidates,
+    demonstrationCandidates = [],
+    proteinInfo,
+    lightMolecules,
+    vqeMolecules,
+  } = derived;
 
   const featured = derived.bestNovel;
   const others = candidates.filter((c) => c !== featured);
 
-  const chains = Array.isArray(proteinInfo.chains) ? proteinInfo.chains.length : null;
+  const chains = Array.isArray(proteinInfo.chains)
+    ? proteinInfo.chains.length
+    : null;
   const infoChips = [
     result.protein?.pdb_id && { k: "PDB", v: result.protein.pdb_id },
     chains != null && chains > 0 && { k: "Chains", v: chains },
-    isNum(proteinInfo.sequence_length) && proteinInfo.sequence_length > 0 && { k: "Residues", v: proteinInfo.sequence_length },
-    isNum(proteinInfo.binding_sites_count) && { k: "Binding sites", v: proteinInfo.binding_sites_count },
+    isNum(proteinInfo.sequence_length) &&
+      proteinInfo.sequence_length > 0 && {
+        k: "Residues",
+        v: proteinInfo.sequence_length,
+      },
+    isNum(proteinInfo.binding_sites_count) && {
+      k: "Binding sites",
+      v: proteinInfo.binding_sites_count,
+    },
   ].filter(Boolean);
 
   return (
@@ -44,14 +61,21 @@ export default function ResultsDashboard({ result, derived, onReset }) {
         <div className="min-w-0">
           <p className="eyebrow !text-emerald-300/80">Analysis complete</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            {result.protein_name || result.protein?.name || "Molecular Analysis"}
+            {result.protein_name ||
+              result.protein?.name ||
+              "Molecular Analysis"}
           </h1>
-          {result.summary && <p className="mt-2 text-sm text-slate-400">{result.summary}</p>}
+          {result.summary && (
+            <p className="mt-2 text-sm text-slate-400">{result.summary}</p>
+          )}
           {infoChips.length > 0 && (
             <ul className="mt-4 flex flex-wrap gap-2">
               {infoChips.map((c) => (
-                <li key={c.k} className="rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-slate-400">
-                  {c.k} <span className="font-data ml-1 text-slate-100">{c.v}</span>
+                <li
+                  key={c.k}
+                  className="rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs text-slate-400">
+                  {c.k}{" "}
+                  <span className="font-data ml-1 text-slate-100">{c.v}</span>
                 </li>
               ))}
             </ul>
@@ -64,7 +88,9 @@ export default function ResultsDashboard({ result, derived, onReset }) {
 
       {/* Lightweight-mode notice */}
       {lightMolecules.length > 0 && vqeMolecules.length === 0 && (
-        <div role="note" className="rounded-xl border border-amber-400/30 bg-amber-400/[0.06] p-4 text-sm text-amber-100">
+        <div
+          role="note"
+          className="rounded-xl border border-amber-400/30 bg-amber-400/[0.06] p-4 text-sm text-amber-100">
           This backend is running in lightweight descriptor mode. The quantum
           stage returned RDKit molecular descriptors only; VQE was not run for
           these results.
@@ -73,14 +99,25 @@ export default function ResultsDashboard({ result, derived, onReset }) {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <SummaryCard label="Candidates analyzed" value={summaryCounts.analyzed} />
+        <SummaryCard
+          label="Candidates analyzed"
+          value={summaryCounts.analyzed}
+        />
         <SummaryCard
           label="Quantum evaluated"
           value={summaryCounts.quantumEvaluated}
           accent="text-cyan-300"
-          sub={summaryCounts.quantumTargeted != null ? `of ${summaryCounts.quantumTargeted} novel candidates` : undefined}
+          sub={
+            summaryCounts.quantumTargeted != null
+              ? `of ${summaryCounts.quantumTargeted} novel candidates`
+              : undefined
+          }
         />
-        <SummaryCard label="Best novel candidate" value={bestNovelId || "—"} accent="text-emerald-300" />
+        <SummaryCard
+          label="Best novel candidate"
+          value={bestNovelId || "—"}
+          accent="text-emerald-300"
+        />
         <SummaryCard
           label="Analysis time"
           value={isNum(durationMs) ? `${Math.round(durationMs / 1000)}s` : "—"}
@@ -99,7 +136,11 @@ export default function ResultsDashboard({ result, derived, onReset }) {
           </p>
         </div>
         {candidates.length === 0 ? (
-          <div className="panel p-5 text-sm text-slate-400">No candidates were returned.</div>
+          <div className="panel p-5 text-sm text-slate-400">
+            No eligible non-mock candidates are available for primary ranking.
+            Check the demonstration references below, if any, or run another
+            analysis.
+          </div>
         ) : (
           <div className="space-y-4">
             {featured && <CandidateCard candidate={featured} featured />}
@@ -113,6 +154,23 @@ export default function ResultsDashboard({ result, derived, onReset }) {
           </div>
         )}
       </section>
+      {demonstrationCandidates.length > 0 && (
+        <section className="scroll-mt-24">
+          <div className="mb-5">
+            <h2 className="section-title">Demonstration references</h2>
+            <p className="mt-1.5 max-w-2xl text-sm text-slate-400">
+              Mock reference compounds shown for pipeline demonstration only.
+              They are not verified drugs and are excluded from primary ranking.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {demonstrationCandidates.map((candidate) => (
+              <CandidateCard key={candidate.id} candidate={candidate} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <QuantumAnalysis derived={derived} />
       <CandidateComparison derived={derived} />

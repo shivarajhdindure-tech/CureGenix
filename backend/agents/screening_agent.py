@@ -59,6 +59,7 @@ class ScreeningAgent(BaseAgent):
                 "target_association_verified": candidate.get(
                     "target_association_verified", False
                 ),
+                "candidate_metadata": candidate.get("candidate_metadata"),
                 "drug_likeness": round(dl_score, 2),
                 "bbb_permeability": round(bbb_score, 2),
                 "potency_proxy": potency,

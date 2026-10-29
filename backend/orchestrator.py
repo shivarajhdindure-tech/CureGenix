@@ -73,6 +73,21 @@ class Orchestrator:
         
         # 2. Store input for the Target agent
         memory_mcp._store("parsed_protein", parsed_protein)
+        memory_mcp._store(
+            "target_selection",
+            {
+                "selected_uniprot_id": protein_payload.get("selected_uniprot_id"),
+                "selected_chain_id": protein_payload.get("selected_chain_id"),
+                "dbref_uniprot_accessions": protein_payload.get(
+                    "dbref_uniprot_accessions", []
+                ),
+                "structure_identity_evidence": protein_payload.get(
+                    "structure_identity_evidence", {}
+                ),
+                "pdb_id": protein_payload.get("pdb_id"),
+                "pdb_header_id": protein_payload.get("pdb_header_id"),
+            },
+        )
 
         # 3. Execute agents sequentially
         results = {}
@@ -85,6 +100,9 @@ class Orchestrator:
         highlights = memory_mcp._retrieve("highlights").get("value") or {}
         research_result = memory_mcp._retrieve("research_result").get("value") or {}
         protein_info = memory_mcp._retrieve("protein_info").get("value") or {}
+        candidate_generation = (
+            memory_mcp._retrieve("candidate_generation_status").get("value") or {}
+        )
 
         pipeline_duration_ms = int((time.time() - pipeline_start) * 1000)
         resolved_protein_name = protein_info.get("protein_name", "Unknown")
@@ -100,6 +118,7 @@ class Orchestrator:
                 "name": protein_name,
                 "pdb_id": protein_pdb_id,
                 "source": protein_source,
+                "target_identity": protein_info.get("target_identity"),
             },
             # Backward compatibility fields
             "protein_name": protein_name,
@@ -109,11 +128,13 @@ class Orchestrator:
             "binder_search": research_result.get("binder_search"),
             "llm_analysis": research_result.get("llm_analysis"),
             "protein_info": {
+                "target_identity": protein_info.get("target_identity"),
                 "sequence_length": protein_info.get("sequence_length", 0),
                 "chains": protein_info.get("chains", []),
                 "binding_sites_count": protein_info.get("binding_sites_count", 0),
                 "binding_sites": protein_info.get("binding_sites", [])
             },
+            "candidate_generation": candidate_generation,
             "steps": [res for k, res in results.items()],
             "decisions": final_decisions,
             "top_candidate": {

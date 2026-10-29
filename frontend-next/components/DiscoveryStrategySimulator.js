@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { rankSimulatedResults } from "@/lib/simulatorRanking.mjs";
 
 const DEFAULT_WEIGHTS = {
   drug_likeness: 25,
@@ -113,29 +114,20 @@ export default function DiscoveryStrategySimulator({ candidates = [] }) {
   );
 
   const results = useMemo(() => {
-    return candidates
-      .map((candidate) => {
-        const originalScore = Number.isFinite(candidate.adjustedScore)
-          ? candidate.adjustedScore
-          : null;
+    const scored = candidates.map((candidate) => {
+      const originalScore = Number.isFinite(candidate.adjustedScore)
+        ? candidate.adjustedScore
+        : null;
 
-        const simulated = calculateScore(candidate, normalizedWeights);
+      const simulated = calculateScore(candidate, normalizedWeights);
 
-        return {
-          candidate,
-          originalScore,
-          ...simulated,
-        };
-      })
-      .sort((a, b) => {
-        if (a.adjusted === null) return 1;
-        if (b.adjusted === null) return -1;
-        return b.adjusted - a.adjusted;
-      })
-      .map((item, index) => ({
-        ...item,
-        simulatedRank: item.adjusted === null ? null : index + 1,
-      }));
+      return {
+        candidate,
+        originalScore,
+        ...simulated,
+      };
+    });
+    return rankSimulatedResults(scored, 3);
   }, [candidates, normalizedWeights]);
 
   const weightTotal = Object.values(weights).reduce(
@@ -165,9 +157,9 @@ export default function DiscoveryStrategySimulator({ candidates = [] }) {
       </div>
 
       <div className="rounded-lg border border-amber-400/20 bg-amber-400/[0.05] p-3 text-xs leading-5 text-amber-100/80">
-        Hypothetical prioritization only. The screening metrics are heuristics,
-        and changing their weights does not change the underlying molecule or
-        validate the scoring model.
+          Hypothetical prioritization only. Simulated scores and ranks are based
+          on your selected heuristic weights; original pipeline ranks remain
+          separate. Changing weights does not validate the scoring model.
       </div>
 
       <div className="space-y-5">
@@ -229,7 +221,7 @@ export default function DiscoveryStrategySimulator({ candidates = [] }) {
           Original score is the pipeline's adjusted score. Simulated score
           uses the selected weights and the existing risk-level penalty.
           Missing screening metrics are excluded and remaining weights are
-          renormalized.
+          renormalized. Equal scores at displayed precision are shown as ties.
         </p>
       </div>
 
@@ -239,9 +231,16 @@ export default function DiscoveryStrategySimulator({ candidates = [] }) {
         </p>
       ) : (
         <div className="space-y-3">
+          {results.some((item) => item.simulatedTie) && (
+            <p role="note" className="rounded-lg border border-sky-400/20 bg-sky-400/[0.05] p-3 text-xs text-sky-100/90">
+              Candidates with the same simulated score to three decimals share a simulated rank; their display order does not imply superiority.
+            </p>
+          )}
           {results.map((item) => {
             const { candidate } = item;
             const moved =
+              !candidate.scoreTie &&
+              !item.simulatedTie &&
               Number.isFinite(candidate.rank) &&
               item.simulatedRank !== null
                 ? candidate.rank - item.simulatedRank
@@ -269,26 +268,24 @@ export default function DiscoveryStrategySimulator({ candidates = [] }) {
                     <p className="font-data text-lg text-cyan-200">
                       {formatScore(item.adjusted)}
                     </p>
-                    <p className="text-xs text-slate-500">
-                      Simulated score
-                    </p>
+            <p className="text-xs text-slate-500">Hypothetical score</p>
                   </div>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <div>
-                    <p className="metric-label">Simulated rank</p>
+                    <p className="metric-label">Simulated rank · hypothetical</p>
                     <p className="mt-1 font-data text-sm text-white">
-                      {item.simulatedRank === null
-                        ? "Not ranked"
-                        : `#${item.simulatedRank}`}
+                      {item.simulatedRankLabel}
                     </p>
                   </div>
 
                   <div>
                     <p className="metric-label">Original rank</p>
                     <p className="mt-1 font-data text-sm text-white">
-                      {Number.isFinite(candidate.rank)
+                      {candidate.scoreTie
+                        ? "Tie"
+                        : Number.isFinite(candidate.rank)
                         ? `#${candidate.rank}`
                         : "—"}
                     </p>

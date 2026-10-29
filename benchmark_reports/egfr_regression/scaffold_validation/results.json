@@ -1,0 +1,905 @@
+{
+  "experiment": "Repeated scaffold-aware EGFR activity validation",
+  "dataset": {
+    "source_npz": "benchmark_reports\\egfr_regression\\fingerprints_and_targets.npz",
+    "source_curated_csv": "benchmark_reports\\egfr_regression\\curated_compounds.csv",
+    "original_rows": 2996,
+    "evaluated_compounds": 2995,
+    "unique_scaffolds": 1129,
+    "excluded_compounds": [
+      {
+        "source_row_index": 0,
+        "molecule_chembl_ids": "CHEMBL5835804;CHEMBL5838290;CHEMBL5853014;CHEMBL5877960;CHEMBL5905176;CHEMBL5978836;CHEMBL6018374;CHEMBL6026037;CHEMBL6048652",
+        "canonical_smiles": "",
+        "saved_scaffold_label": "ACYCLIC::",
+        "exclusion_reason": "Blank or invalid SMILES; RDKit cannot verify a Murcko scaffold."
+      }
+    ],
+    "compound_identity": "Aggregated ChEMBL molecule IDs from curated_compounds.csv; canonical SMILES; pIC50_median."
+  },
+  "scaffold_generation": {
+    "library": "RDKit MurckoScaffold.GetScaffoldForMol",
+    "smiles_parser": "RDKit Chem.MolFromSmiles",
+    "canonicalization": "Chem.MolToSmiles(scaffold, canonical=True, isomericSmiles=False)",
+    "acyclic_label": "ACYCLIC::",
+    "verified_against_saved_scaffold_groups": true,
+    "valid_row_mismatches": 0,
+    "invalid_smiles_rows": 1,
+    "dataset_provenance_note": "The original scaffold-generator source file was not present in the repository; recomputation matched every parseable row exactly."
+  },
+  "source_features": {
+    "fingerprints": "2048-bit Morgan fingerprints, radius=2, float32 matrix in fingerprints_and_targets.npz",
+    "target": "Median pIC50 from retained biochemical IC50 measurements, as described in baseline_results.json.",
+    "raw_fingerprint_preprocessing_for_random_forest": "None; Morgan bits are used directly.",
+    "rbf_svr_preprocessing": "TruncatedSVD(128) and StandardScaler; each fitted on current training rows only for selection and train+validation rows only for final test refit.",
+    "fingerprints_and_targets_npz_arrays": {
+      "X": "2996 x 2048 float32 Morgan fingerprint matrix",
+      "y": "2996 float64 median pIC50 targets",
+      "smiles": "2996 canonical SMILES strings; one is blank",
+      "scaffold_groups": "2996 saved Murcko scaffold labels; recomputed and checked for all parseable structures",
+      "splits": "2996 original train/validation/test labels"
+    },
+    "quantum_pilot_npz_arrays": {
+      "train_angles": "256 x 16 float32",
+      "validation_angles": "64 x 16 float32",
+      "test_angles": "64 x 16 float32",
+      "split_targets_smiles_scaffolds": "Saved for the same 256/64/64 pilot members",
+      "generation": "16-component TruncatedSVD, StandardScaler, and MinMaxScaler to [0, pi], all fitted on the pilot training compounds only"
+    }
+  },
+  "evaluation_protocol": {
+    "method": "Repeated nested GroupShuffleSplit by recomputed Murcko scaffold ID.",
+    "seeds": [
+      11,
+      23,
+      42,
+      87,
+      101
+    ],
+    "test_fraction_of_groups": 0.2,
+    "validation_fraction_of_remaining_groups": 0.25,
+    "approximate_group_allocation": "60% train / 20% validation / 20% test; compound counts vary because groups have unequal sizes.",
+    "split_integrity": "Each compound and each scaffold occurs in exactly one partition within each seed.",
+    "selection_metric": "Validation MAE, separately for each model family and seed.",
+    "test_labels_used_for_selection_or_preprocessing": false,
+    "random_forest_search": {
+      "n_estimators": 200,
+      "min_samples_leaf": [
+        2,
+        4
+      ],
+      "max_features": 0.7
+    },
+    "rbf_svr_search": {
+      "C": [
+        1.0,
+        10.0,
+        100.0
+      ],
+      "epsilon": 0.2,
+      "gamma": "scale",
+      "input_components": 128
+    },
+    "split_membership_file": "benchmark_reports\\egfr_regression\\scaffold_validation\\split_membership_audit.csv"
+  },
+  "package_versions": {
+    "python": "3.12.3",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "scikit_learn": "1.9.1",
+    "rdkit": "2026.09.1"
+  },
+  "original_partition_scaffold_overlap_counts": {
+    "train_vs_validation": 0,
+    "train_vs_test": 0,
+    "validation_vs_test": 0
+  },
+  "per_split_results": [
+    {
+      "seed": 11,
+      "split_sizes": {
+        "train": 1641,
+        "validation": 600,
+        "test": 754
+      },
+      "scaffold_counts": {
+        "train": 677,
+        "validation": 226,
+        "test": 226
+      },
+      "validation_model_selection": {
+        "selection_metric": "validation MAE (minimum); test labels are not used",
+        "svr_candidates": [
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 1.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.6102851543942976,
+              "rmse": 0.8386624088851804,
+              "r2": 0.47728304479432515
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 10.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.5752255429878171,
+              "rmse": 0.7838293245131265,
+              "r2": 0.5434006936207205
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 100.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.5829574983703013,
+              "rmse": 0.7924320632973104,
+              "r2": 0.5333230915346452
+            }
+          }
+        ],
+        "selected_svr_parameters": {
+          "kernel": "rbf",
+          "C": 10.0,
+          "epsilon": 0.2,
+          "gamma": "scale"
+        },
+        "random_forest_candidates": [
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 2,
+              "max_features": 0.7,
+              "random_state": 11
+            },
+            "validation": {
+              "mae": 0.5422459082391341,
+              "rmse": 0.7247811145591664,
+              "r2": 0.6096034509488985
+            }
+          },
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 4,
+              "max_features": 0.7,
+              "random_state": 11
+            },
+            "validation": {
+              "mae": 0.5677802457411871,
+              "rmse": 0.7495484811659744,
+              "r2": 0.5824661501033873
+            }
+          }
+        ],
+        "selected_random_forest_parameters": {
+          "n_estimators": 200,
+          "min_samples_leaf": 2,
+          "max_features": 0.7,
+          "random_state": 11
+        },
+        "selected_svr_validation_metrics": {
+          "mae": 0.5752255429878171,
+          "rmse": 0.7838293245131265,
+          "r2": 0.5434006936207205
+        },
+        "selected_random_forest_validation_metrics": {
+          "mae": 0.5422459082391341,
+          "rmse": 0.7247811145591664,
+          "r2": 0.6096034509488985
+        }
+      },
+      "test_metrics": {
+        "rbf_svr": {
+          "mae": 0.49902703753165056,
+          "rmse": 0.6928269899325898,
+          "r2": 0.6495751410600863
+        },
+        "random_forest": {
+          "mae": 0.4554856566246534,
+          "rmse": 0.6458537445189125,
+          "r2": 0.6954815046188936
+        }
+      },
+      "svr_preprocessing": {
+        "model_selection_fit_rows": 1641,
+        "final_fit_rows": 2241,
+        "components": 128,
+        "variance_explained_ratio_sum_train_only": 0.834132194519043,
+        "variance_explained_ratio_sum_train_plus_validation": 0.8252593278884888,
+        "scaling": "StandardScaler fitted only on corresponding fit rows"
+      },
+      "elapsed_seconds": 25.268399500011583
+    },
+    {
+      "seed": 23,
+      "split_sizes": {
+        "train": 1771,
+        "validation": 535,
+        "test": 689
+      },
+      "scaffold_counts": {
+        "train": 677,
+        "validation": 226,
+        "test": 226
+      },
+      "validation_model_selection": {
+        "selection_metric": "validation MAE (minimum); test labels are not used",
+        "svr_candidates": [
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 1.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.6540973130549492,
+              "rmse": 0.8711630974637558,
+              "r2": 0.5039645345901009
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 10.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.6292626195399669,
+              "rmse": 0.8407893279915091,
+              "r2": 0.537950856918479
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 100.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.6462655813411976,
+              "rmse": 0.8662285049524386,
+              "r2": 0.5095680787813428
+            }
+          }
+        ],
+        "selected_svr_parameters": {
+          "kernel": "rbf",
+          "C": 10.0,
+          "epsilon": 0.2,
+          "gamma": "scale"
+        },
+        "random_forest_candidates": [
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 2,
+              "max_features": 0.7,
+              "random_state": 23
+            },
+            "validation": {
+              "mae": 0.5903832503131093,
+              "rmse": 0.8307343881091881,
+              "r2": 0.5489360023047473
+            }
+          },
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 4,
+              "max_features": 0.7,
+              "random_state": 23
+            },
+            "validation": {
+              "mae": 0.6142496607120994,
+              "rmse": 0.8544762012965522,
+              "r2": 0.5227853906848903
+            }
+          }
+        ],
+        "selected_random_forest_parameters": {
+          "n_estimators": 200,
+          "min_samples_leaf": 2,
+          "max_features": 0.7,
+          "random_state": 23
+        },
+        "selected_svr_validation_metrics": {
+          "mae": 0.6292626195399669,
+          "rmse": 0.8407893279915091,
+          "r2": 0.537950856918479
+        },
+        "selected_random_forest_validation_metrics": {
+          "mae": 0.5903832503131093,
+          "rmse": 0.8307343881091881,
+          "r2": 0.5489360023047473
+        }
+      },
+      "test_metrics": {
+        "rbf_svr": {
+          "mae": 0.6212780080454622,
+          "rmse": 0.8474930433219465,
+          "r2": 0.591868864017058
+        },
+        "random_forest": {
+          "mae": 0.5872538403386223,
+          "rmse": 0.8079920575168944,
+          "r2": 0.6290275762549018
+        }
+      },
+      "svr_preprocessing": {
+        "model_selection_fit_rows": 1771,
+        "final_fit_rows": 2306,
+        "components": 128,
+        "variance_explained_ratio_sum_train_only": 0.8406742811203003,
+        "variance_explained_ratio_sum_train_plus_validation": 0.8307120203971863,
+        "scaling": "StandardScaler fitted only on corresponding fit rows"
+      },
+      "elapsed_seconds": 25.49948620000214
+    },
+    {
+      "seed": 42,
+      "split_sizes": {
+        "train": 1922,
+        "validation": 542,
+        "test": 531
+      },
+      "scaffold_counts": {
+        "train": 677,
+        "validation": 226,
+        "test": 226
+      },
+      "validation_model_selection": {
+        "selection_metric": "validation MAE (minimum); test labels are not used",
+        "svr_candidates": [
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 1.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.5478100094644399,
+              "rmse": 0.7206643317259539,
+              "r2": 0.64903739214483
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 10.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.5755986558613022,
+              "rmse": 0.7521377915795093,
+              "r2": 0.6177129257449323
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 100.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.6000980959538201,
+              "rmse": 0.7855978670652464,
+              "r2": 0.5829430295073159
+            }
+          }
+        ],
+        "selected_svr_parameters": {
+          "kernel": "rbf",
+          "C": 1.0,
+          "epsilon": 0.2,
+          "gamma": "scale"
+        },
+        "random_forest_candidates": [
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 2,
+              "max_features": 0.7,
+              "random_state": 42
+            },
+            "validation": {
+              "mae": 0.5080964089649664,
+              "rmse": 0.7097581062389353,
+              "r2": 0.6595796486612746
+            }
+          },
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 4,
+              "max_features": 0.7,
+              "random_state": 42
+            },
+            "validation": {
+              "mae": 0.5284854088685067,
+              "rmse": 0.7245461652737771,
+              "r2": 0.6452463133658558
+            }
+          }
+        ],
+        "selected_random_forest_parameters": {
+          "n_estimators": 200,
+          "min_samples_leaf": 2,
+          "max_features": 0.7,
+          "random_state": 42
+        },
+        "selected_svr_validation_metrics": {
+          "mae": 0.5478100094644399,
+          "rmse": 0.7206643317259539,
+          "r2": 0.64903739214483
+        },
+        "selected_random_forest_validation_metrics": {
+          "mae": 0.5080964089649664,
+          "rmse": 0.7097581062389353,
+          "r2": 0.6595796486612746
+        }
+      },
+      "test_metrics": {
+        "rbf_svr": {
+          "mae": 0.5476627381424832,
+          "rmse": 0.7515719641305515,
+          "r2": 0.5956371973686921
+        },
+        "random_forest": {
+          "mae": 0.5079041187179795,
+          "rmse": 0.7137593767656195,
+          "r2": 0.6353017252556766
+        }
+      },
+      "svr_preprocessing": {
+        "model_selection_fit_rows": 1922,
+        "final_fit_rows": 2464,
+        "components": 128,
+        "variance_explained_ratio_sum_train_only": 0.8354928493499756,
+        "variance_explained_ratio_sum_train_plus_validation": 0.8266870975494385,
+        "scaling": "StandardScaler fitted only on corresponding fit rows"
+      },
+      "elapsed_seconds": 29.451393700001063
+    },
+    {
+      "seed": 87,
+      "split_sizes": {
+        "train": 1770,
+        "validation": 532,
+        "test": 693
+      },
+      "scaffold_counts": {
+        "train": 677,
+        "validation": 226,
+        "test": 226
+      },
+      "validation_model_selection": {
+        "selection_metric": "validation MAE (minimum); test labels are not used",
+        "svr_candidates": [
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 1.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.5996270184834308,
+              "rmse": 0.8207753397847716,
+              "r2": 0.5352670173296425
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 10.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.5983578905630156,
+              "rmse": 0.8256855092153517,
+              "r2": 0.5296899898661018
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 100.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.5993919392302852,
+              "rmse": 0.8303815118275663,
+              "r2": 0.5243250959921135
+            }
+          }
+        ],
+        "selected_svr_parameters": {
+          "kernel": "rbf",
+          "C": 10.0,
+          "epsilon": 0.2,
+          "gamma": "scale"
+        },
+        "random_forest_candidates": [
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 2,
+              "max_features": 0.7,
+              "random_state": 87
+            },
+            "validation": {
+              "mae": 0.5659849906392722,
+              "rmse": 0.7764844491068724,
+              "r2": 0.5840698318636646
+            }
+          },
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 4,
+              "max_features": 0.7,
+              "random_state": 87
+            },
+            "validation": {
+              "mae": 0.5723223330166688,
+              "rmse": 0.780752095240646,
+              "r2": 0.5794852694975143
+            }
+          }
+        ],
+        "selected_random_forest_parameters": {
+          "n_estimators": 200,
+          "min_samples_leaf": 2,
+          "max_features": 0.7,
+          "random_state": 87
+        },
+        "selected_svr_validation_metrics": {
+          "mae": 0.5983578905630156,
+          "rmse": 0.8256855092153517,
+          "r2": 0.5296899898661018
+        },
+        "selected_random_forest_validation_metrics": {
+          "mae": 0.5659849906392722,
+          "rmse": 0.7764844491068724,
+          "r2": 0.5840698318636646
+        }
+      },
+      "test_metrics": {
+        "rbf_svr": {
+          "mae": 0.4927658002390124,
+          "rmse": 0.6590502554732597,
+          "r2": 0.6578167158362807
+        },
+        "random_forest": {
+          "mae": 0.47709560445262655,
+          "rmse": 0.6690488403076994,
+          "r2": 0.6473552933481909
+        }
+      },
+      "svr_preprocessing": {
+        "model_selection_fit_rows": 1770,
+        "final_fit_rows": 2302,
+        "components": 128,
+        "variance_explained_ratio_sum_train_only": 0.836392879486084,
+        "variance_explained_ratio_sum_train_plus_validation": 0.8241487741470337,
+        "scaling": "StandardScaler fitted only on corresponding fit rows"
+      },
+      "elapsed_seconds": 27.64545719999296
+    },
+    {
+      "seed": 101,
+      "split_sizes": {
+        "train": 1873,
+        "validation": 502,
+        "test": 620
+      },
+      "scaffold_counts": {
+        "train": 677,
+        "validation": 226,
+        "test": 226
+      },
+      "validation_model_selection": {
+        "selection_metric": "validation MAE (minimum); test labels are not used",
+        "svr_candidates": [
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 1.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.6617043672275896,
+              "rmse": 0.8674997121290954,
+              "r2": 0.5249008526827263
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 10.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.6608871316045256,
+              "rmse": 0.8773018516748244,
+              "r2": 0.5141036191441878
+            }
+          },
+          {
+            "parameters": {
+              "kernel": "rbf",
+              "C": 100.0,
+              "epsilon": 0.2,
+              "gamma": "scale"
+            },
+            "validation": {
+              "mae": 0.6685799208345908,
+              "rmse": 0.8880539786672614,
+              "r2": 0.5021204355369837
+            }
+          }
+        ],
+        "selected_svr_parameters": {
+          "kernel": "rbf",
+          "C": 10.0,
+          "epsilon": 0.2,
+          "gamma": "scale"
+        },
+        "random_forest_candidates": [
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 2,
+              "max_features": 0.7,
+              "random_state": 101
+            },
+            "validation": {
+              "mae": 0.6371453643242049,
+              "rmse": 0.8519909748512303,
+              "r2": 0.5417361906498146
+            }
+          },
+          {
+            "parameters": {
+              "n_estimators": 200,
+              "min_samples_leaf": 4,
+              "max_features": 0.7,
+              "random_state": 101
+            },
+            "validation": {
+              "mae": 0.651611921994005,
+              "rmse": 0.8661581174067189,
+              "r2": 0.5263692050871664
+            }
+          }
+        ],
+        "selected_random_forest_parameters": {
+          "n_estimators": 200,
+          "min_samples_leaf": 2,
+          "max_features": 0.7,
+          "random_state": 101
+        },
+        "selected_svr_validation_metrics": {
+          "mae": 0.6608871316045256,
+          "rmse": 0.8773018516748244,
+          "r2": 0.5141036191441878
+        },
+        "selected_random_forest_validation_metrics": {
+          "mae": 0.6371453643242049,
+          "rmse": 0.8519909748512303,
+          "r2": 0.5417361906498146
+        }
+      },
+      "test_metrics": {
+        "rbf_svr": {
+          "mae": 0.6427599642213466,
+          "rmse": 0.8534715130859472,
+          "r2": 0.5357626105047086
+        },
+        "random_forest": {
+          "mae": 0.6072571928476405,
+          "rmse": 0.8063698786652782,
+          "r2": 0.5855895971440199
+        }
+      },
+      "svr_preprocessing": {
+        "model_selection_fit_rows": 1873,
+        "final_fit_rows": 2375,
+        "components": 128,
+        "variance_explained_ratio_sum_train_only": 0.8439782857894897,
+        "variance_explained_ratio_sum_train_plus_validation": 0.8320354223251343,
+        "scaling": "StandardScaler fitted only on corresponding fit rows"
+      },
+      "elapsed_seconds": 28.247437099998933
+    }
+  ],
+  "aggregate_test_metrics": {
+    "rbf_svr": {
+      "mae": {
+        "mean": 0.560698709635991,
+        "sample_standard_deviation": 0.06890593728404186,
+        "per_split": [
+          0.49902703753165056,
+          0.6212780080454622,
+          0.5476627381424832,
+          0.4927658002390124,
+          0.6427599642213466
+        ]
+      },
+      "rmse": {
+        "mean": 0.7608827531888589,
+        "sample_standard_deviation": 0.08826403020553933,
+        "per_split": [
+          0.6928269899325898,
+          0.8474930433219465,
+          0.7515719641305515,
+          0.6590502554732597,
+          0.8534715130859472
+        ]
+      },
+      "r2": {
+        "mean": 0.6061321057573651,
+        "sample_standard_deviation": 0.04955816094364716,
+        "per_split": [
+          0.6495751410600863,
+          0.591868864017058,
+          0.5956371973686921,
+          0.6578167158362807,
+          0.5357626105047086
+        ]
+      }
+    },
+    "random_forest": {
+      "mae": {
+        "mean": 0.5269992825963045,
+        "sample_standard_deviation": 0.06715866467190756,
+        "per_split": [
+          0.4554856566246534,
+          0.5872538403386223,
+          0.5079041187179795,
+          0.47709560445262655,
+          0.6072571928476405
+        ]
+      },
+      "rmse": {
+        "mean": 0.7286047795548808,
+        "sample_standard_deviation": 0.07577067411766468,
+        "per_split": [
+          0.6458537445189125,
+          0.8079920575168944,
+          0.7137593767656195,
+          0.6690488403076994,
+          0.8063698786652782
+        ]
+      },
+      "r2": {
+        "mean": 0.6385511393243366,
+        "sample_standard_deviation": 0.03944857892273186,
+        "per_split": [
+          0.6954815046188936,
+          0.6290275762549018,
+          0.6353017252556766,
+          0.6473552933481909,
+          0.5855895971440199
+        ]
+      }
+    }
+  },
+  "quantum_comparability": {
+    "existing_quantum_pilot_can_be_compared_on_its_original_single_split": true,
+    "exact_pilot_split_sizes": {
+      "train": 256,
+      "validation": 64,
+      "test": 64
+    },
+    "pilot_scaffold_counts": {
+      "train": 163,
+      "validation": 45,
+      "test": 46
+    },
+    "scaffold_overlap_across_pilot_partitions": false,
+    "exact_feature_and_target_alignment_verified": true,
+    "saved_quantum_metrics": {
+      "validation": {
+        "mae": 1.1292552519578543,
+        "rmse": 1.3468221161871003,
+        "r2": 0.0006170345298013302
+      },
+      "test": {
+        "mae": 0.9435253726917072,
+        "rmse": 1.1233535552739278,
+        "r2": -0.05312026988471108
+      }
+    },
+    "matched_classical_metrics_from_prior_artifact": {
+      "classical_rbf_svr_16d": {
+        "validation": {
+          "mae": 0.891933033650926,
+          "rmse": 1.1167798813410763,
+          "r2": 0.31285779037661476
+        },
+        "test": {
+          "mae": 0.6476043661082835,
+          "rmse": 0.9045293974848723,
+          "r2": 0.3172048683715577
+        },
+        "fit_seconds": 0.02652220000163652,
+        "model": {
+          "input": "saved 16D pilot angles; preprocessing was fit on the pilot training split only",
+          "parameters": {
+            "kernel": "rbf",
+            "C": 10.0,
+            "epsilon": 0.2,
+            "gamma": "scale"
+          }
+        }
+      },
+      "classical_random_forest_16d": {
+        "validation": {
+          "mae": 0.885021404878044,
+          "rmse": 1.1112492955921256,
+          "r2": 0.3196467537862039
+        },
+        "test": {
+          "mae": 0.616612668652252,
+          "rmse": 0.7838995584870656,
+          "r2": 0.48717890304106526
+        },
+        "fit_seconds": 0.5171507000050042,
+        "model": {
+          "input": "saved 16D pilot angles; preprocessing was fit on the pilot training split only",
+          "parameters": {
+            "n_estimators": 400,
+            "min_samples_leaf": 2,
+            "max_features": 0.7,
+            "random_state": 42
+          }
+        }
+      }
+    },
+    "quantum_artifact_availability": {
+      "aggregate_validation_and_test_metrics": true,
+      "per_compound_quantum_predictions": false,
+      "kernel_matrices": false,
+      "saved_16d_features": true,
+      "saved_feature_memberships": true,
+      "saved_landmark_indices": false
+    },
+    "cannot_evaluate_on_new_repeated_splits": "The feature archive contains only the old 256/64/64 random-within-original-partition subset. It has no per-compound kernel values or predictions and no transformed features for the new scaffold seeds. Each new split requires refitting SVD/scaling on its training compounds and recomputing the quantum kernel.",
+    "pilot_kernel_construction_seconds": 1168.6145122350001,
+    "estimated_full_cohort_quantum_cost_seconds_per_split": 9032.667325239086,
+    "cost_estimate_method": "Linear extrapolation from 1168.6s for 1552 4-landmark sample/landmark pairs to 11996 pairs for the full valid cohort. This is an estimate, not a measured runtime."
+  },
+  "limitations": [
+    "Only five scaffold split seeds were evaluated; this is a modest repeated holdout, not an external prospective validation.",
+    "The assay cohort was heuristically curated, and scaffold-separated testing is a distribution-shift challenge.",
+    "The one blank-SMILES compound cannot be scaffold-verified and was excluded rather than assigned an artificial scaffold.",
+    "GroupShuffleSplit targets fractions of scaffold groups, not exact compound fractions; large groups change sample counts.",
+    "The RBF-SVR uses a 128D training-only SVD representation; Random Forest uses the full 2048 Morgan bits, so the two classical model pipelines are model-specific.",
+    "Existing quantum metrics are directly comparable only on their original single 256/64/64 scaffold-disjoint pilot split; no quantum results exist for the five new splits.",
+    "No quantum simulation was run in this task."
+  ]
+}

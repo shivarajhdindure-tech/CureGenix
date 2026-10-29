@@ -113,12 +113,13 @@ export default function CandidateComparison({ derived }) {
                   vqe: "Analyzed",
                   lightweight: "Descriptor mode",
                   skipped: "Skipped",
+                  resource_skipped: "Skipped · resource limit",
                   failed: "Failed",
                   none: "—",
                 }[c.quantumState];
                 return (
                   <tr key={c.id} className={`border-b border-white/[0.04] last:border-0 ${c.isBestNovel ? "bg-emerald-400/[0.05]" : ""}`}>
-                    <td className="font-data px-4 py-3 text-slate-400">{isNum(c.rank) ? `#${c.rank}` : "—"}</td>
+                    <td className="font-data px-4 py-3 text-slate-400">{c.scoreTie ? "Tie" : isNum(c.rank) ? `#${c.rank}` : "—"}</td>
                     <td className="font-data px-4 py-3 text-slate-100">{c.id}</td>
                     <td className="px-4 py-3 capitalize text-slate-300">{c.category || "—"}</td>
                     <td className="px-4 py-3 text-slate-300">{stateLabel}</td>

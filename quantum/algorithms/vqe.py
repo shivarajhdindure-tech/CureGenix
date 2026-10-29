@@ -68,6 +68,12 @@ def run_vqe(
         "num_qubits": num_qubits,
         "evaluations": getattr(optimizer_result, "nfev", None),
         "iterations": getattr(optimizer_result, "nit", None),
+        "optimizer_success": getattr(optimizer_result, "success", None),
+        "optimizer_message": str(getattr(optimizer_result, "message", "")),
+        "optimizer_status_available": (
+            hasattr(optimizer_result, "success")
+            or hasattr(optimizer_result, "message")
+        ),
         "raw_result": result,
         "vqe_solver": vqe,
     }

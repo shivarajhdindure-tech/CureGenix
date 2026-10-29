@@ -1,6 +1,11 @@
 import os
 import gc
+import logging
+import time
 from backend.agents.base_agent import BaseAgent
+
+
+logger = logging.getLogger("curegenix.quantum.analysis")
 
 
 class QuantumAnalysisAgent(BaseAgent):
@@ -52,6 +57,7 @@ class QuantumAnalysisAgent(BaseAgent):
         quantum_candidates = 0
         successful = 0
         failed = 0
+        skipped_resource_limit = 0
 
         for candidate in molecules:
             candidate = dict(candidate)
@@ -82,6 +88,7 @@ class QuantumAnalysisAgent(BaseAgent):
                 analyzed.append(candidate)
                 continue
 
+            analysis_started = time.perf_counter()
             try:
                 result = analyze_smiles(
                     smiles=smiles,
@@ -89,13 +96,34 @@ class QuantumAnalysisAgent(BaseAgent):
                     maxiter=50,
                 )
 
+                elapsed = time.perf_counter() - analysis_started
+                if not isinstance(result, dict):
+                    raise TypeError("Quantum analysis returned a non-object result")
+                result.setdefault("elapsed_seconds", round(elapsed, 3))
                 candidate["quantum_analysis"] = result
-                successful += 1
+                if result.get("status") == "skipped_resource_limit":
+                    skipped_resource_limit += 1
+                elif result.get("status") == "success":
+                    successful += 1
+                else:
+                    failed += 1
+                    result.setdefault("status", "failed")
+                    result.setdefault("message", "Quantum analysis returned without a successful result.")
 
             except Exception as exc:
+                elapsed = time.perf_counter() - analysis_started
+                candidate_id = candidate.get("id") or candidate.get("name") or "unknown"
+                logger.error(
+                    "Quantum analysis failed for candidate %s after %.2fs (%s): %s",
+                    candidate_id, elapsed, type(exc).__name__, exc,
+                )
                 candidate["quantum_analysis"] = {
                     "status": "failed",
                     "message": str(exc),
+                    "error_type": type(exc).__name__,
+                    "elapsed_seconds": round(elapsed, 3),
+                    "failed_stage": getattr(exc, "failed_stage", None),
+                    "stage_diagnostics": getattr(exc, "stage_diagnostics", {}),
                 }
                 failed += 1
 
@@ -124,6 +152,7 @@ class QuantumAnalysisAgent(BaseAgent):
             "quantum_candidates": quantum_candidates,
             "successful": successful,
             "failed": failed,
+            "skipped_resource_limit": skipped_resource_limit,
             "skipped": skipped,
             "molecules": analyzed,
         }

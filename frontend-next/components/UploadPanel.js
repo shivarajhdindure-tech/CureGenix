@@ -9,7 +9,7 @@ function Spinner() {
   );
 }
 
-export default function UploadPanel({ file, validation, onSelect, onRemove, onStart, disabled }) {
+export default function UploadPanel({ file, validation, onSelect, onRemove, onStart, disabled, targetUniprotId, onTargetUniprotIdChange, targetChainId, onTargetChainIdChange }) {
   const inputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
 
@@ -131,6 +131,37 @@ export default function UploadPanel({ file, validation, onSelect, onRemove, onSt
           if (selected) onSelect(selected);
           e.target.value = "";
         }}
+      />
+
+      <label className="mt-5 block text-sm font-medium text-slate-200" htmlFor="target-uniprot-id">
+        UniProt target accession <span className="font-normal text-slate-400">(optional)</span>
+      </label>
+      <input
+        id="target-uniprot-id"
+        type="text"
+        value={targetUniprotId}
+        onChange={(event) => onTargetUniprotIdChange(event.target.value)}
+        placeholder="e.g. P00533"
+        maxLength={10}
+        autoCapitalize="characters"
+        className="mt-2 w-full rounded-xl border border-white/10 bg-ink-900/60 px-4 py-3 font-data text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none"
+        disabled={disabled}
+      />
+      <p className="mt-2 text-xs leading-5 text-slate-400">
+        An accession is checked against UniProt, but does not prove it matches the uploaded structure. Candidate generation requires a matching PDB DBREF for the selected chain.
+      </p>
+      <label className="mt-4 block text-sm font-medium text-slate-200" htmlFor="target-chain-id">
+        Target chain <span className="font-normal text-slate-400">(required for multi-chain PDB files)</span>
+      </label>
+      <input
+        id="target-chain-id"
+        type="text"
+        value={targetChainId}
+        onChange={(event) => onTargetChainIdChange(event.target.value)}
+        placeholder="e.g. A (use _ for blank chain)"
+        maxLength={1}
+        className="mt-2 w-full rounded-xl border border-white/10 bg-ink-900/60 px-4 py-3 font-data text-sm text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none"
+        disabled={disabled}
       />
 
       <button

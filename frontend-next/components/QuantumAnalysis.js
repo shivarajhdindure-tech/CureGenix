@@ -73,9 +73,9 @@ function WhyQuantum() {
     <div className="rounded-2xl border border-violet-400/20 bg-violet-400/[0.05] p-5">
       <h3 className="text-sm font-semibold text-violet-200">Why quantum?</h3>
       <p className="mt-2 text-sm leading-6 text-slate-300">
-        VQE is used here to estimate molecular electronic properties within a
-        reduced active-space representation. These quantum-derived descriptors
-        are reported alongside classical molecular features for each candidate.
+        VQE can estimate molecular electronic properties within a reduced
+        active-space representation. A VQE result is available only when that
+        candidate's calculation completes successfully.
       </p>
       <p className="mt-3 text-xs leading-5 text-slate-500">
         The calculation is a statevector simulation on classical hardware. It
@@ -87,7 +87,7 @@ function WhyQuantum() {
 }
 
 function NotRun({ derived }) {
-  const { quantumStep, lightMolecules, failedMolecules, summaryCounts } = derived;
+  const { quantumStep, lightMolecules, failedMolecules, resourceSkippedMolecules = [], summaryCounts } = derived;
   const stepError = quantumStep?.status === "error";
 
   let title = "VQE analysis was not run for this result";
@@ -101,6 +101,11 @@ function NotRun({ derived }) {
     title = "Backend ran in lightweight descriptor mode";
     body =
       "This deployment returned RDKit molecular descriptors only. VQE, Hamiltonian construction and active-space reduction were not executed, so no quantum values are displayed.";
+  } else if (resourceSkippedMolecules.length > 0) {
+    title = "Quantum calculation skipped by resource policy";
+    body = resourceSkippedMolecules
+      .map((m) => `${m.name}: ${m.quantum_analysis?.message || "configured resource limit exceeded"}`)
+      .join(" · ");
   } else if (failedMolecules.length > 0) {
     title = "Quantum analysis failed for all targeted candidates";
     body = failedMolecules
@@ -117,12 +122,17 @@ function NotRun({ derived }) {
           Candidates targeted for quantum analysis: {summaryCounts.quantumTargeted}
         </p>
       )}
+      {(summaryCounts.quantumSuccessful != null || summaryCounts.quantumFailed != null || summaryCounts.resourceSkipped != null) && (
+        <p className="mt-2 text-xs text-slate-500">
+          Successful: {summaryCounts.quantumSuccessful ?? 0} · Failed: {summaryCounts.quantumFailed ?? 0} · Skipped by resource policy: {summaryCounts.resourceSkipped ?? 0}
+        </p>
+      )}
     </div>
   );
 }
 
 export default function QuantumAnalysis({ derived }) {
-  const { vqeMolecules, quantumStep } = derived;
+  const { vqeMolecules, quantumStep, failedMolecules, resourceSkippedMolecules = [], summaryCounts } = derived;
   const [selected, setSelected] = useState(0);
 
   const idx = Math.min(selected, Math.max(vqeMolecules.length - 1, 0));
@@ -153,6 +163,17 @@ export default function QuantumAnalysis({ derived }) {
         <div className="mt-6">
           <MethodFlow />
         </div>
+
+        {(failedMolecules.length > 0 || resourceSkippedMolecules.length > 0) && (
+          <div className="mt-6 rounded-xl border border-white/10 bg-ink-900/50 p-4" aria-label="Quantum candidate outcomes">
+            <h3 className="text-sm font-semibold text-slate-200">Candidate calculation outcomes</h3>
+            <p className="mt-1 text-xs text-slate-400">Successful: {summaryCounts.quantumSuccessful ?? vqeMolecules.length} · Failed: {summaryCounts.quantumFailed ?? failedMolecules.length} · Skipped by resource policy: {summaryCounts.resourceSkipped ?? resourceSkippedMolecules.length}</p>
+            <ul className="mt-3 space-y-2 text-xs">
+              {resourceSkippedMolecules.map((m) => <li key={`skip-${m.name}`} className="text-amber-200">{m.name}: Skipped by resource policy — {m.quantum_analysis?.message || "configured limit exceeded"}{isNum(m.quantum_analysis?.elapsed_seconds) ? ` (${m.quantum_analysis.elapsed_seconds}s)` : ""}</li>)}
+              {failedMolecules.map((m) => <li key={`fail-${m.name}`} className="text-red-200">{m.name}: Failed — {m.quantum_analysis?.message || "unknown error"}{isNum(m.quantum_analysis?.elapsed_seconds) ? ` (${m.quantum_analysis.elapsed_seconds}s)` : ""}</li>)}
+            </ul>
+          </div>
+        )}
 
         {!q ? (
           <div className="mt-6">
@@ -198,6 +219,30 @@ export default function QuantumAnalysis({ derived }) {
                   value={`${fmt(q.vqe?.electronic_energy_hartree)} Ha`}
                   label="Electronic energy"
                   sub="VQE estimate"
+                />
+                <QMetric
+                  value={`${fmt(q.vqe?.total_molecular_energy_hartree)} Ha`}
+                  label="Total molecular energy"
+                  sub="Includes active-space and nuclear-repulsion corrections"
+                />
+                <QMetric
+                  value={q.vqe?.optimizer_status_available
+                    ? (q.vqe.optimizer_success ? "Reported converged" : "Reported not converged")
+                    : "Not reported"}
+                  label="Optimizer status"
+                  mono={false}
+                />
+                <QMetric
+                  value={`${fmt(q.vqe?.total_molecular_energy_hartree)} Ha`}
+                  label="Total molecular energy"
+                  sub="Includes active-space and nuclear-repulsion corrections"
+                />
+                <QMetric
+                  value={q.vqe?.optimizer_status_available
+                    ? (q.vqe.optimizer_success ? "Reported converged" : "Reported not converged")
+                    : "Not reported"}
+                  label="Optimizer status"
+                  mono={false}
                 />
                 <QMetric
                   value={

@@ -1,6 +1,7 @@
 // Helpers for safely reading the /api/discover response.
 // Every field here was verified against backend/orchestrator.py and the agent
 // sources. Nothing is invented: missing data stays missing.
+import { deriveCandidateTieDisplay } from "./candidateTransparency.mjs";
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -143,6 +144,9 @@ export function deriveResults(result) {
   const failedMolecules = molecules.filter(
     (m) => m?.quantum_analysis?.status === "failed",
   );
+  const resourceSkippedMolecules = molecules.filter(
+    (m) => m?.quantum_analysis?.status === "skipped_resource_limit",
+  );
 
   const recommendations = Array.isArray(decisionData.recommendations)
     ? decisionData.recommendations
@@ -180,6 +184,7 @@ export function deriveResults(result) {
     reasoning: r.reasoning || "",
     verificationStatus: r.verification_status || "not_verified",
     targetAssociationVerified: r.target_association_verified === true,
+    candidateMetadata: r.candidate_metadata || null,
     demonstrationOnly,
   });
 
@@ -208,9 +213,10 @@ export function deriveResults(result) {
             id: m.name,
             smiles: m.smiles,
             category: m.category,
+            candidateMetadata: m.candidate_metadata || null,
           }));
 
-  const candidates = source.map((c) => {
+  const unrankedCandidates = source.map((c) => {
     const q = quantumByName[c.id]?.quantum_analysis || null;
     let quantumState = "none";
     if (q) {
@@ -218,6 +224,7 @@ export function deriveResults(result) {
         quantumState = "vqe";
       else if (q.status === "success" && q.mode === "lightweight")
         quantumState = "lightweight";
+      else if (q.status === "skipped_resource_limit") quantumState = "resource_skipped";
       else if (q.status === "skipped") quantumState = "skipped";
       else if (q.status === "failed") quantumState = "failed";
     }
@@ -229,6 +236,9 @@ export function deriveResults(result) {
       isBestNovel: bestNovelId != null && c.id === bestNovelId,
     };
   });
+
+  const tieDisplay = deriveCandidateTieDisplay(unrankedCandidates, bestNovelId);
+  const candidates = tieDisplay.candidates;
 
   const demonstrationCandidates = mockSource.map((c) => ({
     ...c,
@@ -248,12 +258,24 @@ export function deriveResults(result) {
     vqeMolecules,
     lightMolecules,
     failedMolecules,
+    resourceSkippedMolecules,
     candidates,
     recommendations,
     highlights,
-    bestNovelId,
-    bestNovel: candidates.find((c) => c.isBestNovel) || null,
-    topCandidate: result?.top_candidate || null,
+    bestNovelId: tieDisplay.bestNovelId,
+    bestNovel: tieDisplay.bestNovel,
+    bestNovelCandidates: tieDisplay.bestNovelCandidates,
+    bestNovelIsTie: tieDisplay.bestNovelIsTie,
+    hasScoreTies: tieDisplay.hasScoreTies,
+    topScoreIsTie: tieDisplay.topScoreIsTie,
+    topScoreCandidateIds: tieDisplay.topScoreCandidateIds,
+    topCandidate: result?.top_candidate
+      ? {
+          ...result.top_candidate,
+          scoreTie: tieDisplay.topScoreIsTie,
+          tiedCandidateIds: tieDisplay.topScoreCandidateIds,
+        }
+      : null,
     riskDistribution,
     riskStep,
     decisionStep,
@@ -267,6 +289,11 @@ export function deriveResults(result) {
       quantumTargeted: isNum(quantumData.quantum_candidates)
         ? quantumData.quantum_candidates
         : null,
+      quantumSuccessful: isNum(quantumData.successful) ? quantumData.successful : vqeMolecules.length + lightMolecules.length,
+      quantumFailed: isNum(quantumData.failed) ? quantumData.failed : failedMolecules.length,
+      resourceSkipped: isNum(quantumData.skipped_resource_limit)
+        ? quantumData.skipped_resource_limit
+        : resourceSkippedMolecules.length,
     },
     demonstrationCandidates,
   };

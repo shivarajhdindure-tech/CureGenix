@@ -30,6 +30,7 @@ export default function EvidencePassport({ candidate: c }) {
 
   const q = c.quantumState === "vqe" ? c.quantum : null;
   const screening = c.screening;
+  const provenance = c.candidateMetadata;
 
   return (
     <section className="mt-5 overflow-hidden rounded-xl border border-cyan-400/20 bg-cyan-400/[0.025]">
@@ -91,6 +92,45 @@ export default function EvidencePassport({ candidate: c }) {
                     : "Evidence gap"
                 }
               />
+              {provenance && (
+                <>
+                  <EvidenceRow
+                    label="Target-informed context"
+                    value={`${provenance.target?.name || "Unknown target"} (${provenance.target?.uniprot_id || "no accession"}); ${provenance.target?.identity_state || "unresolved"}; chain ${provenance.target?.selected_chain_id || "not selected"}`}
+                  />
+                  <EvidenceRow label="Identity source" value={provenance.target?.identity_source} />
+                  <EvidenceRow label="Identity warnings" value={(provenance.target?.warnings || []).join(" ") || "None"} />
+                  {provenance.target?.evidence?.sequence_validation && (
+                    <>
+                      <EvidenceRow
+                        label="Sequence validation"
+                        value={provenance.target.evidence.sequence_validation.identity_state}
+                        status={provenance.target.evidence.sequence_validation.validation_outcome}
+                      />
+                      <EvidenceRow
+                        label="Sequence identity and coverage"
+                        value={`${Number(provenance.target.evidence.sequence_validation.identity_percent || 0).toFixed(1)}% identity · ${(Number(provenance.target.evidence.sequence_validation.observed_chain_coverage || 0) * 100).toFixed(1)}% observed coverage · ${(Number(provenance.target.evidence.sequence_validation.reference_sequence_coverage || 0) * 100).toFixed(1)}% reference coverage`}
+                      />
+                    </>
+                  )}
+                  <EvidenceRow
+                    label="Reference scaffold"
+                    value={`${provenance.scaffold_provenance?.scaffold_name || "Unknown"} from ${provenance.scaffold_provenance?.reference_compound || "unknown compound"} (${provenance.scaffold_provenance?.reference_chembl_id || "no ChEMBL ID"})`}
+                  />
+                  <EvidenceRow
+                    label="Generation method"
+                    value={provenance.generation_method?.name}
+                    status="Hypothesis only"
+                  />
+                  <EvidenceRow
+                    label="Rationale and source"
+                    value={provenance.scaffold_provenance?.rationale}
+                  />
+                  {(provenance.scaffold_provenance?.sources || []).map((source) => (
+                    <EvidenceRow key={source.url} label="Reference source" value={source.name} status={source.url} />
+                  ))}
+                </>
+              )}
             </div>
           </div>
 
@@ -176,6 +216,18 @@ export default function EvidencePassport({ candidate: c }) {
                     : "Not available"
                 }
               />
+              <EvidenceRow
+                label="Total molecular energy"
+                value={q && isNum(q.vqe?.total_molecular_energy_hartree)
+                  ? `${fmt(q.vqe.total_molecular_energy_hartree)} Ha`
+                  : "Not available"}
+              />
+              <EvidenceRow
+                label="Optimizer status"
+                value={q?.vqe?.optimizer_status_available
+                  ? (q.vqe.optimizer_success ? "Reported converged" : "Reported not converged")
+                  : "Not reported by optimizer"}
+              />
               <p className="mt-2 text-xs leading-5 text-slate-400">
                 Quantum-derived descriptors are computational results.
                 They do not establish target binding, clinical efficacy,
@@ -203,7 +255,11 @@ export default function EvidencePassport({ candidate: c }) {
               )}
               {c.quantumState !== "vqe" && (
                 <li>
-                  • A successful VQE result is not available for this candidate.
+                  {c.quantumState === "resource_skipped"
+                    ? `• Quantum calculation was skipped by resource policy: ${c.quantum?.message || "molecule exceeded a configured eligibility limit"}.`
+                    : c.quantumState === "failed"
+                      ? `• Quantum calculation failed: ${c.quantum?.message || "no failure detail available"}.`
+                      : "• A successful VQE result is not available for this candidate."}
                 </li>
               )}
               <li>

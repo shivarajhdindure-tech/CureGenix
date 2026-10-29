@@ -1,0 +1,54 @@
+{
+  "experiment": "EGFR classical dimensionality sweep",
+  "seed": 42,
+  "selection_metric": "validation MAE",
+  "selected_components": 16,
+  "results": {
+    "4": {
+      "components": 4,
+      "explained_variance_ratio_sum": 0.28318798542022705,
+      "validation": {
+        "mae": 0.8905102951924216,
+        "rmse": 1.1759735847635242,
+        "r2": 0.23921881320518912
+      },
+      "test_diagnostic_only": {
+        "mae": 0.6511457664727632,
+        "rmse": 0.8848133980129886,
+        "r2": 0.42678362099877143
+      },
+      "runtime_seconds": 0.67
+    },
+    "8": {
+      "components": 8,
+      "explained_variance_ratio_sum": 0.3805104196071625,
+      "validation": {
+        "mae": 0.8203289150847988,
+        "rmse": 1.1244749253795892,
+        "r2": 0.30439261749243873
+      },
+      "test_diagnostic_only": {
+        "mae": 0.5940212821086123,
+        "rmse": 0.8265968327489419,
+        "r2": 0.49973204499260027
+      },
+      "runtime_seconds": 0.62
+    },
+    "16": {
+      "components": 16,
+      "explained_variance_ratio_sum": 0.4884733557701111,
+      "validation": {
+        "mae": 0.7355561365818449,
+        "rmse": 0.9847810521508222,
+        "r2": 0.4664882371440665
+      },
+      "test_diagnostic_only": {
+        "mae": 0.5455925900746835,
+        "rmse": 0.7515043044952129,
+        "r2": 0.5864974843815611
+      },
+      "runtime_seconds": 0.57
+    }
+  },
+  "warning": "Test metrics are diagnostic only and must not guide selection. This sweep uses one fixed SVR configuration and one seed."
+}

@@ -10,13 +10,15 @@ dependencies = [
     "qiskit-aer==0.17.2",
     "qiskit-algorithms==0.4.0",
     "qiskit-nature==0.8.0",
-    "pyscf==2.14.0",
+    "pyscf==2.14.0; sys_platform == 'linux'",
     "qiskit-optimization>=0.7.0",
     "fastapi==0.115.0",
     "uvicorn>=0.31.1,<1.0.0",
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
     "rdkit>=2024.3.1",
+    "qiskit-machine-learning==0.9.1",
+    "scikit-learn==1.9.1",
 ]
 
 [build-system]

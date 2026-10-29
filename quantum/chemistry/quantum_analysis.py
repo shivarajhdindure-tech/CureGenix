@@ -1,11 +1,13 @@
 
+import os
 import time
 
 from quantum.chemistry.smiles_adapter import smiles_to_geometry
 from quantum.chemistry.molecule import build_molecular_problem
 from quantum.chemistry.active_space import reduce_to_active_space
-from quantum.chemistry.hamiltonian import build_qubit_hamiltonian
+from quantum.chemistry.hamiltonian import build_qubit_hamiltonian, interpret_vqe_energy
 from quantum.algorithms.vqe import run_vqe
+from backend.services.quantum_resource_policy import assess_smiles_resources
 
 
 def analyze_smiles(
@@ -26,10 +28,47 @@ def analyze_smiles(
     if not smiles:
         raise ValueError("SMILES cannot be empty")
 
+    eligibility = assess_smiles_resources(
+        smiles, basis=basis, maxiter=maxiter, charge=charge, benchmark=benchmark
+    )
+    if eligibility.get("status") == "skipped_resource_limit":
+        return {
+            "status": "skipped_resource_limit",
+            "message": "Quantum calculation skipped by the configured resource eligibility policy.",
+            "resource_eligibility": eligibility,
+        }
+    if eligibility.get("status") == "invalid_input":
+        raise ValueError("Invalid SMILES: molecular resource preflight could not parse the structure.")
+    if eligibility.get("status") != "eligible":
+        raise RuntimeError("Quantum resource policy could not be evaluated: " + "; ".join(eligibility.get("reasons", [])))
+
     # 1. SMILES -> 3D geometry
     geometry = smiles_to_geometry(smiles)
 
-    # 2. Build molecular problem
+    # 2. Check execution environment (local PySCF vs WSL adapter)
+    use_wsl = os.getenv("CUREGENIX_QUANTUM_BACKEND", "").lower() == "wsl"
+    if not use_wsl:
+        try:
+            import pyscf  # noqa: F401
+
+            has_local_pyscf = True
+        except Exception:
+            has_local_pyscf = False
+        use_wsl = not has_local_pyscf
+
+    if use_wsl:
+        from backend.services.wsl_quantum_adapter import wsl_quantum_adapter
+
+        return wsl_quantum_adapter.analyze_geometry(
+            atom=geometry,
+            basis=basis,
+            charge=charge,
+            spin=spin,
+            maxiter=maxiter,
+            benchmark=benchmark,
+        )
+
+    # 2b. Build molecular problem locally if PySCF is available
     problem = build_molecular_problem(
         atom=geometry,
         basis=basis,
@@ -77,6 +116,10 @@ def analyze_smiles(
 
     vqe_runtime_seconds = time.perf_counter() - vqe_start
 
+    energy_components = interpret_vqe_energy(
+        float(vqe_result["electronic_energy"]), active_problem
+    )
+
     homo_energy = float(orbital_energies[homo_index])
     lumo_energy = float(orbital_energies[lumo_index])
 
@@ -113,11 +156,18 @@ def analyze_smiles(
             "mapping": "Jordan-Wigner",
         },
         "vqe": {
-            "electronic_energy_hartree": vqe_result["electronic_energy"],
+            "electronic_energy_hartree": energy_components["electronic_energy"],
+            "raw_active_space_energy_hartree": energy_components["raw_active_space_energy"],
+            "total_molecular_energy_hartree": energy_components["total_molecular_energy"],
+            "active_space_correction_hartree": energy_components["active_space_correction"],
+            "nuclear_repulsion_energy_hartree": energy_components["nuclear_repulsion_energy"],
             "optimizer": vqe_result["optimizer"],
             "ansatz": vqe_result["ansatz"],
             "max_iterations": maxiter,
             "runtime_seconds": vqe_runtime_seconds,
+            "optimizer_success": vqe_result.get("optimizer_success"),
+            "optimizer_message": vqe_result.get("optimizer_message"),
+            "optimizer_status_available": vqe_result.get("optimizer_status_available", False),
         },
     }
 
@@ -141,6 +191,8 @@ def analyze_smiles(
 
         response["exact_reference"] = {
             "energy_hartree": exact_energy,
+            "electronic_energy_hartree": exact_energy + energy_components["active_space_correction"],
+            "total_molecular_energy_hartree": exact_energy + energy_components["active_space_correction"] + energy_components["nuclear_repulsion_energy"],
             "method": "Full-Hamiltonian exact diagonalization",
             "runtime_seconds": exact_runtime_seconds,
             "interpretation": (

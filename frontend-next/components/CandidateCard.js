@@ -59,9 +59,27 @@ function Badges({ c }) {
         </span>
       )}
 
+      {c.quantumState === "resource_skipped" && (
+        <span className="badge border-amber-400/30 bg-amber-400/10 text-amber-200">
+          Skipped · resource limit
+        </span>
+      )}
+
       {c.quantumState === "failed" && (
         <span className="badge border-red-400/30 bg-red-400/10 text-red-300">
           Quantum failed
+        </span>
+      )}
+
+      {c.scoreTie && (
+        <span className="badge border-sky-400/30 bg-sky-400/10 text-sky-200">
+          Equal adjusted score · tie
+        </span>
+      )}
+
+      {c.isBestNovelTie && (
+        <span className="badge border-violet-400/30 bg-violet-400/10 text-violet-200">
+          Top novel score · tied
         </span>
       )}
 
@@ -150,8 +168,10 @@ export default function CandidateCard({ candidate: c, featured = false }) {
         <div className="min-w-0">
           <div className="flex items-center gap-3">
             {isNum(c.rank) && (
-              <span className="font-data text-lg font-semibold text-slate-500">
-                #{c.rank}
+              <span
+                className="font-data text-lg font-semibold text-slate-500"
+                title={c.scoreTie ? "Equal adjusted score; order does not imply superiority." : undefined}>
+                {c.scoreTie ? "Tie" : `#${c.rank}`}
               </span>
             )}
 
@@ -173,6 +193,9 @@ export default function CandidateCard({ candidate: c, featured = false }) {
             <p className="font-data mt-1 text-2xl font-semibold text-white">
               {fmt(c.adjustedScore, 3)}
             </p>
+            {c.scoreTie && (
+              <p className="mt-1 text-[10px] text-sky-200/80">Equal displayed score; no score-based distinction.</p>
+            )}
           </div>
         )}
       </div>
@@ -256,6 +279,12 @@ export default function CandidateCard({ candidate: c, featured = false }) {
             <p className="metric-label">VQE electronic energy</p>
             <p className="font-data mt-1 text-sm font-semibold text-cyan-200">
               {fmt(q.vqe?.electronic_energy_hartree)} Ha
+            </p>
+          </div>
+          <div>
+            <p className="metric-label">Total molecular energy</p>
+            <p className="font-data mt-1 text-sm font-semibold text-cyan-200">
+              {fmt(q.vqe?.total_molecular_energy_hartree)} Ha
             </p>
           </div>
         </div>

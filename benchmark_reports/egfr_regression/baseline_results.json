@@ -1,0 +1,78 @@
+{
+  "dataset": "EGFR IC50 candidate biochemical cohort",
+  "raw_source": "data/raw/egfr_chembl_ic50.csv",
+  "assay_metadata_source": "data/egfr_assay_metadata.csv",
+  "curation_note": "Heuristic description filtering; not manually verified assay curation. Exact IC50 in nM; assay type B; confidence 9; excludes descriptions matching configured mutant/cell-based terms. Canonical structures deduplicated; target is median pIC50 across retained measurements.",
+  "seed": 42,
+  "fingerprint": {
+    "type": "Morgan",
+    "radius": 2,
+    "bits": 2048
+  },
+  "split_method": "GroupShuffleSplit by Murcko scaffold",
+  "split_summary": {
+    "train": {
+      "compounds": 2112,
+      "scaffold_groups": 790,
+      "pIC50_median_range": [
+        4.116338564846382,
+        10.769551078621726
+      ]
+    },
+    "validation": {
+      "compounds": 476,
+      "scaffold_groups": 170,
+      "pIC50_median_range": [
+        4.6252516539898965,
+        10.795880017344075
+      ]
+    },
+    "test": {
+      "compounds": 408,
+      "scaffold_groups": 170,
+      "pIC50_median_range": [
+        4.0,
+        9.795880017344075
+      ]
+    }
+  },
+  "models": {
+    "random_forest": {
+      "n_estimators": 400,
+      "min_samples_leaf": 2,
+      "max_features": 0.7
+    },
+    "rbf_svr": {
+      "C": 10.0,
+      "epsilon": 0.2,
+      "gamma": "scale"
+    }
+  },
+  "results": {
+    "random_forest": {
+      "validation": {
+        "mae": 0.5767395844367934,
+        "rmse": 0.8001089426956153,
+        "r2": 0.647821466757581
+      },
+      "test": {
+        "mae": 0.48114076765714403,
+        "rmse": 0.6679217096880825,
+        "r2": 0.6733622837728521
+      }
+    },
+    "rbf_svr": {
+      "validation": {
+        "mae": 0.7102335624365766,
+        "rmse": 0.9510223720327173,
+        "r2": 0.5024392676494602
+      },
+      "test": {
+        "mae": 0.5900808860574991,
+        "rmse": 0.7894815521436144,
+        "r2": 0.543648813971795
+      }
+    }
+  },
+  "test_set_policy": "These initial models are fixed baseline configurations, not tuned against the test set. Use validation data for future model selection."
+}

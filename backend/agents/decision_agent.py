@@ -92,6 +92,7 @@ class DecisionAgent(BaseAgent):
                 },
                 "verification_status": verification_status,
                 "target_association_verified": target_verified,
+                "candidate_metadata": score_entry.get("candidate_metadata"),
             })
 
         # ── Sort by adjusted score (DETERMINISTIC) ────────────────────────

@@ -30,7 +30,7 @@ class MoleculeMCPServer(BaseMCPServer):
         )
         self.register_tool(
             name="simulate_structure",
-            description="Simulate 3D molecular structure and predict binding conformation",
+            description="Report that target docking is unavailable; no binding prediction is performed",
             handler=self._simulate_structure,
             parameters={"smiles": "str", "target_protein": "str"}
         )
@@ -60,116 +60,129 @@ class MoleculeMCPServer(BaseMCPServer):
         )
 
     def _generate_analogs(self, parent_smiles: str, parent_name: str = "", modification_strategy: str = "balanced", count: int = 3) -> dict:
-        """Generate structural analogs with realistic modifications."""
-        time.sleep(random.uniform(0.1, 0.3))
+        """Enumerate valid variants around a known terminal-alkyne motif.
 
-        strategies = {
-            "bbb_penetration": {
-                "description": "Optimize for blood-brain barrier permeability",
-                "modifications": [
-                    "Added lipophilic fluorine substituent to improve membrane permeability",
-                    "Replaced polar hydroxyl with methoxy group to reduce TPSA",
-                    "Introduced N-methylation to reduce hydrogen bond donors",
-                    "Replaced carboxylic acid with tetrazole bioisostere"
-                ]
-            },
-            "selectivity": {
-                "description": "Improve target selectivity to reduce off-target effects",
-                "modifications": [
-                    "Extended binding motif with pyridine ring for selective pocket interaction",
-                    "Added steric bulk near off-target binding region",
-                    "Introduced conformational constraint via cyclization",
-                    "Replaced flexible linker with rigid biphenyl scaffold"
-                ]
-            },
-            "metabolic_stability": {
-                "description": "Improve metabolic stability and oral bioavailability",
-                "modifications": [
-                    "Blocked CYP3A4 metabolic soft spot with fluorine",
-                    "Replaced ester with amide for hydrolytic stability",
-                    "Deuterium substitution at metabolically labile position",
-                    "Added gem-dimethyl group to block oxidative metabolism"
-                ]
-            },
-            "balanced": {
-                "description": "Balanced optimization across ADMET properties",
-                "modifications": [
-                    "Fluorine substitution for improved metabolic stability and lipophilicity",
-                    "Piperazine replacement for enhanced solubility and target engagement",
-                    "Cyclopropyl introduction for conformational rigidity",
-                    "Bioisosteric replacement of amide with sulfonamide"
-                ]
+        This is structure editing, not a prediction of target binding or ADMET.
+        The caller must supply a documented parent compound and preserve its
+        provenance separately.
+        """
+        from rdkit import Chem
+
+        parent = Chem.MolFromSmiles(parent_smiles or "")
+        if parent is None:
+            return {
+                "strategy": "RDKit analog enumeration",
+                "parent": parent_name,
+                "analogs_generated": 0,
+                "analogs": [],
+                "warning": "Parent SMILES is invalid.",
             }
-        }
 
-        strategy = strategies.get(modification_strategy, strategies["balanced"])
+        parent_canonical = Chem.MolToSmiles(parent, canonical=True)
+        motif = Chem.MolFromSmarts("[c:1][C:2]#[CH:3]")
+        matches = parent.GetSubstructMatches(motif)
+        analog_specs = []
+
+        for aromatic_carbon, alkyne_carbon, terminal_carbon in matches:
+            extended = Chem.RWMol(parent)
+            methyl_index = extended.AddAtom(Chem.Atom("C"))
+            extended.AddBond(terminal_carbon, methyl_index, Chem.BondType.SINGLE)
+            extended_molecule = extended.GetMol()
+            try:
+                Chem.SanitizeMol(extended_molecule)
+                analog_specs.append(
+                    (
+                        Chem.MolToSmiles(extended_molecule, canonical=True),
+                        "Extended the reference terminal alkyne by one carbon.",
+                    )
+                )
+            except Exception:
+                pass
+
+            nitrile = Chem.RWMol(parent)
+            nitrile_atom = nitrile.GetAtomWithIdx(terminal_carbon)
+            nitrile_atom.SetAtomicNum(7)
+            nitrile_atom.SetNoImplicit(True)
+            nitrile_molecule = nitrile.GetMol()
+            try:
+                Chem.SanitizeMol(nitrile_molecule)
+                analog_specs.append(
+                    (
+                        Chem.MolToSmiles(nitrile_molecule, canonical=True),
+                        "Replaced the reference terminal alkyne terminus with a nitrile bioisostere.",
+                    )
+                )
+            except Exception:
+                pass
+
         analogs = []
-
-        for i in range(min(count, len(strategy["modifications"]))):
-            seed = hashlib.md5(f"{parent_smiles}_{i}_{modification_strategy}".encode()).hexdigest()
-            analog_smiles = self._mutate_smiles(parent_smiles, i)
-            analogs.append({
-                "id": f"GEN-{seed[:6].upper()}",
-                "smiles": analog_smiles,
-                "parent_drug": parent_name or "Unknown",
-                "parent_smiles": parent_smiles,
-                "modification": strategy["modifications"][i],
-                "strategy": modification_strategy,
-                "predicted_properties": self._quick_property_estimate(analog_smiles),
-                "similarity_to_parent": round(random.uniform(0.55, 0.90), 2),
-                "confidence": round(random.uniform(0.6, 0.9), 2)
-            })
+        seen = {parent_canonical}
+        for analog_smiles, modification in analog_specs:
+            molecule = Chem.MolFromSmiles(analog_smiles)
+            if molecule is None:
+                continue
+            canonical = Chem.MolToSmiles(molecule, canonical=True)
+            if canonical in seen:
+                continue
+            seen.add(canonical)
+            digest = hashlib.sha256(
+                f"{parent_canonical}|{canonical}|{modification_strategy}".encode()
+            ).hexdigest()
+            analogs.append(
+                {
+                    "id": f"GEN-{digest[:8].upper()}",
+                    "smiles": canonical,
+                    "parent_drug": parent_name or "Reference compound",
+                    "parent_smiles": parent_canonical,
+                    "modification": modification,
+                    "strategy": modification_strategy,
+                }
+            )
+            if len(analogs) >= max(0, min(int(count), 2)):
+                break
 
         return {
-            "strategy": strategy["description"],
+            "strategy": "RDKit rule-based terminal-alkyne analog enumeration",
             "parent": parent_name,
             "analogs_generated": len(analogs),
-            "analogs": analogs
+            "analogs": analogs,
+            "warning": None if analogs else "No supported editable motif was found in the reference compound.",
         }
 
     def _simulate_structure(self, smiles: str, target_protein: str = "") -> dict:
-        """Simulate 3D structure and predict binding properties."""
-        time.sleep(random.uniform(0.15, 0.35))
-
-        energy_score = round(random.uniform(-12.5, -5.2), 2)
-        rmsd = round(random.uniform(0.8, 3.5), 2)
-
+        """Fail clearly instead of fabricating docking or affinity results."""
         return {
             "smiles": smiles,
             "target_protein": target_protein,
             "simulation": {
-                "method": "Semi-empirical conformer generation (PM7-level)",
-                "num_conformers_generated": random.randint(10, 50),
-                "lowest_energy_conformer": {
-                    "energy_kcal_mol": energy_score,
-                    "rmsd_angstrom": rmsd,
-                    "num_rotatable_bonds": random.randint(2, 8)
-                },
-                "binding_prediction": {
-                    "docking_score": round(energy_score * random.uniform(0.8, 1.2), 2),
-                    "predicted_ki_nm": round(10 ** random.uniform(0.5, 3.5), 1),
-                    "binding_mode": random.choice([
-                        "Competitive inhibitor — binds active site",
-                        "Allosteric modulator — binds regulatory site",
-                        "Mixed inhibition — partial active site overlap",
-                        "Covalent binder — irreversible modification"
-                    ]),
-                    "key_interactions": random.sample([
-                        "Hydrogen bond with Asp32",
-                        "Pi-stacking with Phe108",
-                        "Salt bridge with Glu205",
-                        "Hydrophobic contact with Leu120",
-                        "Van der Waals with Val148",
-                        "Water-mediated H-bond with Thr72"
-                    ], k=random.randint(2, 4))
-                }
-            }
+                "status": "not_performed",
+                "method": None,
+                "warning": (
+                    "No protein-ligand docking or binding-affinity prediction is "
+                    "implemented. A protein structure and validated docking workflow "
+                    "are required; no binding result is available."
+                ),
+            },
         }
 
     def _compute_molecular_properties(self, smiles: str) -> dict:
-        """Compute molecular properties using rule-based estimation."""
-        time.sleep(random.uniform(0.02, 0.08))
-        return self._quick_property_estimate(smiles)
+        """Compute standard 2D molecular descriptors with RDKit."""
+        from rdkit import Chem
+        from rdkit.Chem import Crippen, Descriptors, Lipinski, rdMolDescriptors
+
+        molecule = Chem.MolFromSmiles(smiles or "")
+        if molecule is None:
+            return {"status": "invalid_smiles", "error": "SMILES could not be parsed."}
+        return {
+            "status": "computed",
+            "method": "RDKit 2D descriptors",
+            "molecular_weight": round(float(Descriptors.MolWt(molecule)), 3),
+            "logp": round(float(Crippen.MolLogP(molecule)), 3),
+            "hbd": int(Lipinski.NumHDonors(molecule)),
+            "hba": int(Lipinski.NumHAcceptors(molecule)),
+            "tpsa": round(float(rdMolDescriptors.CalcTPSA(molecule)), 3),
+            "rotatable_bonds": int(Lipinski.NumRotatableBonds(molecule)),
+        }
 
     def _quick_property_estimate(self, smiles: str) -> dict:
         """Estimate molecular properties from SMILES using heuristic rules."""

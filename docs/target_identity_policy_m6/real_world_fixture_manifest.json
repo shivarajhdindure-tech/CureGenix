@@ -1,0 +1,1264 @@
+{
+  "dataset_version": "1.0.0",
+  "curated_on": "2026-10-26",
+  "labeling_method": "RCSB PDB polymer-entity UniProt/SIFTS mapping and author-chain instance identity; labels are not derived from sequence alignment metrics.",
+  "limitations": [
+    "Only two unique PDB entries; not an independent validation cohort.",
+    "3PP0 chains A and B share one polymer entity and are not independent biological examples.",
+    "The 3PP0 wrong-target case is a useful related-kinase negative control, not a broad homolog benchmark.",
+    "Structure-to-accession identity does not prove target function, pocket validity, binding, or activity."
+  ],
+  "source_snapshots": [
+    {
+      "path": "real_pdb/1M17.pdb",
+      "sha256": "5b020cd186307d657de80611793554b074f6936a3443d33f81d9b1a58004962e",
+      "bytes": 252720
+    },
+    {
+      "path": "real_pdb/3PP0.pdb",
+      "sha256": "221706c699bb2cf2b97a4e1255b410cb2454d89138e57356cc0fd2c369dfd1e9",
+      "bytes": 837864
+    },
+    {
+      "path": "real_pdb/1M17_A_instance.json",
+      "sha256": "ce167d7ddf1d9c173e48dd49848d5059839bcd2f82e29ea6450e00522c7c2d8f",
+      "bytes": 41115
+    },
+    {
+      "path": "real_pdb/1M17_entity_1.json",
+      "sha256": "fee33e03b66002c89b903f83a0e8b3a7644724a3a01984f1d517d0cf47873519",
+      "bytes": 191037
+    },
+    {
+      "path": "real_pdb/3PP0_A_instance.json",
+      "sha256": "d17584c1e33aa30e5cebafa8a9a6c45c160046dfcb72781141ffbc84c339d7e6",
+      "bytes": 38548
+    },
+    {
+      "path": "real_pdb/3PP0_B_instance.json",
+      "sha256": "dabf577964eacc03db1eb1a4b99735055b20621e712b256a4a1e4064acc312bb",
+      "bytes": 39503
+    },
+    {
+      "path": "real_pdb/3PP0_entity_1.json",
+      "sha256": "6ff722b6fb91c7d43abda21c0fd877ba0f3cb1f362250b256cf53dce53324792",
+      "bytes": 130055
+    },
+    {
+      "path": "real_pdb/P00533.fasta",
+      "sha256": "684e2da1f3ef05d0ce90d0aefe9125c6f7e9cdcfeac27ae72ed35243b64a73e8",
+      "bytes": 1328
+    },
+    {
+      "path": "real_pdb/P04626.fasta",
+      "sha256": "544da5f05e6961a6a51f6fb7540d48b61f57cdfe5c8cfe4da455bb3118574cdb",
+      "bytes": 1382
+    }
+  ],
+  "cases": [
+    {
+      "pdb": "1M17",
+      "chain": "A",
+      "accession": "P00533",
+      "kind": "kinase-domain construct",
+      "expected": true,
+      "entity_json": "1M17_entity_1.json",
+      "instance_json": "1M17_A_instance.json",
+      "observed_chain_sequence": "GEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLMDEEDMDDVVDADEYLIP",
+      "reference_sequence_source": "UniProt REST FASTA P00533",
+      "reference_sequence": "MRPSGTAGAALLALLAALCPASRALEEKKVCQGTSNKLTQLGTFEDHFLSLQRMFNNCEVVLGNLEITYVQRNYDLSFLKTIQEVAGYVLIALNTVERIPLENLQIIRGNMYYENSYALAVLSNYDANKTGLKELPMRNLQEILHGAVRFSNNPALCNVESIQWRDIVSSDFLSNMSMDFQNHLGSCQKCDPSCPNGSCWGAGEENCQKLTKIICAQQCSGRCRGKSPSDCCHNQCAAGCTGPRESDCLVCRKFRDEATCKDTCPPLMLYNPTTYQMDVNPEGKYSFGATCVKKCPRNYVVTDHGSCVRACGADSYEMEEDGVRKCKKCEGPCRKVCNGIGIGEFKDSLSINATNIKHFKNCTSISGDLHILPVAFRGDSFTHTPPLDPQELDILKTVKEITGFLLIQAWPENRTDLHAFENLEIIRGRTKQHGQFSLAVVSLNITSLGLRSLKEISDGDVIISGNKNLCYANTINWKKLFGTSGQKTKIISNRGENSCKATGQVCHALCSPEGCWGPEPRDCVSCRNVSRGRECVDKCNLLEGEPREFVENSECIQCHPECLPQAMNITCTGRGPDNCIQCAHYIDGPHCVKTCPAGVMGENNTLVWKYADAGHVCHLCHPNCTYGCTGPGLEGCPTNGPKIPSIATGMVGALLLLLVVALGIGLFMRRRHIVRKRTLRRLLQERELVEPLTPSGEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIPQQGFFSSPSTSRTPLLSSLSATSNNSTVACIDRNGLQSCPIKEDSFLQRYSSDPTGALTEDSIDDTFLPVPEYINQSVPKRPAGSVQNPVYHNQPLNPAPSRDPHYQDPHSTAVGNPEYLNTVQPTCVNSTFDSPAHWAQKGSHQISLDNPDYQQDFFPKEAKPNGIFKGSTAENAEYLRVAPQSSEFIGA",
+      "observed_dbref_records": [
+        "DBREF  1M17 A  671   998  UNP    P00533   EGFR_HUMAN     695   1022"
+      ],
+      "pdb_seqadv_records": [
+        "SEQADV 1M17 ALA A  670  UNP  P00533              CLONING ARTIFACT"
+      ],
+      "rcsb_mapping": {
+        "database_accession": "P00533",
+        "database_name": "UniProt",
+        "entity_sequence_coverage": 0.984984984984985,
+        "provenance_source": "SIFTS",
+        "reference_sequence_coverage": 0.27107438016528923
+      },
+      "rcsb_instance_auth_chain_id": "A",
+      "rcsb_entity_sequence": "GSHMASGEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIPQQG",
+      "uniprot_validation": {
+        "selected_chain_id": "A",
+        "observed_sequence": "GEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLMDEEDMDDVVDADEYLIP",
+        "observed_chain_sequence_length": 312,
+        "reference_sequence_length": 1210,
+        "alignment_method": "affine-gap semi-global Gotoh; full observed chain to reference substring",
+        "scoring_parameters": {
+          "match": 2,
+          "mismatch": -2,
+          "gap_open": -5,
+          "gap_extend": -1,
+          "alignment_mode": "semi-global: all observed-chain residues aligned; free reference termini"
+        },
+        "thresholds": {
+          "minimum_identity_fraction": 0.9,
+          "minimum_observed_coverage": 0.8,
+          "minimum_reference_coverage": 0.15,
+          "minimum_aligned_residues": 100,
+          "maximum_gap_fraction": 0.1,
+          "exact_reference_coverage": 1.0
+        },
+        "warnings": [
+          "Unrecognized HETATM residues not declared as polymer residues were treated as non-protein heterogens and excluded.",
+          "Residue numbering gaps were retained as coordinate gaps; their sequence is unknown.",
+          "Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.",
+          "Sequence support is partial or contains localized differences; generation is allowed under the configured thresholds."
+        ],
+        "validation_outcome": "passed_partial",
+        "identity_state": "structure_linked_partial_sequence_support",
+        "candidate_generation_allowed": true,
+        "alignment_score": 608,
+        "aligned_observed_sequence": "GEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMH------------LMDEEDMDDVVDADEYLIP",
+        "aligned_reference_sequence": "GEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIP",
+        "identical_aligned_residues": 312,
+        "informative_aligned_residues": 312,
+        "identity_fraction": 1.0,
+        "identity_percent": 100.0,
+        "identity_denominator_definition": "informative residue/residue alignment columns; X/B/Z/J excluded",
+        "observed_chain_coverage": 1.0,
+        "observed_coverage_denominator": "all observed coordinate residues, including X",
+        "reference_sequence_coverage": 0.2578512396694215,
+        "reference_coverage_denominator": "full verified UniProt sequence length",
+        "aligned_observed_residue_count": 312,
+        "substitution_count": 0,
+        "substitutions": [],
+        "insertion_count": 0,
+        "insertions": [],
+        "deletion_count": 12,
+        "deletions": [
+          {
+            "reference_start_position": 989,
+            "reference_end_position": 1000,
+            "reference_sequence": "LPSPTDSNFYRA"
+          }
+        ],
+        "gap_fraction": 0.037037037037037035,
+        "unaligned_reference_prefix": "MRPSGTAGAALLALLAALCPASRALEEKKVCQGTSNKLTQLGTFEDHFLSLQRMFNNCEVVLGNLEITYVQRNYDLSFLKTIQEVAGYVLIALNTVERIPLENLQIIRGNMYYENSYALAVLSNYDANKTGLKELPMRNLQEILHGAVRFSNNPALCNVESIQWRDIVSSDFLSNMSMDFQNHLGSCQKCDPSCPNGSCWGAGEENCQKLTKIICAQQCSGRCRGKSPSDCCHNQCAAGCTGPRESDCLVCRKFRDEATCKDTCPPLMLYNPTTYQMDVNPEGKYSFGATCVKKCPRNYVVTDHGSCVRACGADSYEMEEDGVRKCKKCEGPCRKVCNGIGIGEFKDSLSINATNIKHFKNCTSISGDLHILPVAFRGDSFTHTPPLDPQELDILKTVKEITGFLLIQAWPENRTDLHAFENLEIIRGRTKQHGQFSLAVVSLNITSLGLRSLKEISDGDVIISGNKNLCYANTINWKKLFGTSGQKTKIISNRGENSCKATGQVCHALCSPEGCWGPEPRDCVSCRNVSRGRECVDKCNLLEGEPREFVENSECIQCHPECLPQAMNITCTGRGPDNCIQCAHYIDGPHCVKTCPAGVMGENNTLVWKYADAGHVCHLCHPNCTYGCTGPGLEGCPTNGPKIPSIATGMVGALLLLLVVALGIGLFMRRRHIVRKRTLRRLLQERELVEPLTPS",
+        "unaligned_reference_suffix": "QQGFFSSPSTSRTPLLSSLSATSNNSTVACIDRNGLQSCPIKEDSFLQRYSSDPTGALTEDSIDDTFLPVPEYINQSVPKRPAGSVQNPVYHNQPLNPAPSRDPHYQDPHSTAVGNPEYLNTVQPTCVNSTFDSPAHWAQKGSHQISLDNPDYQQDFFPKEAKPNGIFKGSTAENAEYLRVAPQSSEFIGA",
+        "unaligned_observed_prefix": "",
+        "unaligned_observed_suffix": "",
+        "observed_terminal_residue_ids": {
+          "first": "672",
+          "last": "995"
+        },
+        "aligned_reference_start_position": 696,
+        "aligned_reference_end_position": 1019,
+        "internal_gaps": [
+          {
+            "reference_start_position": 989,
+            "reference_end_position": 1000,
+            "reference_sequence": "LPSPTDSNFYRA"
+          }
+        ]
+      },
+      "entity_sequence_validation": {
+        "selected_chain_id": "A",
+        "observed_sequence": "GEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLMDEEDMDDVVDADEYLIP",
+        "observed_chain_sequence_length": 312,
+        "reference_sequence_length": 333,
+        "alignment_method": "affine-gap semi-global Gotoh; full observed chain to reference substring",
+        "scoring_parameters": {
+          "match": 2,
+          "mismatch": -2,
+          "gap_open": -5,
+          "gap_extend": -1,
+          "alignment_mode": "semi-global: all observed-chain residues aligned; free reference termini"
+        },
+        "thresholds": {
+          "minimum_identity_fraction": 0.9,
+          "minimum_observed_coverage": 0.8,
+          "minimum_reference_coverage": 0.15,
+          "minimum_aligned_residues": 100,
+          "maximum_gap_fraction": 0.1,
+          "exact_reference_coverage": 1.0
+        },
+        "warnings": [
+          "Unrecognized HETATM residues not declared as polymer residues were treated as non-protein heterogens and excluded.",
+          "Residue numbering gaps were retained as coordinate gaps; their sequence is unknown.",
+          "Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.",
+          "Sequence support is partial or contains localized differences; generation is allowed under the configured thresholds."
+        ],
+        "validation_outcome": "passed_partial",
+        "identity_state": "structure_linked_partial_sequence_support",
+        "candidate_generation_allowed": true,
+        "alignment_score": 608,
+        "aligned_observed_sequence": "GEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMH------------LMDEEDMDDVVDADEYLIP",
+        "aligned_reference_sequence": "GEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIP",
+        "identical_aligned_residues": 312,
+        "informative_aligned_residues": 312,
+        "identity_fraction": 1.0,
+        "identity_percent": 100.0,
+        "identity_denominator_definition": "informative residue/residue alignment columns; X/B/Z/J excluded",
+        "observed_chain_coverage": 1.0,
+        "observed_coverage_denominator": "all observed coordinate residues, including X",
+        "reference_sequence_coverage": 0.9369369369369369,
+        "reference_coverage_denominator": "full verified UniProt sequence length",
+        "aligned_observed_residue_count": 312,
+        "substitution_count": 0,
+        "substitutions": [],
+        "insertion_count": 0,
+        "insertions": [],
+        "deletion_count": 12,
+        "deletions": [
+          {
+            "reference_start_position": 300,
+            "reference_end_position": 311,
+            "reference_sequence": "LPSPTDSNFYRA"
+          }
+        ],
+        "gap_fraction": 0.037037037037037035,
+        "unaligned_reference_prefix": "GSHMAS",
+        "unaligned_reference_suffix": "QQG",
+        "unaligned_observed_prefix": "",
+        "unaligned_observed_suffix": "",
+        "observed_terminal_residue_ids": {
+          "first": "672",
+          "last": "995"
+        },
+        "aligned_reference_start_position": 7,
+        "aligned_reference_end_position": 330,
+        "internal_gaps": [
+          {
+            "reference_start_position": 300,
+            "reference_end_position": 311,
+            "reference_sequence": "LPSPTDSNFYRA"
+          }
+        ]
+      },
+      "generation_authorization": {
+        "allowed": true,
+        "policy_state": "independently_documented_partial_construct",
+        "evidence": [
+          "selected-chain DBREF accession",
+          "exact UniProt accession lookup",
+          "RCSB/SIFTS chain-to-accession mapping",
+          "observed sequence support against RCSB entity sequence"
+        ],
+        "reason": "Partial sequence support is accompanied by an independently documented RCSB/SIFTS mapping for this chain and accession."
+      },
+      "expected_generation_allowed": true,
+      "actual_generation_allowed": true,
+      "independent_label_basis": "RCSB polymer entity UniProt/SIFTS mapping plus matching author-chain instance; expected status is not derived from sequence identity score.",
+      "source_urls": [
+        "https://www.rcsb.org/structure/1M17",
+        "https://data.rcsb.org/rest/v1/core/polymer_entity_instance/1M17/A",
+        "https://data.rcsb.org/rest/v1/core/polymer_entity/1M17/1",
+        "https://rest.uniprot.org/uniprotkb/P00533.fasta"
+      ]
+    },
+    {
+      "pdb": "3PP0",
+      "chain": "A",
+      "accession": "P04626",
+      "kind": "engineered kinase-domain construct",
+      "expected": true,
+      "entity_json": "3PP0_entity_1.json",
+      "instance_json": "3PP0_A_instance.json",
+      "observed_chain_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+      "reference_sequence_source": "UniProt REST FASTA P04626",
+      "reference_sequence": "MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLALTLIDTNRSRACHPCSPMCKGSRCWGESSEDCQSLTRTVCAGGCARCKGPLPTDCCHEQCAAGCTGPKHSDCLACLHFNHSGICELHCPALVTYNTDTFESMPNPEGRYTFGASCVTACPYNYLSTDVGSCTLVCPLHNQEVTAEDGTQRCEKCSKPCARVCYGLGMEHLREVRAVTSANIQEFAGCKKIFGSLAFLPESFDGDPASNTAPLQPEQLQVFETLEEITGYLYISAWPDSLPDLSVFQNLQVIRGRILHNGAYSLTLQGLGISWLGLRSLRELGSGLALIHHNTHLCFVHTVPWDQLFRNPHQALLHTANRPEDECVGEGLACHQLCARGHCWGPGPTQCVNCSQFLRGQECVEECRVLQGLPREYVNARHCLPCHPECQPQNGSVTCFGPEADQCVACAHYKDPPFCVARCPSGVKPDLSYMPIWKFPDEEGACQPCPINCTHSCVDLDDKGCPAEQRASPLTSIISAVVGILLVVVLGVVFGILIKRRQQKIRKYTMRRLLQETELVEPLTPSGAMPNQAQMRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEDLGPASPLDSTFYRSLLEDDDMGDLVDAEEYLVPQQGFFCPDPAPGAGGMVHHRHRSSSTRSGGGDLTLGLEPSEEEAPRSPLAPSEGAGSDVFDGDLGMGAAKGLQSLPTHDPSPLQRYSEDPTVPLPSETDGYVAPLTCSPQPEYVNQPDVRPQPPSPREGPLPAARPAGATLERPKTLSPGKNGVVKDVFAFGGAVENPEYLTPQGGAAPQPHPPPAFSPAFDNLYYWDQDPPERGAPPSTFKGTPTAENPEYLGLDVPV",
+      "observed_dbref_records": [
+        "DBREF  3PP0 A  706  1009  UNP    P04626   ERBB2_HUMAN    706   1009"
+      ],
+      "pdb_seqadv_records": [
+        "SEQADV 3PP0 ALA A  706  UNP  P04626    MET   706 ENGINEERED MUTATION",
+        "SEQADV 3PP0 ALA B  706  UNP  P04626    MET   706 ENGINEERED MUTATION"
+      ],
+      "rcsb_mapping": {
+        "database_accession": "P04626",
+        "database_name": "UniProt",
+        "entity_sequence_coverage": 0.9970414201183432,
+        "provenance_source": "SIFTS",
+        "reference_sequence_coverage": 0.2685258964143426
+      },
+      "rcsb_instance_auth_chain_id": "A",
+      "rcsb_entity_sequence": "MSGAAPNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEDLGPASPLDSTFYRSLLEDDDMGDLVDAEEYLVPQQGAAASHHHHHH",
+      "uniprot_validation": {
+        "selected_chain_id": "A",
+        "observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "observed_chain_sequence_length": 286,
+        "reference_sequence_length": 1255,
+        "alignment_method": "affine-gap semi-global Gotoh; full observed chain to reference substring",
+        "scoring_parameters": {
+          "match": 2,
+          "mismatch": -2,
+          "gap_open": -5,
+          "gap_extend": -1,
+          "alignment_mode": "semi-global: all observed-chain residues aligned; free reference termini"
+        },
+        "thresholds": {
+          "minimum_identity_fraction": 0.9,
+          "minimum_observed_coverage": 0.8,
+          "minimum_reference_coverage": 0.15,
+          "minimum_aligned_residues": 100,
+          "maximum_gap_fraction": 0.1,
+          "exact_reference_coverage": 1.0
+        },
+        "warnings": [
+          "Unrecognized HETATM residues not declared as polymer residues were treated as non-protein heterogens and excluded.",
+          "Residue numbering gaps were retained as coordinate gaps; their sequence is unknown.",
+          "Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.",
+          "Observed/reference substitutions were retained and reported.",
+          "Sequence support is partial or contains localized differences; generation is allowed under the configured thresholds."
+        ],
+        "validation_outcome": "passed_partial",
+        "identity_state": "structure_linked_partial_sequence_support",
+        "candidate_generation_allowed": true,
+        "alignment_score": 554,
+        "aligned_observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHA--GKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "aligned_reference_sequence": "MPNQAQMRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "identical_aligned_residues": 283,
+        "informative_aligned_residues": 286,
+        "identity_fraction": 0.9895104895104895,
+        "identity_percent": 98.95104895104895,
+        "identity_denominator_definition": "informative residue/residue alignment columns; X/B/Z/J excluded",
+        "observed_chain_coverage": 1.0,
+        "observed_coverage_denominator": "all observed coordinate residues, including X",
+        "reference_sequence_coverage": 0.22788844621513943,
+        "reference_coverage_denominator": "full verified UniProt sequence length",
+        "aligned_observed_residue_count": 286,
+        "substitution_count": 3,
+        "substitutions": [
+          {
+            "observed_index": 1,
+            "pdb_residue_id": "706",
+            "observed_amino_acid": "A",
+            "reference_position": 706,
+            "reference_amino_acid": "M"
+          },
+          {
+            "observed_index": 6,
+            "pdb_residue_id": "711",
+            "observed_amino_acid": "L",
+            "reference_position": 711,
+            "reference_amino_acid": "Q"
+          },
+          {
+            "observed_index": 7,
+            "pdb_residue_id": "712",
+            "observed_amino_acid": "L",
+            "reference_position": 712,
+            "reference_amino_acid": "M"
+          }
+        ],
+        "insertion_count": 0,
+        "insertions": [],
+        "deletion_count": 2,
+        "deletions": [
+          {
+            "reference_start_position": 880,
+            "reference_end_position": 881,
+            "reference_sequence": "DG"
+          }
+        ],
+        "gap_fraction": 0.006944444444444444,
+        "unaligned_reference_prefix": "MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLALTLIDTNRSRACHPCSPMCKGSRCWGESSEDCQSLTRTVCAGGCARCKGPLPTDCCHEQCAAGCTGPKHSDCLACLHFNHSGICELHCPALVTYNTDTFESMPNPEGRYTFGASCVTACPYNYLSTDVGSCTLVCPLHNQEVTAEDGTQRCEKCSKPCARVCYGLGMEHLREVRAVTSANIQEFAGCKKIFGSLAFLPESFDGDPASNTAPLQPEQLQVFETLEEITGYLYISAWPDSLPDLSVFQNLQVIRGRILHNGAYSLTLQGLGISWLGLRSLRELGSGLALIHHNTHLCFVHTVPWDQLFRNPHQALLHTANRPEDECVGEGLACHQLCARGHCWGPGPTQCVNCSQFLRGQECVEECRVLQGLPREYVNARHCLPCHPECQPQNGSVTCFGPEADQCVACAHYKDPPFCVARCPSGVKPDLSYMPIWKFPDEEGACQPCPINCTHSCVDLDDKGCPAEQRASPLTSIISAVVGILLVVVLGVVFGILIKRRQQKIRKYTMRRLLQETELVEPLTPSGA",
+        "unaligned_reference_suffix": "LGPASPLDSTFYRSLLEDDDMGDLVDAEEYLVPQQGFFCPDPAPGAGGMVHHRHRSSSTRSGGGDLTLGLEPSEEEAPRSPLAPSEGAGSDVFDGDLGMGAAKGLQSLPTHDPSPLQRYSEDPTVPLPSETDGYVAPLTCSPQPEYVNQPDVRPQPPSPREGPLPAARPAGATLERPKTLSPGKNGVVKDVFAFGGAVENPEYLTPQGGAAPQPHPPPAFSPAFDNLYYWDQDPPERGAPPSTFKGTPTAENPEYLGLDVPV",
+        "unaligned_observed_prefix": "",
+        "unaligned_observed_suffix": "",
+        "observed_terminal_residue_ids": {
+          "first": "706",
+          "last": "993"
+        },
+        "aligned_reference_start_position": 706,
+        "aligned_reference_end_position": 993,
+        "internal_gaps": [
+          {
+            "reference_start_position": 880,
+            "reference_end_position": 881,
+            "reference_sequence": "DG"
+          }
+        ]
+      },
+      "entity_sequence_validation": {
+        "selected_chain_id": "A",
+        "observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "observed_chain_sequence_length": 286,
+        "reference_sequence_length": 338,
+        "alignment_method": "affine-gap semi-global Gotoh; full observed chain to reference substring",
+        "scoring_parameters": {
+          "match": 2,
+          "mismatch": -2,
+          "gap_open": -5,
+          "gap_extend": -1,
+          "alignment_mode": "semi-global: all observed-chain residues aligned; free reference termini"
+        },
+        "thresholds": {
+          "minimum_identity_fraction": 0.9,
+          "minimum_observed_coverage": 0.8,
+          "minimum_reference_coverage": 0.15,
+          "minimum_aligned_residues": 100,
+          "maximum_gap_fraction": 0.1,
+          "exact_reference_coverage": 1.0
+        },
+        "warnings": [
+          "Unrecognized HETATM residues not declared as polymer residues were treated as non-protein heterogens and excluded.",
+          "Residue numbering gaps were retained as coordinate gaps; their sequence is unknown.",
+          "Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.",
+          "Sequence support is partial or contains localized differences; generation is allowed under the configured thresholds."
+        ],
+        "validation_outcome": "passed_partial",
+        "identity_state": "structure_linked_partial_sequence_support",
+        "candidate_generation_allowed": true,
+        "alignment_score": 566,
+        "aligned_observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHA--GKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "aligned_reference_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "identical_aligned_residues": 286,
+        "informative_aligned_residues": 286,
+        "identity_fraction": 1.0,
+        "identity_percent": 100.0,
+        "identity_denominator_definition": "informative residue/residue alignment columns; X/B/Z/J excluded",
+        "observed_chain_coverage": 1.0,
+        "observed_coverage_denominator": "all observed coordinate residues, including X",
+        "reference_sequence_coverage": 0.8461538461538461,
+        "reference_coverage_denominator": "full verified UniProt sequence length",
+        "aligned_observed_residue_count": 286,
+        "substitution_count": 0,
+        "substitutions": [],
+        "insertion_count": 0,
+        "insertions": [],
+        "deletion_count": 2,
+        "deletions": [
+          {
+            "reference_start_position": 179,
+            "reference_end_position": 180,
+            "reference_sequence": "DG"
+          }
+        ],
+        "gap_fraction": 0.006944444444444444,
+        "unaligned_reference_prefix": "MSGA",
+        "unaligned_reference_suffix": "LGPASPLDSTFYRSLLEDDDMGDLVDAEEYLVPQQGAAASHHHHHH",
+        "unaligned_observed_prefix": "",
+        "unaligned_observed_suffix": "",
+        "observed_terminal_residue_ids": {
+          "first": "706",
+          "last": "993"
+        },
+        "aligned_reference_start_position": 5,
+        "aligned_reference_end_position": 292,
+        "internal_gaps": [
+          {
+            "reference_start_position": 179,
+            "reference_end_position": 180,
+            "reference_sequence": "DG"
+          }
+        ]
+      },
+      "generation_authorization": {
+        "allowed": true,
+        "policy_state": "independently_documented_partial_construct",
+        "evidence": [
+          "selected-chain DBREF accession",
+          "exact UniProt accession lookup",
+          "RCSB/SIFTS chain-to-accession mapping",
+          "observed sequence support against RCSB entity sequence"
+        ],
+        "reason": "Partial sequence support is accompanied by an independently documented RCSB/SIFTS mapping for this chain and accession."
+      },
+      "expected_generation_allowed": true,
+      "actual_generation_allowed": true,
+      "independent_label_basis": "RCSB polymer entity UniProt/SIFTS mapping plus matching author-chain instance; expected status is not derived from sequence identity score.",
+      "source_urls": [
+        "https://www.rcsb.org/structure/3PP0",
+        "https://data.rcsb.org/rest/v1/core/polymer_entity_instance/3PP0/A",
+        "https://data.rcsb.org/rest/v1/core/polymer_entity/3PP0/1",
+        "https://rest.uniprot.org/uniprotkb/P04626.fasta"
+      ]
+    },
+    {
+      "pdb": "3PP0",
+      "chain": "B",
+      "accession": "P04626",
+      "kind": "engineered kinase-domain construct, second chain",
+      "expected": true,
+      "entity_json": "3PP0_entity_1.json",
+      "instance_json": "3PP0_B_instance.json",
+      "observed_chain_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEPLDSTFYRSLL",
+      "reference_sequence_source": "UniProt REST FASTA P04626",
+      "reference_sequence": "MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLALTLIDTNRSRACHPCSPMCKGSRCWGESSEDCQSLTRTVCAGGCARCKGPLPTDCCHEQCAAGCTGPKHSDCLACLHFNHSGICELHCPALVTYNTDTFESMPNPEGRYTFGASCVTACPYNYLSTDVGSCTLVCPLHNQEVTAEDGTQRCEKCSKPCARVCYGLGMEHLREVRAVTSANIQEFAGCKKIFGSLAFLPESFDGDPASNTAPLQPEQLQVFETLEEITGYLYISAWPDSLPDLSVFQNLQVIRGRILHNGAYSLTLQGLGISWLGLRSLRELGSGLALIHHNTHLCFVHTVPWDQLFRNPHQALLHTANRPEDECVGEGLACHQLCARGHCWGPGPTQCVNCSQFLRGQECVEECRVLQGLPREYVNARHCLPCHPECQPQNGSVTCFGPEADQCVACAHYKDPPFCVARCPSGVKPDLSYMPIWKFPDEEGACQPCPINCTHSCVDLDDKGCPAEQRASPLTSIISAVVGILLVVVLGVVFGILIKRRQQKIRKYTMRRLLQETELVEPLTPSGAMPNQAQMRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEDLGPASPLDSTFYRSLLEDDDMGDLVDAEEYLVPQQGFFCPDPAPGAGGMVHHRHRSSSTRSGGGDLTLGLEPSEEEAPRSPLAPSEGAGSDVFDGDLGMGAAKGLQSLPTHDPSPLQRYSEDPTVPLPSETDGYVAPLTCSPQPEYVNQPDVRPQPPSPREGPLPAARPAGATLERPKTLSPGKNGVVKDVFAFGGAVENPEYLTPQGGAAPQPHPPPAFSPAFDNLYYWDQDPPERGAPPSTFKGTPTAENPEYLGLDVPV",
+      "observed_dbref_records": [
+        "DBREF  3PP0 B  706  1009  UNP    P04626   ERBB2_HUMAN    706   1009"
+      ],
+      "pdb_seqadv_records": [],
+      "rcsb_mapping": {
+        "database_accession": "P04626",
+        "database_name": "UniProt",
+        "entity_sequence_coverage": 0.9970414201183432,
+        "provenance_source": "SIFTS",
+        "reference_sequence_coverage": 0.2685258964143426
+      },
+      "rcsb_instance_auth_chain_id": "B",
+      "rcsb_entity_sequence": "MSGAAPNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEDLGPASPLDSTFYRSLLEDDDMGDLVDAEEYLVPQQGAAASHHHHHH",
+      "uniprot_validation": {
+        "selected_chain_id": "B",
+        "observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEPLDSTFYRSLL",
+        "observed_chain_sequence_length": 296,
+        "reference_sequence_length": 1255,
+        "alignment_method": "affine-gap semi-global Gotoh; full observed chain to reference substring",
+        "scoring_parameters": {
+          "match": 2,
+          "mismatch": -2,
+          "gap_open": -5,
+          "gap_extend": -1,
+          "alignment_mode": "semi-global: all observed-chain residues aligned; free reference termini"
+        },
+        "thresholds": {
+          "minimum_identity_fraction": 0.9,
+          "minimum_observed_coverage": 0.8,
+          "minimum_reference_coverage": 0.15,
+          "minimum_aligned_residues": 100,
+          "maximum_gap_fraction": 0.1,
+          "exact_reference_coverage": 1.0
+        },
+        "warnings": [
+          "Unrecognized HETATM residues not declared as polymer residues were treated as non-protein heterogens and excluded.",
+          "Residue numbering gaps were retained as coordinate gaps; their sequence is unknown.",
+          "Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.",
+          "Observed/reference substitutions were retained and reported.",
+          "Sequence support is partial or contains localized differences; generation is allowed under the configured thresholds."
+        ],
+        "validation_outcome": "passed_partial",
+        "identity_state": "structure_linked_partial_sequence_support",
+        "candidate_generation_allowed": true,
+        "alignment_score": 564,
+        "aligned_observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHA--GKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNE------PLDSTFYRSLL",
+        "aligned_reference_sequence": "MPNQAQMRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEDLGPASPLDSTFYRSLL",
+        "identical_aligned_residues": 293,
+        "informative_aligned_residues": 296,
+        "identity_fraction": 0.9898648648648649,
+        "identity_percent": 98.98648648648648,
+        "identity_denominator_definition": "informative residue/residue alignment columns; X/B/Z/J excluded",
+        "observed_chain_coverage": 1.0,
+        "observed_coverage_denominator": "all observed coordinate residues, including X",
+        "reference_sequence_coverage": 0.2358565737051793,
+        "reference_coverage_denominator": "full verified UniProt sequence length",
+        "aligned_observed_residue_count": 296,
+        "substitution_count": 3,
+        "substitutions": [
+          {
+            "observed_index": 1,
+            "pdb_residue_id": "706",
+            "observed_amino_acid": "A",
+            "reference_position": 706,
+            "reference_amino_acid": "M"
+          },
+          {
+            "observed_index": 6,
+            "pdb_residue_id": "711",
+            "observed_amino_acid": "L",
+            "reference_position": 711,
+            "reference_amino_acid": "Q"
+          },
+          {
+            "observed_index": 7,
+            "pdb_residue_id": "712",
+            "observed_amino_acid": "L",
+            "reference_position": 712,
+            "reference_amino_acid": "M"
+          }
+        ],
+        "insertion_count": 0,
+        "insertions": [],
+        "deletion_count": 8,
+        "deletions": [
+          {
+            "reference_start_position": 880,
+            "reference_end_position": 881,
+            "reference_sequence": "DG"
+          },
+          {
+            "reference_start_position": 993,
+            "reference_end_position": 998,
+            "reference_sequence": "DLGPAS"
+          }
+        ],
+        "gap_fraction": 0.02631578947368421,
+        "unaligned_reference_prefix": "MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLALTLIDTNRSRACHPCSPMCKGSRCWGESSEDCQSLTRTVCAGGCARCKGPLPTDCCHEQCAAGCTGPKHSDCLACLHFNHSGICELHCPALVTYNTDTFESMPNPEGRYTFGASCVTACPYNYLSTDVGSCTLVCPLHNQEVTAEDGTQRCEKCSKPCARVCYGLGMEHLREVRAVTSANIQEFAGCKKIFGSLAFLPESFDGDPASNTAPLQPEQLQVFETLEEITGYLYISAWPDSLPDLSVFQNLQVIRGRILHNGAYSLTLQGLGISWLGLRSLRELGSGLALIHHNTHLCFVHTVPWDQLFRNPHQALLHTANRPEDECVGEGLACHQLCARGHCWGPGPTQCVNCSQFLRGQECVEECRVLQGLPREYVNARHCLPCHPECQPQNGSVTCFGPEADQCVACAHYKDPPFCVARCPSGVKPDLSYMPIWKFPDEEGACQPCPINCTHSCVDLDDKGCPAEQRASPLTSIISAVVGILLVVVLGVVFGILIKRRQQKIRKYTMRRLLQETELVEPLTPSGA",
+        "unaligned_reference_suffix": "EDDDMGDLVDAEEYLVPQQGFFCPDPAPGAGGMVHHRHRSSSTRSGGGDLTLGLEPSEEEAPRSPLAPSEGAGSDVFDGDLGMGAAKGLQSLPTHDPSPLQRYSEDPTVPLPSETDGYVAPLTCSPQPEYVNQPDVRPQPPSPREGPLPAARPAGATLERPKTLSPGKNGVVKDVFAFGGAVENPEYLTPQGGAAPQPHPPPAFSPAFDNLYYWDQDPPERGAPPSTFKGTPTAENPEYLGLDVPV",
+        "unaligned_observed_prefix": "",
+        "unaligned_observed_suffix": "",
+        "observed_terminal_residue_ids": {
+          "first": "706",
+          "last": "1009"
+        },
+        "aligned_reference_start_position": 706,
+        "aligned_reference_end_position": 1009,
+        "internal_gaps": [
+          {
+            "reference_start_position": 880,
+            "reference_end_position": 881,
+            "reference_sequence": "DG"
+          },
+          {
+            "reference_start_position": 993,
+            "reference_end_position": 998,
+            "reference_sequence": "DLGPAS"
+          }
+        ]
+      },
+      "entity_sequence_validation": {
+        "selected_chain_id": "B",
+        "observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEPLDSTFYRSLL",
+        "observed_chain_sequence_length": 296,
+        "reference_sequence_length": 338,
+        "alignment_method": "affine-gap semi-global Gotoh; full observed chain to reference substring",
+        "scoring_parameters": {
+          "match": 2,
+          "mismatch": -2,
+          "gap_open": -5,
+          "gap_extend": -1,
+          "alignment_mode": "semi-global: all observed-chain residues aligned; free reference termini"
+        },
+        "thresholds": {
+          "minimum_identity_fraction": 0.9,
+          "minimum_observed_coverage": 0.8,
+          "minimum_reference_coverage": 0.15,
+          "minimum_aligned_residues": 100,
+          "maximum_gap_fraction": 0.1,
+          "exact_reference_coverage": 1.0
+        },
+        "warnings": [
+          "Unrecognized HETATM residues not declared as polymer residues were treated as non-protein heterogens and excluded.",
+          "Residue numbering gaps were retained as coordinate gaps; their sequence is unknown.",
+          "Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.",
+          "Sequence support is partial or contains localized differences; generation is allowed under the configured thresholds."
+        ],
+        "validation_outcome": "passed_partial",
+        "identity_state": "structure_linked_partial_sequence_support",
+        "candidate_generation_allowed": true,
+        "alignment_score": 576,
+        "aligned_observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHA--GKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNE------PLDSTFYRSLL",
+        "aligned_reference_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEDLGPASPLDSTFYRSLL",
+        "identical_aligned_residues": 296,
+        "informative_aligned_residues": 296,
+        "identity_fraction": 1.0,
+        "identity_percent": 100.0,
+        "identity_denominator_definition": "informative residue/residue alignment columns; X/B/Z/J excluded",
+        "observed_chain_coverage": 1.0,
+        "observed_coverage_denominator": "all observed coordinate residues, including X",
+        "reference_sequence_coverage": 0.8757396449704142,
+        "reference_coverage_denominator": "full verified UniProt sequence length",
+        "aligned_observed_residue_count": 296,
+        "substitution_count": 0,
+        "substitutions": [],
+        "insertion_count": 0,
+        "insertions": [],
+        "deletion_count": 8,
+        "deletions": [
+          {
+            "reference_start_position": 179,
+            "reference_end_position": 180,
+            "reference_sequence": "DG"
+          },
+          {
+            "reference_start_position": 292,
+            "reference_end_position": 297,
+            "reference_sequence": "DLGPAS"
+          }
+        ],
+        "gap_fraction": 0.02631578947368421,
+        "unaligned_reference_prefix": "MSGA",
+        "unaligned_reference_suffix": "EDDDMGDLVDAEEYLVPQQGAAASHHHHHH",
+        "unaligned_observed_prefix": "",
+        "unaligned_observed_suffix": "",
+        "observed_terminal_residue_ids": {
+          "first": "706",
+          "last": "1009"
+        },
+        "aligned_reference_start_position": 5,
+        "aligned_reference_end_position": 308,
+        "internal_gaps": [
+          {
+            "reference_start_position": 179,
+            "reference_end_position": 180,
+            "reference_sequence": "DG"
+          },
+          {
+            "reference_start_position": 292,
+            "reference_end_position": 297,
+            "reference_sequence": "DLGPAS"
+          }
+        ]
+      },
+      "generation_authorization": {
+        "allowed": true,
+        "policy_state": "independently_documented_partial_construct",
+        "evidence": [
+          "selected-chain DBREF accession",
+          "exact UniProt accession lookup",
+          "RCSB/SIFTS chain-to-accession mapping",
+          "observed sequence support against RCSB entity sequence"
+        ],
+        "reason": "Partial sequence support is accompanied by an independently documented RCSB/SIFTS mapping for this chain and accession."
+      },
+      "expected_generation_allowed": true,
+      "actual_generation_allowed": true,
+      "independent_label_basis": "RCSB polymer entity UniProt/SIFTS mapping plus matching author-chain instance; expected status is not derived from sequence identity score.",
+      "source_urls": [
+        "https://www.rcsb.org/structure/3PP0",
+        "https://data.rcsb.org/rest/v1/core/polymer_entity_instance/3PP0/B",
+        "https://data.rcsb.org/rest/v1/core/polymer_entity/3PP0/1",
+        "https://rest.uniprot.org/uniprotkb/P04626.fasta"
+      ]
+    },
+    {
+      "pdb": "3PP0",
+      "chain": "A",
+      "accession": "P00533",
+      "kind": "wrong-target negative control (HER2 structure supplied as EGFR)",
+      "expected": false,
+      "entity_json": "3PP0_entity_1.json",
+      "instance_json": "3PP0_A_instance.json",
+      "observed_chain_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+      "reference_sequence_source": "UniProt REST FASTA P00533",
+      "reference_sequence": "MRPSGTAGAALLALLAALCPASRALEEKKVCQGTSNKLTQLGTFEDHFLSLQRMFNNCEVVLGNLEITYVQRNYDLSFLKTIQEVAGYVLIALNTVERIPLENLQIIRGNMYYENSYALAVLSNYDANKTGLKELPMRNLQEILHGAVRFSNNPALCNVESIQWRDIVSSDFLSNMSMDFQNHLGSCQKCDPSCPNGSCWGAGEENCQKLTKIICAQQCSGRCRGKSPSDCCHNQCAAGCTGPRESDCLVCRKFRDEATCKDTCPPLMLYNPTTYQMDVNPEGKYSFGATCVKKCPRNYVVTDHGSCVRACGADSYEMEEDGVRKCKKCEGPCRKVCNGIGIGEFKDSLSINATNIKHFKNCTSISGDLHILPVAFRGDSFTHTPPLDPQELDILKTVKEITGFLLIQAWPENRTDLHAFENLEIIRGRTKQHGQFSLAVVSLNITSLGLRSLKEISDGDVIISGNKNLCYANTINWKKLFGTSGQKTKIISNRGENSCKATGQVCHALCSPEGCWGPEPRDCVSCRNVSRGRECVDKCNLLEGEPREFVENSECIQCHPECLPQAMNITCTGRGPDNCIQCAHYIDGPHCVKTCPAGVMGENNTLVWKYADAGHVCHLCHPNCTYGCTGPGLEGCPTNGPKIPSIATGMVGALLLLLVVALGIGLFMRRRHIVRKRTLRRLLQERELVEPLTPSGEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIPQQGFFSSPSTSRTPLLSSLSATSNNSTVACIDRNGLQSCPIKEDSFLQRYSSDPTGALTEDSIDDTFLPVPEYINQSVPKRPAGSVQNPVYHNQPLNPAPSRDPHYQDPHSTAVGNPEYLNTVQPTCVNSTFDSPAHWAQKGSHQISLDNPDYQQDFFPKEAKPNGIFKGSTAENAEYLRVAPQSSEFIGA",
+      "observed_dbref_records": [
+        "DBREF  3PP0 A  706  1009  UNP    P04626   ERBB2_HUMAN    706   1009"
+      ],
+      "pdb_seqadv_records": [
+        "SEQADV 3PP0 ALA A  706  UNP  P04626    MET   706 ENGINEERED MUTATION",
+        "SEQADV 3PP0 ALA B  706  UNP  P04626    MET   706 ENGINEERED MUTATION"
+      ],
+      "rcsb_mapping": {},
+      "rcsb_instance_auth_chain_id": "A",
+      "rcsb_entity_sequence": "MSGAAPNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNEDLGPASPLDSTFYRSLLEDDDMGDLVDAEEYLVPQQGAAASHHHHHH",
+      "uniprot_validation": {
+        "selected_chain_id": "A",
+        "observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "observed_chain_sequence_length": 286,
+        "reference_sequence_length": 1210,
+        "alignment_method": "affine-gap semi-global Gotoh; full observed chain to reference substring",
+        "scoring_parameters": {
+          "match": 2,
+          "mismatch": -2,
+          "gap_open": -5,
+          "gap_extend": -1,
+          "alignment_mode": "semi-global: all observed-chain residues aligned; free reference termini"
+        },
+        "thresholds": {
+          "minimum_identity_fraction": 0.9,
+          "minimum_observed_coverage": 0.8,
+          "minimum_reference_coverage": 0.15,
+          "minimum_aligned_residues": 100,
+          "maximum_gap_fraction": 0.1,
+          "exact_reference_coverage": 1.0
+        },
+        "warnings": [
+          "Unrecognized HETATM residues not declared as polymer residues were treated as non-protein heterogens and excluded.",
+          "Residue numbering gaps were retained as coordinate gaps; their sequence is unknown.",
+          "Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.",
+          "Observed/reference substitutions were retained and reported.",
+          "Sequence identity or internal-gap disagreement exceeded the configured acceptance policy."
+        ],
+        "validation_outcome": "sequence_mismatch",
+        "identity_state": "sequence_mismatch",
+        "candidate_generation_allowed": false,
+        "alignment_score": 359,
+        "aligned_observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHA--GKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "aligned_reference_sequence": "APNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQ-GD",
+        "identical_aligned_residues": 235,
+        "informative_aligned_residues": 285,
+        "identity_fraction": 0.8245614035087719,
+        "identity_percent": 82.45614035087719,
+        "identity_denominator_definition": "informative residue/residue alignment columns; X/B/Z/J excluded",
+        "observed_chain_coverage": 0.9965034965034965,
+        "observed_coverage_denominator": "all observed coordinate residues, including X",
+        "reference_sequence_coverage": 0.23553719008264462,
+        "reference_coverage_denominator": "full verified UniProt sequence length",
+        "aligned_observed_residue_count": 285,
+        "substitution_count": 50,
+        "substitutions": [
+          {
+            "observed_index": 15,
+            "pdb_residue_id": "720",
+            "observed_amino_acid": "L",
+            "reference_position": 712,
+            "reference_amino_acid": "F"
+          },
+          {
+            "observed_index": 16,
+            "pdb_residue_id": "721",
+            "observed_amino_acid": "R",
+            "reference_position": 713,
+            "reference_amino_acid": "K"
+          },
+          {
+            "observed_index": 18,
+            "pdb_residue_id": "723",
+            "observed_amino_acid": "V",
+            "reference_position": 715,
+            "reference_amino_acid": "I"
+          },
+          {
+            "observed_index": 33,
+            "pdb_residue_id": "738",
+            "observed_amino_acid": "I",
+            "reference_position": 730,
+            "reference_amino_acid": "L"
+          },
+          {
+            "observed_index": 37,
+            "pdb_residue_id": "742",
+            "observed_amino_acid": "D",
+            "reference_position": 734,
+            "reference_amino_acid": "E"
+          },
+          {
+            "observed_index": 40,
+            "pdb_residue_id": "745",
+            "observed_amino_acid": "N",
+            "reference_position": 737,
+            "reference_amino_acid": "K"
+          },
+          {
+            "observed_index": 49,
+            "pdb_residue_id": "754",
+            "observed_amino_acid": "V",
+            "reference_position": 746,
+            "reference_amino_acid": "E"
+          },
+          {
+            "observed_index": 53,
+            "pdb_residue_id": "758",
+            "observed_amino_acid": "N",
+            "reference_position": 750,
+            "reference_amino_acid": "A"
+          },
+          {
+            "observed_index": 71,
+            "pdb_residue_id": "776",
+            "observed_amino_acid": "G",
+            "reference_position": 768,
+            "reference_amino_acid": "S"
+          },
+          {
+            "observed_index": 73,
+            "pdb_residue_id": "778",
+            "observed_amino_acid": "G",
+            "reference_position": 770,
+            "reference_amino_acid": "D"
+          },
+          {
+            "observed_index": 74,
+            "pdb_residue_id": "779",
+            "observed_amino_acid": "S",
+            "reference_position": 771,
+            "reference_amino_acid": "N"
+          },
+          {
+            "observed_index": 76,
+            "pdb_residue_id": "781",
+            "observed_amino_acid": "Y",
+            "reference_position": 773,
+            "reference_amino_acid": "H"
+          },
+          {
+            "observed_index": 78,
+            "pdb_residue_id": "783",
+            "observed_amino_acid": "S",
+            "reference_position": 775,
+            "reference_amino_acid": "C"
+          },
+          {
+            "observed_index": 92,
+            "pdb_residue_id": "797",
+            "observed_amino_acid": "V",
+            "reference_position": 789,
+            "reference_amino_acid": "I"
+          },
+          {
+            "observed_index": 98,
+            "pdb_residue_id": "803",
+            "observed_amino_acid": "Y",
+            "reference_position": 795,
+            "reference_amino_acid": "F"
+          },
+          {
+            "observed_index": 104,
+            "pdb_residue_id": "809",
+            "observed_amino_acid": "H",
+            "reference_position": 801,
+            "reference_amino_acid": "Y"
+          },
+          {
+            "observed_index": 108,
+            "pdb_residue_id": "813",
+            "observed_amino_acid": "N",
+            "reference_position": 805,
+            "reference_amino_acid": "H"
+          },
+          {
+            "observed_index": 109,
+            "pdb_residue_id": "814",
+            "observed_amino_acid": "R",
+            "reference_position": 806,
+            "reference_amino_acid": "K"
+          },
+          {
+            "observed_index": 110,
+            "pdb_residue_id": "815",
+            "observed_amino_acid": "G",
+            "reference_position": 807,
+            "reference_amino_acid": "D"
+          },
+          {
+            "observed_index": 111,
+            "pdb_residue_id": "816",
+            "observed_amino_acid": "R",
+            "reference_position": 808,
+            "reference_amino_acid": "N"
+          },
+          {
+            "observed_index": 112,
+            "pdb_residue_id": "817",
+            "observed_amino_acid": "L",
+            "reference_position": 809,
+            "reference_amino_acid": "I"
+          },
+          {
+            "observed_index": 116,
+            "pdb_residue_id": "821",
+            "observed_amino_acid": "D",
+            "reference_position": 813,
+            "reference_amino_acid": "Y"
+          },
+          {
+            "observed_index": 122,
+            "pdb_residue_id": "827",
+            "observed_amino_acid": "M",
+            "reference_position": 819,
+            "reference_amino_acid": "V"
+          },
+          {
+            "observed_index": 129,
+            "pdb_residue_id": "834",
+            "observed_amino_acid": "S",
+            "reference_position": 826,
+            "reference_amino_acid": "N"
+          },
+          {
+            "observed_index": 134,
+            "pdb_residue_id": "839",
+            "observed_amino_acid": "V",
+            "reference_position": 831,
+            "reference_amino_acid": "R"
+          },
+          {
+            "observed_index": 150,
+            "pdb_residue_id": "855",
+            "observed_amino_acid": "S",
+            "reference_position": 847,
+            "reference_amino_acid": "T"
+          },
+          {
+            "observed_index": 152,
+            "pdb_residue_id": "857",
+            "observed_amino_acid": "N",
+            "reference_position": 849,
+            "reference_amino_acid": "Q"
+          },
+          {
+            "observed_index": 163,
+            "pdb_residue_id": "868",
+            "observed_amino_acid": "R",
+            "reference_position": 860,
+            "reference_amino_acid": "K"
+          },
+          {
+            "observed_index": 166,
+            "pdb_residue_id": "871",
+            "observed_amino_acid": "D",
+            "reference_position": 863,
+            "reference_amino_acid": "G"
+          },
+          {
+            "observed_index": 167,
+            "pdb_residue_id": "872",
+            "observed_amino_acid": "I",
+            "reference_position": 864,
+            "reference_amino_acid": "A"
+          },
+          {
+            "observed_index": 168,
+            "pdb_residue_id": "873",
+            "observed_amino_acid": "D",
+            "reference_position": 865,
+            "reference_amino_acid": "E"
+          },
+          {
+            "observed_index": 170,
+            "pdb_residue_id": "875",
+            "observed_amino_acid": "T",
+            "reference_position": 867,
+            "reference_amino_acid": "K"
+          },
+          {
+            "observed_index": 189,
+            "pdb_residue_id": "896",
+            "observed_amino_acid": "R",
+            "reference_position": 888,
+            "reference_amino_acid": "H"
+          },
+          {
+            "observed_index": 191,
+            "pdb_residue_id": "898",
+            "observed_amino_acid": "R",
+            "reference_position": 890,
+            "reference_amino_acid": "I"
+          },
+          {
+            "observed_index": 192,
+            "pdb_residue_id": "899",
+            "observed_amino_acid": "F",
+            "reference_position": 891,
+            "reference_amino_acid": "Y"
+          },
+          {
+            "observed_index": 213,
+            "pdb_residue_id": "920",
+            "observed_amino_acid": "A",
+            "reference_position": 912,
+            "reference_amino_acid": "S"
+          },
+          {
+            "observed_index": 222,
+            "pdb_residue_id": "929",
+            "observed_amino_acid": "R",
+            "reference_position": 921,
+            "reference_amino_acid": "S"
+          },
+          {
+            "observed_index": 225,
+            "pdb_residue_id": "932",
+            "observed_amino_acid": "P",
+            "reference_position": 924,
+            "reference_amino_acid": "S"
+          },
+          {
+            "observed_index": 226,
+            "pdb_residue_id": "933",
+            "observed_amino_acid": "D",
+            "reference_position": 925,
+            "reference_amino_acid": "S"
+          },
+          {
+            "observed_index": 227,
+            "pdb_residue_id": "934",
+            "observed_amino_acid": "L",
+            "reference_position": 926,
+            "reference_amino_acid": "I"
+          },
+          {
+            "observed_index": 256,
+            "pdb_residue_id": "963",
+            "observed_amino_acid": "S",
+            "reference_position": 955,
+            "reference_amino_acid": "A"
+          },
+          {
+            "observed_index": 257,
+            "pdb_residue_id": "964",
+            "observed_amino_acid": "E",
+            "reference_position": 956,
+            "reference_amino_acid": "D"
+          },
+          {
+            "observed_index": 258,
+            "pdb_residue_id": "965",
+            "observed_amino_acid": "C",
+            "reference_position": 957,
+            "reference_amino_acid": "S"
+          },
+          {
+            "observed_index": 261,
+            "pdb_residue_id": "968",
+            "observed_amino_acid": "R",
+            "reference_position": 960,
+            "reference_amino_acid": "K"
+          },
+          {
+            "observed_index": 266,
+            "pdb_residue_id": "973",
+            "observed_amino_acid": "V",
+            "reference_position": 965,
+            "reference_amino_acid": "I"
+          },
+          {
+            "observed_index": 267,
+            "pdb_residue_id": "974",
+            "observed_amino_acid": "S",
+            "reference_position": 966,
+            "reference_amino_acid": "I"
+          },
+          {
+            "observed_index": 271,
+            "pdb_residue_id": "978",
+            "observed_amino_acid": "R",
+            "reference_position": 970,
+            "reference_amino_acid": "K"
+          },
+          {
+            "observed_index": 279,
+            "pdb_residue_id": "986",
+            "observed_amino_acid": "F",
+            "reference_position": 978,
+            "reference_amino_acid": "Y"
+          },
+          {
+            "observed_index": 280,
+            "pdb_residue_id": "987",
+            "observed_amino_acid": "V",
+            "reference_position": 979,
+            "reference_amino_acid": "L"
+          },
+          {
+            "observed_index": 285,
+            "pdb_residue_id": "992",
+            "observed_amino_acid": "E",
+            "reference_position": 983,
+            "reference_amino_acid": "G"
+          }
+        ],
+        "insertion_count": 1,
+        "insertions": [
+          {
+            "observed_start_index": 284,
+            "observed_end_index": 284,
+            "observed_sequence": "N",
+            "pdb_residue_ids": [
+              "991"
+            ]
+          }
+        ],
+        "deletion_count": 2,
+        "deletions": [
+          {
+            "reference_start_position": 872,
+            "reference_end_position": 873,
+            "reference_sequence": "EG"
+          }
+        ],
+        "gap_fraction": 0.010416666666666666,
+        "unaligned_reference_prefix": "MRPSGTAGAALLALLAALCPASRALEEKKVCQGTSNKLTQLGTFEDHFLSLQRMFNNCEVVLGNLEITYVQRNYDLSFLKTIQEVAGYVLIALNTVERIPLENLQIIRGNMYYENSYALAVLSNYDANKTGLKELPMRNLQEILHGAVRFSNNPALCNVESIQWRDIVSSDFLSNMSMDFQNHLGSCQKCDPSCPNGSCWGAGEENCQKLTKIICAQQCSGRCRGKSPSDCCHNQCAAGCTGPRESDCLVCRKFRDEATCKDTCPPLMLYNPTTYQMDVNPEGKYSFGATCVKKCPRNYVVTDHGSCVRACGADSYEMEEDGVRKCKKCEGPCRKVCNGIGIGEFKDSLSINATNIKHFKNCTSISGDLHILPVAFRGDSFTHTPPLDPQELDILKTVKEITGFLLIQAWPENRTDLHAFENLEIIRGRTKQHGQFSLAVVSLNITSLGLRSLKEISDGDVIISGNKNLCYANTINWKKLFGTSGQKTKIISNRGENSCKATGQVCHALCSPEGCWGPEPRDCVSCRNVSRGRECVDKCNLLEGEPREFVENSECIQCHPECLPQAMNITCTGRGPDNCIQCAHYIDGPHCVKTCPAGVMGENNTLVWKYADAGHVCHLCHPNCTYGCTGPGLEGCPTNGPKIPSIATGMVGALLLLLVVALGIGLFMRRRHIVRKRTLRRLLQERELVEPLTPSGE",
+        "unaligned_reference_suffix": "ERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIPQQGFFSSPSTSRTPLLSSLSATSNNSTVACIDRNGLQSCPIKEDSFLQRYSSDPTGALTEDSIDDTFLPVPEYINQSVPKRPAGSVQNPVYHNQPLNPAPSRDPHYQDPHSTAVGNPEYLNTVQPTCVNSTFDSPAHWAQKGSHQISLDNPDYQQDFFPKEAKPNGIFKGSTAENAEYLRVAPQSSEFIGA",
+        "unaligned_observed_prefix": "",
+        "unaligned_observed_suffix": "",
+        "observed_terminal_residue_ids": {
+          "first": "706",
+          "last": "993"
+        },
+        "aligned_reference_start_position": 698,
+        "aligned_reference_end_position": 984,
+        "internal_gaps": [
+          {
+            "observed_start_index": 284,
+            "observed_end_index": 284,
+            "observed_sequence": "N",
+            "pdb_residue_ids": [
+              "991"
+            ]
+          },
+          {
+            "reference_start_position": 872,
+            "reference_end_position": 873,
+            "reference_sequence": "EG"
+          }
+        ]
+      },
+      "entity_sequence_validation": {
+        "selected_chain_id": "A",
+        "observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHAGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "observed_chain_sequence_length": 286,
+        "reference_sequence_length": 338,
+        "alignment_method": "affine-gap semi-global Gotoh; full observed chain to reference substring",
+        "scoring_parameters": {
+          "match": 2,
+          "mismatch": -2,
+          "gap_open": -5,
+          "gap_extend": -1,
+          "alignment_mode": "semi-global: all observed-chain residues aligned; free reference termini"
+        },
+        "thresholds": {
+          "minimum_identity_fraction": 0.9,
+          "minimum_observed_coverage": 0.8,
+          "minimum_reference_coverage": 0.15,
+          "minimum_aligned_residues": 100,
+          "maximum_gap_fraction": 0.1,
+          "exact_reference_coverage": 1.0
+        },
+        "warnings": [
+          "Unrecognized HETATM residues not declared as polymer residues were treated as non-protein heterogens and excluded.",
+          "Residue numbering gaps were retained as coordinate gaps; their sequence is unknown.",
+          "Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.",
+          "Sequence support is partial or contains localized differences; generation is allowed under the configured thresholds."
+        ],
+        "validation_outcome": "passed_partial",
+        "identity_state": "structure_linked_partial_sequence_support",
+        "candidate_generation_allowed": true,
+        "alignment_score": 566,
+        "aligned_observed_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHA--GKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "aligned_reference_sequence": "APNQALLRILKETELRKVKVLGSGAFGTVYKGIWIPDGENVKIPVAIKVLRENTSPKANKEILDEAYVMAGVGSPYVSRLLGICLTSTVQLVTQLMPYGCLLDHVRENRGRLGSQDLLNWCMQIAKGMSYLEDVRLVHRDLAARNVLVKSPNHVKITDFGLARLLDIDETEYHADGGKVPIKWMALESILRRRFTHQSDVWSYGVTVWELMTFGAKPYDGIPAREIPDLLEKGERLPQPPICTIDVYMIMVKCWMIDSECRPRFRELVSEFSRMARDPQRFVVIQNED",
+        "identical_aligned_residues": 286,
+        "informative_aligned_residues": 286,
+        "identity_fraction": 1.0,
+        "identity_percent": 100.0,
+        "identity_denominator_definition": "informative residue/residue alignment columns; X/B/Z/J excluded",
+        "observed_chain_coverage": 1.0,
+        "observed_coverage_denominator": "all observed coordinate residues, including X",
+        "reference_sequence_coverage": 0.8461538461538461,
+        "reference_coverage_denominator": "full verified UniProt sequence length",
+        "aligned_observed_residue_count": 286,
+        "substitution_count": 0,
+        "substitutions": [],
+        "insertion_count": 0,
+        "insertions": [],
+        "deletion_count": 2,
+        "deletions": [
+          {
+            "reference_start_position": 179,
+            "reference_end_position": 180,
+            "reference_sequence": "DG"
+          }
+        ],
+        "gap_fraction": 0.006944444444444444,
+        "unaligned_reference_prefix": "MSGA",
+        "unaligned_reference_suffix": "LGPASPLDSTFYRSLLEDDDMGDLVDAEEYLVPQQGAAASHHHHHH",
+        "unaligned_observed_prefix": "",
+        "unaligned_observed_suffix": "",
+        "observed_terminal_residue_ids": {
+          "first": "706",
+          "last": "993"
+        },
+        "aligned_reference_start_position": 5,
+        "aligned_reference_end_position": 292,
+        "internal_gaps": [
+          {
+            "reference_start_position": 179,
+            "reference_end_position": 180,
+            "reference_sequence": "DG"
+          }
+        ]
+      },
+      "generation_authorization": {
+        "allowed": false,
+        "policy_state": "insufficient_or_conflicting_evidence",
+        "evidence": [],
+        "reason": "Target-specific generation requires exact sequence correspondence or independently documented partial-construct evidence."
+      },
+      "expected_generation_allowed": false,
+      "actual_generation_allowed": false,
+      "independent_label_basis": "RCSB polymer entity UniProt/SIFTS mapping plus matching author-chain instance; expected status is not derived from sequence identity score.",
+      "source_urls": [
+        "https://www.rcsb.org/structure/3PP0",
+        "https://data.rcsb.org/rest/v1/core/polymer_entity_instance/3PP0/A",
+        "https://data.rcsb.org/rest/v1/core/polymer_entity/3PP0/1",
+        "https://rest.uniprot.org/uniprotkb/P00533.fasta"
+      ]
+    }
+  ]
+}

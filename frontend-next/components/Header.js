@@ -1,5 +1,6 @@
 const NAV = [
   { label: "Analysis", href: "#analysis", always: true },
+  { label: "Benchmarks", href: "#benchmarks", always: true },
   { label: "Candidates", href: "#candidates" },
   { label: "Quantum Engine", href: "#quantum" },
   { label: "Risk", href: "#risk" },

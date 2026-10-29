@@ -1,0 +1,197 @@
+{
+  "experiment": "EGFR threshold-labeled scaffold-disjoint VQC classification prototype",
+  "status": "completed",
+  "dataset": {
+    "source": "benchmark_reports/egfr_regression/curated_compounds.csv",
+    "origin_note": "Heuristically curated ChEMBL biochemical IC50 cohort; labels are derived from aggregated pIC50 ranges, not an independent prospective endpoint.",
+    "label_definition": {
+      "active": "pIC50_min >= 7.0",
+      "inactive": "pIC50_max <= 6.0",
+      "excluded": "All borderline or discordant measurement ranges, plus invalid/blank SMILES.",
+      "interpretation": "Conservative threshold-based activity class proxy; not clinical efficacy or target engagement."
+    },
+    "original_partition_labeled_counts": {
+      "train": {
+        "active": 1374,
+        "inactive": 305
+      },
+      "validation": {
+        "active": 312,
+        "inactive": 66
+      },
+      "test": {
+        "active": 250,
+        "inactive": 61
+      }
+    },
+    "balanced_training_subset_per_class": 64,
+    "ambiguous_or_invalid_exclusions": {
+      "excluded_invalid_or_blank_smiles": 1,
+      "excluded_borderline_or_discordant_measurements": 627
+    }
+  },
+  "evaluation": {
+    "seed": 42,
+    "split_source": "Existing train/validation/test split in fingerprints_and_targets.npz; documented as Murcko scaffold-disjoint.",
+    "scaffold_overlap": {
+      "train_validation": 0,
+      "train_test": 0,
+      "validation_test": 0
+    },
+    "labeled_partition_counts": {
+      "train": 1679,
+      "validation": 378,
+      "test": 311
+    },
+    "preprocessing": {
+      "input": "2048-bit Morgan fingerprints, radius 2",
+      "reduction": "TruncatedSVD(4) fitted on labeled training rows only",
+      "scaling": "StandardScaler then MinMaxScaler to [0, pi], both fitted on labeled training rows only",
+      "same_feature_transform_for_models": true
+    },
+    "metrics": {
+      "vqc": {
+        "validation": {
+          "sample_count": 378,
+          "class_counts": {
+            "inactive": 66,
+            "active": 312
+          },
+          "accuracy": 0.6587301587301587,
+          "balanced_accuracy": 0.6857517482517483,
+          "precision_active": 0.9178082191780822,
+          "recall_active": 0.6442307692307693,
+          "f1_active": 0.7570621468926554,
+          "roc_auc": 0.7296037296037295,
+          "confusion_matrix_inactive_active": [
+            [
+              48,
+              18
+            ],
+            [
+              111,
+              201
+            ]
+          ]
+        },
+        "test": {
+          "sample_count": 311,
+          "class_counts": {
+            "inactive": 61,
+            "active": 250
+          },
+          "accuracy": 0.6430868167202572,
+          "balanced_accuracy": 0.6478688524590164,
+          "precision_active": 0.8839779005524862,
+          "recall_active": 0.64,
+          "f1_active": 0.7424593967517401,
+          "roc_auc": 0.6604918032786885,
+          "confusion_matrix_inactive_active": [
+            [
+              40,
+              21
+            ],
+            [
+              90,
+              160
+            ]
+          ]
+        }
+      },
+      "classical_rbf_svm": {
+        "validation": {
+          "sample_count": 378,
+          "class_counts": {
+            "inactive": 66,
+            "active": 312
+          },
+          "accuracy": 0.671957671957672,
+          "balanced_accuracy": 0.7833624708624709,
+          "precision_active": 0.9845360824742269,
+          "recall_active": 0.6121794871794872,
+          "f1_active": 0.7549407114624506,
+          "roc_auc": 0.8736402486402486,
+          "confusion_matrix_inactive_active": [
+            [
+              63,
+              3
+            ],
+            [
+              121,
+              191
+            ]
+          ]
+        },
+        "test": {
+          "sample_count": 311,
+          "class_counts": {
+            "inactive": 61,
+            "active": 250
+          },
+          "accuracy": 0.7781350482315113,
+          "balanced_accuracy": 0.8496065573770492,
+          "precision_active": 0.9891891891891892,
+          "recall_active": 0.732,
+          "f1_active": 0.8413793103448276,
+          "roc_auc": 0.9112131147540983,
+          "confusion_matrix_inactive_active": [
+            [
+              59,
+              2
+            ],
+            [
+              67,
+              183
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "vqc": {
+    "implementation": "Qiskit Machine Learning VQC; genuine trainable variational circuit classifier",
+    "feature_map": "ZZFeatureMap(4, reps=1, linear entanglement)",
+    "trainable_ansatz": "RealAmplitudes(4, reps=1, linear entanglement)",
+    "trainable_parameters": 8,
+    "loss": "cross_entropy",
+    "optimizer": "COBYLA(maxiter=15)",
+    "sampler": "StatevectorSampler(256 shots; classical simulation, not quantum hardware)",
+    "fit": {
+      "status": "success",
+      "runtime_seconds": 5.563668,
+      "training_samples": 128,
+      "feature_dimension": 4,
+      "class_labels": [
+        0,
+        1
+      ],
+      "objective_evaluations": 0,
+      "final_training_loss": null,
+      "objective_history": []
+    },
+    "optimizer_objective_history": []
+  },
+  "classical_baseline": {
+    "model": "sklearn SVC(kernel='rbf', C=1.0, gamma='scale', class_weight='balanced')",
+    "training_rows": 128,
+    "runtime_seconds": 0.003143
+  },
+  "package_versions": {
+    "python": "3.12.3",
+    "numpy": "2.5.3",
+    "scikit_learn": "1.9.1",
+    "rdkit": "2026.09.1",
+    "qiskit": "2.5.2",
+    "qiskit_machine_learning": "0.9.1"
+  },
+  "artifacts": {
+    "split_membership": "benchmark_reports\\egfr_regression\\vqc_same_day\\split_membership.csv",
+    "heldout_predictions": "benchmark_reports\\egfr_regression\\vqc_same_day\\heldout_predictions.csv"
+  },
+  "limitations": [
+    "Small prototype; VQC optimizer settings were fixed, not tuned on validation data.",
+    "Threshold-derived classes come from a heuristic curated biochemical cohort; label noise and assay heterogeneity remain.",
+    "The train subset is class-balanced, whereas held-out partitions retain their natural class ratios.",
+    "The circuit runs on a classical statevector sampler and does not demonstrate quantum advantage."
+  ]
+}

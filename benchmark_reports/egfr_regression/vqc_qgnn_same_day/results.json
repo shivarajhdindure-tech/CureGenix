@@ -1,0 +1,136 @@
+{
+  "status": "completed",
+  "experiment": "Same-scaffold-split EGFR activity-proxy VQC/QGNN/classical comparison",
+  "dataset": {
+    "source": "benchmark_reports/egfr_regression/curated_compounds.csv",
+    "label_definition": {
+      "active": "pIC50_min >= 7",
+      "inactive": "pIC50_max <= 6",
+      "excluded": "borderline/discordant or invalid SMILES"
+    },
+    "partition_rows": {
+      "train": 1679,
+      "validation": 378,
+      "test": 311
+    },
+    "balanced_training_subset_per_class": 64
+  },
+  "split": {
+    "seed": 42,
+    "membership": "Existing saved Murcko scaffold-disjoint split; identical training row selection for all three models."
+  },
+  "preprocessing": {
+    "vqc_and_classical": "2048-bit Morgan radius-2 fingerprints; TruncatedSVD(4), StandardScaler, MinMaxScaler[0,pi], fit on labeled train partition only.",
+    "qgnn": "RDKit atom/bond graphs; one weighted message-passing round and mean/max graph readout; TruncatedSVD(4), StandardScaler, MinMaxScaler[0,pi], fit on labeled train partition only."
+  },
+  "models": {
+    "vqc": {
+      "id": "egfr-vqc-zz-real-amplitudes-v1",
+      "feature_map": "4-qubit ZZFeatureMap; RealAmplitudes reps=1",
+      "loss": "cross_entropy",
+      "optimizer": "COBYLA maxiter=15",
+      "sampler": "StatevectorSampler, 256 shots",
+      "training": {
+        "status": "success",
+        "runtime_seconds": 5.205792,
+        "training_samples": 128,
+        "feature_dimension": 4,
+        "class_labels": [
+          0,
+          1
+        ],
+        "objective_evaluations": 15,
+        "final_training_loss": 0.9046655967039281,
+        "objective_history": [],
+        "optimizer_iterations": null,
+        "optimizer_evaluations": 15,
+        "optimizer_objective": 0.9046655967039281,
+        "optimizer_status_available": false,
+        "optimizer_success": null
+      }
+    },
+    "qgnn": {
+      "id": "egfr-qgnn-message-passing-pqc-v1",
+      "graph": "12 atom features, 5 bond features; bond-weighted one-round message passing; tanh; mean/max readout",
+      "circuit": "4-qubit graph-angle RY encoding, trainable RY/RZ ansatz with entangling CNOTs; first-qubit measurement",
+      "loss": "binary cross entropy",
+      "optimizer": "COBYLA maxiter=24",
+      "training": {
+        "status": "success",
+        "runtime_seconds": 3.435072,
+        "training_samples": 128,
+        "objective": 0.562853202682667,
+        "objective_evaluations": 24,
+        "optimizer_success": false,
+        "optimizer_message": "Return from COBYLA because the objective function has been evaluated MAXFUN times."
+      }
+    },
+    "classical_rbf_svm": {
+      "id": "egfr-classical-rbf-svm-v1",
+      "configuration": "SVC RBF C=1 gamma=scale class_weight=balanced"
+    }
+  },
+  "metrics": {
+    "vqc": {
+      "validation": {
+        "sample_count": 378,
+        "accuracy": 0.6587301587301587,
+        "balanced_accuracy": 0.6857517482517483,
+        "roc_auc": 0.7296037296037295
+      },
+      "test": {
+        "sample_count": 311,
+        "accuracy": 0.6430868167202572,
+        "balanced_accuracy": 0.6478688524590164,
+        "roc_auc": 0.6604918032786885
+      }
+    },
+    "qgnn": {
+      "validation": {
+        "sample_count": 378,
+        "accuracy": 0.48677248677248675,
+        "balanced_accuracy": 0.5815850815850816,
+        "roc_auc": 0.5883352758352758
+      },
+      "test": {
+        "sample_count": 311,
+        "accuracy": 0.5562700964630225,
+        "balanced_accuracy": 0.5938688524590163,
+        "roc_auc": 0.6144918032786886
+      }
+    },
+    "classical_rbf_svm": {
+      "validation": {
+        "sample_count": 378,
+        "accuracy": 0.671957671957672,
+        "balanced_accuracy": 0.7833624708624709,
+        "roc_auc": 0.8736402486402486
+      },
+      "test": {
+        "sample_count": 311,
+        "accuracy": 0.7781350482315113,
+        "balanced_accuracy": 0.8496065573770492,
+        "roc_auc": 0.9112131147540983
+      }
+    }
+  },
+  "package_versions": {
+    "python": "3.12.3",
+    "numpy": "2.5.3",
+    "scikit_learn": "1.9.1",
+    "rdkit": "2026.09.1",
+    "qiskit": "2.5.2",
+    "qiskit_machine_learning": "0.9.1"
+  },
+  "artifacts": [
+    "vqc_model.joblib",
+    "qgnn_model.joblib",
+    "split_membership.csv",
+    "heldout_predictions.csv"
+  ],
+  "limitations": [
+    "Activity labels are retrospective heuristic biochemical proxies, not experimental confirmation of new compounds.",
+    "One fixed scaffold split, a small balanced training subset, and limited optimizer evaluations; no quantum advantage claim.",
+    "QGNN is a small hybrid message-passing plus statevector-PQC prototype; readout probabilities are not calibrated."
+  ]
+}

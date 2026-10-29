@@ -11,6 +11,8 @@ import time
 import random
 import urllib.request
 import urllib.parse
+import urllib.error
+import socket
 import json
 import re
 from backend.mcp.base_mcp import BaseMCPServer
@@ -54,6 +56,18 @@ class WebMCPServer(BaseMCPServer):
             description="Identify a protein by name using the real UniProt REST API",
             handler=self._uniprot_search,
             parameters={"protein_name": "str"}
+        )
+        self.register_tool(
+            name="uniprot_fetch_by_accession",
+            description="Fetch one exact UniProt record by accession for target identity verification",
+            handler=self._uniprot_fetch_by_accession,
+            parameters={"accession": "str"}
+        )
+        self.register_tool(
+            name="rcsb_verify_chain_accession",
+            description="Verify a PDB author chain to UniProt mapping using the RCSB Data API/SIFTS",
+            handler=self._rcsb_verify_chain_accession,
+            parameters={"pdb_id": "str", "auth_chain_id": "str", "accession": "str"}
         )
         self.register_tool(
             name="search_binders",
@@ -277,6 +291,176 @@ class WebMCPServer(BaseMCPServer):
         except Exception as e:
             print(f"Error calling UniProt API: {e}")
         return {"name": protein_name, "uniprot_id": None, "found": False}
+
+    def _uniprot_fetch_by_accession(self, accession: str) -> dict:
+        """Fetch an exact accession; unlike name search, never picks a first hit."""
+        accession = (accession or "").strip().upper()
+        if not re.fullmatch(r"[A-Z0-9]{6,10}", accession):
+            return {
+                "found": False, "status": "invalid_accession",
+                "requested_accession": accession,
+            }
+
+        url = f"https://rest.uniprot.org/uniprotkb/{urllib.parse.quote(accession)}.json"
+        req = urllib.request.Request(url, headers={"User-Agent": "CureGenixApp/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=10) as response:
+                payload_bytes = response.read()
+        except urllib.error.HTTPError as exc:
+            return {
+                "found": False,
+                "status": "not_found" if exc.code == 404 else "http_error",
+                "http_status": exc.code,
+                "requested_accession": accession,
+                "error": str(exc),
+            }
+        except (TimeoutError, socket.timeout) as exc:
+            return {
+                "found": False, "status": "timeout",
+                "requested_accession": accession, "error": str(exc),
+            }
+        except urllib.error.URLError as exc:
+            timed_out = isinstance(exc.reason, (TimeoutError, socket.timeout))
+            return {
+                "found": False,
+                "status": "timeout" if timed_out else "network_error",
+                "requested_accession": accession,
+                "error": str(exc),
+            }
+        except Exception as exc:
+            return {
+                "found": False, "status": "network_error",
+                "requested_accession": accession, "error": str(exc),
+            }
+
+        try:
+            payload = payload_bytes.decode("utf-8")
+            record = json.loads(payload)
+        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+            return {
+                "found": False, "status": "malformed_response",
+                "requested_accession": accession, "error": str(exc),
+            }
+        if not isinstance(record, dict):
+            return {
+                "found": False, "status": "malformed_response",
+                "requested_accession": accession,
+                "error": "UniProt response root was not a JSON object.",
+            }
+
+        description = record.get("proteinDescription") or {}
+        if not isinstance(description, dict):
+            return {
+                "found": False, "status": "malformed_response",
+                "requested_accession": accession,
+                "error": "UniProt proteinDescription was malformed.",
+            }
+        recommended = description.get("recommendedName")
+        full_name = recommended.get("fullName") if isinstance(recommended, dict) else None
+        name = full_name.get("value") if isinstance(full_name, dict) else None
+        if not name:
+            submitted = description.get("submissionNames") or []
+            if isinstance(submitted, list) and submitted and isinstance(submitted[0], dict):
+                submitted_name = submitted[0].get("fullName")
+                name = submitted_name.get("value") if isinstance(submitted_name, dict) else None
+
+        primary_accession = str(record.get("primaryAccession") or "").upper()
+        if not primary_accession:
+            return {
+                "found": False, "status": "malformed_response",
+                "requested_accession": accession,
+                "error": "UniProt response did not include primaryAccession.",
+            }
+        if primary_accession != accession:
+            return {
+                "found": False, "status": "accession_mismatch",
+                "requested_accession": accession,
+                "uniprot_id": primary_accession,
+            }
+        sequence_record = record.get("sequence") or {}
+        sequence = sequence_record.get("value") if isinstance(sequence_record, dict) else None
+        if not isinstance(sequence, str) or not sequence:
+            sequence_status = "malformed_sequence"
+            sequence = None
+        else:
+            sequence = "".join(sequence.split()).upper()
+            sequence_status = "provided" if re.fullmatch(r"[A-Z]+", sequence) else "malformed_sequence"
+            if sequence_status != "provided":
+                sequence = None
+        return {
+            "found": True,
+            "status": "verified",
+            "requested_accession": accession,
+            "uniprot_id": primary_accession or None,
+            "name": name,
+            "organism": (record.get("organism") or {}).get("scientificName")
+            if isinstance(record.get("organism") or {}, dict) else None,
+            "sequence": sequence,
+            "sequence_status": sequence_status,
+            "sequence_length": len(sequence) if sequence else None,
+        }
+
+    def _rcsb_verify_chain_accession(self, pdb_id: str, auth_chain_id: str, accession: str) -> dict:
+        """Independently verify a PDB author chain's UniProt/SIFTS entity mapping.
+
+        The API's path parameter is label_asym_id. This adapter accepts a PDB
+        author chain ID and only succeeds when the returned author chain is an
+        exact match, so remapped chain identifiers fail closed.
+        """
+        pdb_id = (pdb_id or "").strip().upper()
+        auth_chain_id = (auth_chain_id or "").strip()
+        accession = (accession or "").strip().upper()
+        if not re.fullmatch(r"[0-9][A-Z0-9]{3}", pdb_id) or len(auth_chain_id) != 1 or not re.fullmatch(r"[A-Z0-9]{6,10}", accession):
+            return {"status": "invalid_request", "verified": False, "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id, "requested_accession": accession}
+
+        def get_json(url: str) -> dict:
+            request = urllib.request.Request(url, headers={"User-Agent": "CureGenixApp/1.0"})
+            with urllib.request.urlopen(request, timeout=10) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            if not isinstance(payload, dict):
+                raise ValueError("RCSB response root was not a JSON object")
+            return payload
+
+        base = "https://data.rcsb.org/rest/v1/core"
+        try:
+            instance = get_json(f"{base}/polymer_entity_instance/{pdb_id}/{auth_chain_id}")
+            identifiers = instance.get("rcsb_polymer_entity_instance_container_identifiers") or {}
+            returned_auth_chain = str(identifiers.get("auth_asym_id") or "")
+            entity_id = str(identifiers.get("entity_id") or "")
+            if returned_auth_chain != auth_chain_id or not entity_id:
+                return {"status": "chain_mapping_mismatch", "verified": False, "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id, "returned_auth_chain_id": returned_auth_chain or None}
+            entity = get_json(f"{base}/polymer_entity/{pdb_id}/{entity_id}")
+            entity_poly = entity.get("entity_poly") or {}
+            sequence = entity_poly.get("pdbx_seq_one_letter_code_can")
+            identifiers = entity.get("rcsb_polymer_entity") or {}
+            ref_ids = ((entity.get("rcsb_polymer_entity_container_identifiers") or {}).get("reference_sequence_identifiers") or [])
+            matching = [item for item in ref_ids if isinstance(item, dict) and item.get("database_name") == "UniProt" and str(item.get("database_accession") or "").upper() == accession]
+            competing = [item for item in ref_ids if isinstance(item, dict) and item.get("database_name") == "UniProt" and item.get("database_accession")]
+            if len(matching) != 1 or any(str(item.get("database_accession")).upper() != accession for item in competing):
+                return {"status": "accession_mapping_mismatch" if not matching else "ambiguous_accession_mapping", "verified": False, "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id, "requested_accession": accession, "reference_sequence_identifiers": ref_ids}
+            if not isinstance(sequence, str) or not sequence.strip():
+                return {"status": "missing_entity_sequence", "verified": False, "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id, "requested_accession": accession}
+            sequence = "".join(sequence.split()).replace(".", "").upper()
+            return {
+                "status": "verified", "verified": True, "pdb_id": pdb_id,
+                "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id,
+                "label_asym_id": identifiers.get("asym_id"), "entity_id": entity_id,
+                "mapping": matching[0], "reference_sequence_identifiers": ref_ids,
+                "entity_sequence": sequence,
+                "entity_description": (entity.get("rcsb_polymer_entity") or {}).get("pdbx_description"),
+                "entity_mutation_count": (entity_poly.get("rcsb_mutation_count") or 0),
+                "source": "RCSB PDB Data API polymer_entity_instance + polymer_entity; UniProt mapping provenance must be SIFTS",
+                "source_url": f"https://data.rcsb.org/rest/v1/core/polymer_entity/{pdb_id}/{entity_id}",
+            }
+        except urllib.error.HTTPError as exc:
+            return {"status": "http_error", "verified": False, "http_status": exc.code, "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id, "requested_accession": accession, "error": str(exc)}
+        except (TimeoutError, socket.timeout) as exc:
+            return {"status": "timeout", "verified": False, "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id, "requested_accession": accession, "error": str(exc)}
+        except urllib.error.URLError as exc:
+            timed_out = isinstance(exc.reason, (TimeoutError, socket.timeout))
+            return {"status": "timeout" if timed_out else "network_error", "verified": False, "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id, "requested_accession": accession, "error": str(exc)}
+        except (ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
+            return {"status": "malformed_response", "verified": False, "requested_pdb_id": pdb_id, "auth_chain_id": auth_chain_id, "requested_accession": accession, "error": str(exc)}
 
     def _search_binders(self, protein_name: str) -> dict:
         """Search Wikipedia API for known binders of a given protein."""

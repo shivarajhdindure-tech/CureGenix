@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light dark;
 }
 
 html {
@@ -11,13 +11,9 @@ html {
 }
 
 body {
-  @apply bg-ink-950 text-slate-100 antialiased;
+  @apply bg-slate-50 text-slate-900 antialiased;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  background-image:
-    radial-gradient(ellipse 70% 45% at 15% -5%, rgba(34, 211, 238, 0.10), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 90% 5%, rgba(139, 92, 246, 0.10), transparent 60%);
-  background-attachment: fixed;
 }
 
 .font-data {
@@ -27,11 +23,23 @@ body {
 }
 
 @layer components {
+  /* Scientific SaaS Light Workspace Cards */
+  .saas-card {
+    @apply rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-sm;
+  }
+  .saas-card-subtle {
+    @apply rounded-xl border border-slate-200/80 bg-slate-50/70 p-4;
+  }
+  .saas-kpi {
+    @apply rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm;
+  }
+
+  /* High-Tech Instrument Console Panels (Dark Accents for 3D/Quantum Viewports) */
   .panel {
-    @apply rounded-2xl border border-white/[0.08] bg-ink-800/70 backdrop-blur-sm;
+    @apply rounded-2xl border border-white/[0.08] bg-ink-800/90 backdrop-blur-sm text-slate-100;
   }
   .panel-quantum {
-    @apply rounded-3xl border border-cyan-400/20 bg-ink-800/80 backdrop-blur-sm;
+    @apply rounded-3xl border border-cyan-400/20 bg-ink-800/90 backdrop-blur-sm text-slate-100;
     background-image:
       radial-gradient(ellipse 60% 50% at 100% 0%, rgba(139, 92, 246, 0.10), transparent 70%),
       radial-gradient(ellipse 50% 50% at 0% 0%, rgba(34, 211, 238, 0.08), transparent 70%);
@@ -43,28 +51,28 @@ body {
     @apply inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-sky-500 px-5 py-3 text-sm font-semibold text-ink-950 transition hover:from-cyan-300 hover:to-sky-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 disabled:cursor-not-allowed disabled:opacity-35;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:from-teal-600 hover:to-sky-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-35;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-white/[0.07] focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500;
   }
   .metric {
-    @apply rounded-xl border border-white/[0.07] bg-ink-900/60 p-4;
+    @apply rounded-xl border border-slate-200/80 bg-slate-50/80 p-4;
   }
   .metric-label {
-    @apply text-[11px] font-medium uppercase tracking-wider text-slate-400;
+    @apply text-[11px] font-medium uppercase tracking-wider text-slate-500;
   }
   .section-title {
-    @apply text-xl font-semibold tracking-tight text-white md:text-2xl;
+    @apply text-xl font-bold tracking-tight text-slate-900 md:text-2xl;
   }
 }
 
-/* legacy helpers kept so nothing else breaks */
+/* Legacy helpers kept for backwards compatibility */
 .glass-card {
   @apply rounded-2xl border border-white/10 bg-bio-card backdrop-blur-md shadow-neon;
 }
 .pipeline-btn {
-  @apply rounded-xl border border-cyan-300/40 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-200 transition hover:border-cyan-200 hover:bg-cyan-300/20;
+  @apply rounded-xl border border-teal-300/40 bg-teal-400/10 px-4 py-2 text-sm text-teal-800 transition hover:border-teal-400 hover:bg-teal-300/20;
 }
 .molecule-dot {
   @apply absolute h-2 w-2 rounded-full bg-cyan-300/80;

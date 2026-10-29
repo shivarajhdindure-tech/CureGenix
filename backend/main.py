@@ -15,7 +15,7 @@ import re
 # Add parent directory to path so imports work
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -23,6 +23,16 @@ from fastapi.responses import FileResponse
 from backend.orchestrator import Orchestrator
 from backend.services.pdb_parser import parse_pdb_file
 from backend.services.molecule_3d import router as molecule_3d_router
+from backend.services.target_identity import parse_pdb_identity
+from backend.services.target_sequence import extract_pdb_chain_sequences
+from backend.services.quantum_kernel_api import (
+    router as quantum_kernel_router,
+)
+from backend.services.vqc_api import router as vqc_router
+from backend.services.molecular_activity_api import router as molecular_activity_router
+from backend.services.benchmark_api import (
+    router as benchmark_router,
+)
 
 PROTEIN_NAME_SCORE_SARS_COV = 8
 PROTEIN_NAME_SCORE_SPIKE_GLYCO = 6
@@ -36,6 +46,10 @@ app = FastAPI(
 )
 
 app.include_router(molecule_3d_router)
+app.include_router(quantum_kernel_router)
+app.include_router(vqc_router)
+app.include_router(molecular_activity_router)
+app.include_router(benchmark_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -81,9 +95,11 @@ def _extract_uploaded_protein_metadata(file_path: str, filename: str, parsed_pro
     compnd_name = ""
     title_lines = []
     header_pdb_id = ""
+    pdb_lines = []
 
     with open(file_path, "r", encoding="utf-8", errors="ignore") as pdb_file:
         for line in pdb_file:
+            pdb_lines.append(line)
             record = line[:6]
             if record == "HEADER":
                 header_name = line[10:50].strip() or header_name
@@ -96,6 +112,11 @@ def _extract_uploaded_protein_metadata(file_path: str, filename: str, parsed_pro
                 title_text = line[10:].strip()
                 if title_text:
                     title_lines.append(title_text)
+
+    structure_identity = parse_pdb_identity(pdb_lines)
+    structure_identity["chain_sequences"] = extract_pdb_chain_sequences(
+        pdb_lines, structure_identity["chain_ids"]
+    )
 
     title_name = " ".join(title_lines).strip()
     candidates = [title_name, compnd_name, parsed_name, header_name]
@@ -122,7 +143,10 @@ def _extract_uploaded_protein_metadata(file_path: str, filename: str, parsed_pro
         "name": name_with_id,
         "base_name": selected_name,
         "pdb_id": pdb_id,
+        "pdb_header_id": header_pdb_id or None,
         "source": "uploaded",
+        "dbref_uniprot_accessions": structure_identity["uniprot_accessions"],
+        "structure_identity_evidence": structure_identity,
     }
 
 
@@ -136,7 +160,11 @@ async def serve_frontend():
 
 
 @app.post("/api/discover")
-async def discover(file: UploadFile = File(...)):
+async def discover(
+    file: UploadFile = File(...),
+    target_uniprot_id: str | None = Form(default=None),
+    target_chain_id: str | None = Form(default=None),
+):
     """
     Upload a PDB file and run the full drug discovery pipeline.
 
@@ -158,6 +186,20 @@ async def discover(file: UploadFile = File(...)):
         # Parse PDB → AlphaFold-compatible JSON
         parsed_protein = parse_pdb_file(file_path)
         protein_metadata = _extract_uploaded_protein_metadata(file_path, file.filename, parsed_protein)
+        selected_uniprot_id = (target_uniprot_id or "").strip().upper()
+        if selected_uniprot_id and not re.fullmatch(r"[A-Z0-9]{6,10}", selected_uniprot_id):
+            raise HTTPException(
+                status_code=422,
+                detail="Enter a UniProt accession containing 6 to 10 letters or digits.",
+            )
+        selected_chain_id = (target_chain_id or "").strip()
+        if selected_chain_id and (len(selected_chain_id) != 1 or not selected_chain_id.isprintable()):
+            raise HTTPException(
+                status_code=422,
+                detail="Enter a single-character PDB chain identifier.",
+            )
+        protein_metadata["selected_uniprot_id"] = selected_uniprot_id or None
+        protein_metadata["selected_chain_id"] = selected_chain_id or None
         parsed_protein.setdefault("protein", {})["name"] = protein_metadata["base_name"]
         parsed_protein.setdefault("metadata", {})["protein_id"] = protein_metadata["pdb_id"]
 
@@ -166,6 +208,8 @@ async def discover(file: UploadFile = File(...)):
 
         return result
 
+    except HTTPException:
+        raise
     except RuntimeError as e:
         raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:

@@ -28,6 +28,7 @@ function KpiCard({ title, value, subtitle, accent = "text-slate-900", badge = nu
 export default function OverviewWorkspace({
   result,
   derived,
+  activeStructure = null,
   onNavigate,
   onStartAnalysis,
 }) {
@@ -47,6 +48,12 @@ export default function OverviewWorkspace({
   const vqeMolecules = derived?.vqeMolecules || [];
   const resourceSkippedMolecules = derived?.resourceSkippedMolecules || [];
 
+  const targetPdbId = activeStructure?.pdbId || result?.protein?.pdb_id || null;
+  const targetName = activeStructure?.proteinName || result?.protein_name || result?.protein?.name || null;
+  const targetAccession = activeStructure?.targetAccession || derived?.proteinInfo?.target_identity?.uniprot_id || null;
+  const selectedChain = activeStructure?.selectedChainId || derived?.proteinInfo?.target_identity?.selected_chain_id || null;
+  const ligandCount = activeStructure?.coCrystallizedLigands?.filter((l) => l.is_drug_candidate).length || 0;
+
   return (
     <div className="space-y-8">
       {/* Workspace Header */}
@@ -58,14 +65,22 @@ export default function OverviewWorkspace({
                 Discovery Console
               </span>
               <span className="text-xs text-slate-400">
-                {isDone ? "Pipeline Execution Complete" : "Target Ready for Pipeline Execution"}
+                {isDone
+                  ? "Pipeline Execution Complete"
+                  : targetPdbId
+                    ? "Target Ready for Pipeline Execution"
+                    : "No Structure Selected"}
               </span>
             </div>
             <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              {result?.protein_name || result?.protein?.name || "EGFR Kinase Domain Discovery"}
+              {targetName || "Target Structure Discovery"}
             </h2>
             <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-              Target-aware molecular candidate generation, classical &amp; quantum scoring, and scaffold-disjoint validation across verified biological benchmarks.
+              {activeStructure?.structureSource === "curated"
+                ? "Curated EGFR kinase domain structure with verified crystallographic ligand coordinates and sequence validation."
+                : activeStructure?.structureSource === "custom"
+                  ? "Custom macromolecular PDB upload with autonomous chain parsing and identity evaluation."
+                  : "Target-aware molecular candidate generation, classical & quantum scoring, and scaffold-disjoint validation across verified biological benchmarks."}
             </p>
           </div>
 
@@ -75,7 +90,7 @@ export default function OverviewWorkspace({
               onClick={() => onNavigate("target-analysis")}
               className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-teal-700 transition"
             >
-              Target Analysis &rarr;
+              {targetPdbId ? "Structure & Target Analysis →" : "Select Structure →"}
             </button>
             <button
               type="button"
@@ -87,19 +102,22 @@ export default function OverviewWorkspace({
           </div>
         </div>
 
-        {/* Target Meta Chips */}
+        {/* Dynamic Target Meta Chips */}
         <div className="mt-6 flex flex-wrap gap-2 border-t border-slate-800 pt-4 text-xs">
           <span className="rounded-md bg-slate-800/90 border border-slate-700/80 px-2.5 py-1 text-slate-300">
-            PDB: <strong className="text-white font-mono">{result?.protein?.pdb_id || "1M17 / 1XKK"}</strong>
+            PDB: <strong className="text-white font-mono">{targetPdbId || "None"}</strong>
           </span>
           <span className="rounded-md bg-slate-800/90 border border-slate-700/80 px-2.5 py-1 text-slate-300">
-            UniProt: <strong className="text-teal-300 font-mono">P00533 (EGFR_HUMAN)</strong>
+            UniProt: <strong className="text-teal-300 font-mono">{targetAccession || "Unresolved"}</strong>
           </span>
           <span className="rounded-md bg-slate-800/90 border border-slate-700/80 px-2.5 py-1 text-slate-300">
-            Target Chain: <strong className="text-white font-mono">A (Kinase Domain)</strong>
+            Target Chain: <strong className="text-white font-mono">{selectedChain ? `Chain ${selectedChain}` : "None"}</strong>
           </span>
           <span className="rounded-md bg-slate-800/90 border border-slate-700/80 px-2.5 py-1 text-slate-300">
-            Active Space: <strong className="text-white font-mono">(4e, 4o) STO-3G PySCF</strong>
+            Ligands: <strong className="text-white font-mono">{ligandCount} co-crystallized</strong>
+          </span>
+          <span className="rounded-md bg-slate-800/90 border border-slate-700/80 px-2.5 py-1 text-slate-300">
+            Active Space: <strong className="text-white font-mono">{isDone && vqeMolecules.length > 0 ? "(4e, 4o) STO-3G PySCF" : "Configured upon VQE execution"}</strong>
           </span>
         </div>
       </div>
@@ -108,13 +126,13 @@ export default function OverviewWorkspace({
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard
           title="Candidates Analyzed"
-          value={isDone ? summary.analyzed : "8 Identified"}
-          subtitle={isDone ? "Novel & reference structures" : "Target-aware generation pool"}
+          value={isDone ? summary.analyzed : "0 Candidates"}
+          subtitle={isDone ? "Novel & reference structures" : "Pipeline not yet executed"}
           badge="Chemical Space"
         />
         <KpiCard
           title="Quantum Evaluated"
-          value={isDone ? summary.quantumEvaluated : "Active VQE"}
+          value={isDone ? summary.quantumEvaluated : "0 Evaluated"}
           accent="text-teal-700"
           subtitle={
             isDone && summary.quantumTargeted != null
@@ -125,15 +143,15 @@ export default function OverviewWorkspace({
         />
         <KpiCard
           title={bestNovelIsTie ? "Top Score · Tied" : "Top Candidate"}
-          value={bestNovelId || (isDone ? "Tied Score" : "CAN-001")}
+          value={isDone ? (bestNovelId || "Tied Score") : "None"}
           accent="text-indigo-600"
-          subtitle={bestNovelIsTie ? "Equal adjusted scores" : "Prioritized novel derivative"}
+          subtitle={bestNovelIsTie ? "Equal adjusted scores" : isDone ? "Prioritized novel derivative" : "Awaiting discovery execution"}
           badge="Ranking"
         />
         <KpiCard
           title="Total Pipeline Time"
-          value={isNum(durationMs) ? `${(durationMs / 1000).toFixed(1)}s` : "16.1s (nominal)"}
-          subtitle="Wall-clock autonomous execution"
+          value={isDone && isNum(durationMs) ? `${(durationMs / 1000).toFixed(1)}s` : "—"}
+          subtitle={isDone ? "Wall-clock autonomous execution" : "Nominal pipeline idle"}
           badge="Latency"
         />
       </div>

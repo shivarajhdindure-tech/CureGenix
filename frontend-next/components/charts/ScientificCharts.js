@@ -18,7 +18,7 @@ export function VqcQgnnClassicalGroupedChart({ data }) {
       balancedAccuracy: 0.6479,
       rocAuc: 0.6605,
       accuracy: 0.6431,
-      optimizerNote: "COBYLA (15 evals)",
+      optimizerNote: "15 evals; convergence not reported",
       color: "#0d9488", // teal-600
       lightColor: "#ccfbf1", // teal-100
     },
@@ -29,7 +29,7 @@ export function VqcQgnnClassicalGroupedChart({ data }) {
       balancedAccuracy: 0.5939,
       rocAuc: 0.6145,
       accuracy: 0.5563,
-      optimizerNote: "COBYLA MAXFUN (24 evals)",
+      optimizerNote: "MAXFUN 24; optimizer_success=false",
       color: "#7c3aed", // violet-600
       lightColor: "#ede9fe", // violet-100
     },
@@ -133,7 +133,7 @@ export function VqcQgnnClassicalGroupedChart({ data }) {
       </div>
 
       <div className="mt-4 rounded-lg bg-amber-50 border border-amber-200/80 p-3 text-xs text-amber-900">
-        <span className="font-semibold">Scientific Disclosure:</span> The classical baseline outperforms the hybrid quantum prototypes on this offline activity proxy. QGNN terminated at optimizer iteration limits (MAXFUN = 24). Scores are uncalibrated proxies from historical biochemical data; no quantum advantage is claimed.
+        <span className="font-semibold">Scientific Disclosure:</span> On this saved EGFR activity-proxy split, the classical baseline scores above the hybrid quantum prototypes. QGNN reached its maximum evaluation budget (MAXFUN = 24; optimizer_success=false); VQC convergence was not reported. Scores are uncalibrated proxies from curated historical biochemical data; no quantum advantage is claimed.
       </div>
     </div>
   );
@@ -183,11 +183,11 @@ export function PilotMatchedComparatorChart() {
             Matched 16D Pilot Comparison (Single Partition · Seed 42)
           </h3>
           <span className="rounded-full bg-amber-100 text-amber-800 border border-amber-200 px-2.5 py-0.5 text-xs font-semibold">
-            Single Pilot Split · Not 5-Fold
+            Single Pilot Split · Not 5-Seed Repeated Holdout
           </span>
         </div>
         <p className="mt-1 text-xs text-slate-500">
-          Evaluated strictly on identical test compounds (N=598). Results are kept isolated from the 5-split classical benchmark.
+          Curated biochemical IC50 activity-proxy cohort; identical test compounds (N=64). This is not validated binding affinity, clinical efficacy, or drug performance. Kept separate from the five-seed classical benchmark.
         </p>
       </div>
 
@@ -196,7 +196,7 @@ export function PilotMatchedComparatorChart() {
         <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600">
-              MAE (pIC50)
+              MAE (pIC50 points)
             </h4>
             <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
               Lower is better
@@ -225,7 +225,7 @@ export function PilotMatchedComparatorChart() {
             })}
           </div>
           <p className="mt-3 text-[11px] text-slate-500">
-            Quantum MAE is 0.2959 pIC50 units higher than classical RBF-SVR.
+            Quantum MAE is 0.2959 pIC50 points higher than classical RBF-SVR.
           </p>
         </div>
 
@@ -233,7 +233,7 @@ export function PilotMatchedComparatorChart() {
         <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 p-4">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600">
-              RMSE (pIC50)
+              RMSE (pIC50 points)
             </h4>
             <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
               Lower is better
@@ -410,36 +410,7 @@ export function PipelineStageTimingChart({ steps = [] }) {
  * Compares Affinity Proxy, QED, MW, and LogP with heuristic labels.
  */
 export function CandidateScreeningComparisonChart({ candidates = [] }) {
-  // If no candidates loaded yet, show realistic sample candidate data
-  const candidatePool = candidates.length > 0 ? candidates.slice(0, 5) : [
-    {
-      id: "CAN-001 (Erlotinib Analog)",
-      affinityScore: 0.88,
-      qed: 0.76,
-      mw: 393.4,
-      logp: 3.2,
-      riskLevel: "low",
-      category: "Novel Derivative",
-    },
-    {
-      id: "CAN-002 (Gefitinib Scaff)",
-      affinityScore: 0.82,
-      qed: 0.69,
-      mw: 446.9,
-      logp: 4.1,
-      riskLevel: "low",
-      category: "Novel Derivative",
-    },
-    {
-      id: "CAN-003 (Pyrazolopyrimidine)",
-      affinityScore: 0.79,
-      qed: 0.82,
-      mw: 358.2,
-      logp: 2.8,
-      riskLevel: "medium",
-      category: "Target-Aware Gen",
-    },
-  ];
+  const candidatePool = Array.isArray(candidates) ? candidates.slice(0, 5) : [];
 
   return (
     <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-sm">
@@ -449,7 +420,7 @@ export function CandidateScreeningComparisonChart({ candidates = [] }) {
             Candidate Screening Heuristics & Properties
           </h3>
           <p className="text-xs text-slate-500">
-            Comparison of screening affinity proxy, drug-likeness (QED), and physicochemical properties.
+            Comparison of returned heuristic screening values and physicochemical properties.
           </p>
         </div>
         <span className="rounded bg-teal-50 text-teal-800 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold">
@@ -457,17 +428,21 @@ export function CandidateScreeningComparisonChart({ candidates = [] }) {
         </span>
       </div>
 
-      <div className="mt-5 space-y-4">
+      {candidatePool.length === 0 ? (
+        <p className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+          No primary candidates were returned for this target, so no candidate comparison is shown.
+        </p>
+      ) : <div className="mt-5 space-y-4">
         {candidatePool.map((c) => {
-          const affinity = isNum(c.screeningScore ?? c.affinityScore) ? (c.screeningScore ?? c.affinityScore) : 0.75;
-          const qed = isNum(c.qed) ? c.qed : 0.72;
-          const mw = isNum(c.molecularWeight ?? c.mw) ? (c.molecularWeight ?? c.mw) : 400;
-          const logp = isNum(c.logp) ? c.logp : 3.0;
+          const affinity = c.screeningScore ?? c.affinityScore ?? c.screening?.potency_proxy;
+          const drugLikeness = c.qed ?? c.drugLikeness ?? c.screening?.drug_likeness;
+          const mw = c.molecularWeight ?? c.mw ?? c.molecular_properties?.molecular_weight;
+          const logp = c.logp ?? c.molecular_properties?.logp;
 
           // Normalized values for visualization
-          const affinityPct = Math.min(100, Math.max(0, affinity * 100));
-          const qedPct = Math.min(100, Math.max(0, qed * 100));
-          const mwNorm = Math.min(100, (mw / 600) * 100);
+          const affinityPct = isNum(affinity) ? Math.min(100, Math.max(0, affinity * 100)) : null;
+          const drugLikenessPct = isNum(drugLikeness) ? Math.min(100, Math.max(0, drugLikeness * 100)) : null;
+          const mwNorm = isNum(mw) ? Math.min(100, (mw / 600) * 100) : null;
 
           return (
             <div key={c.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 transition hover:bg-slate-50">
@@ -480,10 +455,10 @@ export function CandidateScreeningComparisonChart({ candidates = [] }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="rounded bg-teal-100 text-teal-900 border border-teal-200 px-2 py-0.5 text-[11px] font-semibold">
-                    Affinity Proxy: {affinity.toFixed(2)}
+                    Potency proxy: {isNum(affinity) ? affinity.toFixed(2) : "Not reported"}
                   </span>
                   <span className="rounded bg-slate-200 text-slate-800 px-2 py-0.5 text-[11px]">
-                    QED: {qed.toFixed(2)}
+                    Drug-likeness: {isNum(drugLikeness) ? drugLikeness.toFixed(2) : "Not reported"}
                   </span>
                 </div>
               </div>
@@ -492,38 +467,38 @@ export function CandidateScreeningComparisonChart({ candidates = [] }) {
               <div className="grid gap-3 sm:grid-cols-3">
                 <div>
                   <div className="flex justify-between text-[11px] text-slate-600 mb-1">
-                    <span>Affinity Score</span>
-                    <span className="font-data font-semibold text-teal-700">{(affinity * 100).toFixed(0)}%</span>
+                    <span>Potency proxy (heuristic)</span>
+                    <span className="font-data font-semibold text-teal-700">{isNum(affinity) ? `${(affinity * 100).toFixed(0)}%` : "—"}</span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-slate-200">
-                    <div className="h-full rounded-full bg-teal-600" style={{ width: `${affinityPct}%` }} />
+                    {affinityPct != null && <div className="h-full rounded-full bg-teal-600" style={{ width: `${affinityPct}%` }} />}
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between text-[11px] text-slate-600 mb-1">
-                    <span>Drug-likeness (QED)</span>
-                    <span className="font-data font-semibold text-sky-700">{(qed * 100).toFixed(0)}%</span>
+                    <span>Drug-likeness heuristic</span>
+                    <span className="font-data font-semibold text-sky-700">{isNum(drugLikeness) ? `${(drugLikeness * 100).toFixed(0)}%` : "—"}</span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-slate-200">
-                    <div className="h-full rounded-full bg-sky-500" style={{ width: `${qedPct}%` }} />
+                    {drugLikenessPct != null && <div className="h-full rounded-full bg-sky-500" style={{ width: `${drugLikenessPct}%` }} />}
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between text-[11px] text-slate-600 mb-1">
-                    <span>MW: {mw.toFixed(1)} Da</span>
-                    <span className="font-data font-semibold text-slate-700">LogP: {logp.toFixed(1)}</span>
+                    <span>MW: {isNum(mw) ? `${mw.toFixed(1)} Da` : "Not reported"}</span>
+                    <span className="font-data font-semibold text-slate-700">LogP: {isNum(logp) ? logp.toFixed(1) : "Not reported"}</span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-slate-200">
-                    <div className="h-full rounded-full bg-indigo-500" style={{ width: `${mwNorm}%` }} />
+                    {mwNorm != null && <div className="h-full rounded-full bg-indigo-500" style={{ width: `${mwNorm}%` }} />}
                   </div>
                 </div>
               </div>
             </div>
           );
         })}
-      </div>
+      </div>}
 
       <div className="mt-4 rounded-lg bg-slate-100 border border-slate-200 p-2.5 text-[11px] text-slate-600">
         <span className="font-semibold text-slate-800">Transparency Note:</span> Affinity proxy scores are calculated from empirical molecular graph heuristics and functional group matches. They do not represent experimental dissociation constants ($K_d$ / $K_i$) or cell-based IC50 measurements.
@@ -636,23 +611,26 @@ export function QuantumOutcomeDistributionChart({ vqeCount = 0, skippedCount = 0
  * Dual-track sequence alignment bar: Observed PDB Chain Coverage vs Full Reference UniProt Sequence.
  */
 export function TargetSequenceCoverageChart({ sequenceValidation, proteinInfo }) {
-  // Use real sequence validation if available, or verified default EGFR values
-  const seqVal = sequenceValidation || {
-    aligned_observed_residue_count: 284,
-    observed_chain_coverage: 0.945,
-    reference_sequence_coverage: 0.235,
-    identity_percent: 98.6,
-    substitution_count: 3,
-    insertion_count: 0,
-    deletion_count: 0,
-    validation_outcome: "structure_linked_partial_sequence_support",
-  };
+  if (!sequenceValidation) {
+    return (
+      <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-sm">
+        <h3 className="text-base font-semibold text-slate-900">Target Sequence Coverage &amp; Alignment Evidence</h3>
+        <p className="mt-2 text-sm text-slate-500">No observed-chain to verified UniProt sequence alignment is available for this result.</p>
+      </div>
+    );
+  }
+  const seqVal = sequenceValidation;
+  const identity = proteinInfo?.target_identity || {};
 
-  const observedPct = (seqVal.observed_chain_coverage * 100).toFixed(1);
-  const refPct = (seqVal.reference_sequence_coverage * 100).toFixed(1);
+  const observedPct = Number.isFinite(seqVal.observed_chain_coverage)
+    ? (seqVal.observed_chain_coverage * 100).toFixed(1)
+    : null;
+  const refPct = Number.isFinite(seqVal.reference_sequence_coverage)
+    ? (seqVal.reference_sequence_coverage * 100).toFixed(1)
+    : null;
   const identityPct = Number.isFinite(seqVal.identity_percent)
     ? seqVal.identity_percent.toFixed(1)
-    : "98.6";
+    : null;
 
   return (
     <div className="rounded-xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-sm">
@@ -662,7 +640,7 @@ export function TargetSequenceCoverageChart({ sequenceValidation, proteinInfo })
             Target Sequence Coverage & Alignment Evidence
           </h3>
           <p className="text-xs text-slate-500">
-            Observed PDB crystallographic chain vs. full-length UniProt reference sequence.
+            Observed PDB chain vs. the fetched UniProt reference sequence.
           </p>
         </div>
         <span className="rounded bg-teal-50 text-teal-800 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold">
@@ -679,13 +657,13 @@ export function TargetSequenceCoverageChart({ sequenceValidation, proteinInfo })
               Observed PDB Chain Coverage
             </span>
             <span className="font-data font-bold text-teal-700">
-              {observedPct}% ({seqVal.aligned_observed_residue_count} residues)
+              {observedPct == null ? "Not available" : `${observedPct}% (${seqVal.aligned_observed_residue_count ?? "—"} aligned residues)`}
             </span>
           </div>
           <div className="h-4 w-full rounded-md bg-slate-200/90 overflow-hidden relative">
             <div
               className="h-full rounded-md bg-teal-600 transition-all duration-700"
-              style={{ width: `${observedPct}%` }}
+              style={{ width: observedPct == null ? "0%" : `${observedPct}%` }}
             />
           </div>
           <p className="mt-1 text-[11px] text-slate-500">
@@ -697,22 +675,21 @@ export function TargetSequenceCoverageChart({ sequenceValidation, proteinInfo })
         <div>
           <div className="flex justify-between text-xs mb-1.5">
             <span className="font-semibold text-slate-800">
-              Full UniProt Reference Coverage (EGFR 1,210 aa)
+              Full UniProt Reference Coverage ({identity.uniprot_id || "accession not resolved"}; {seqVal.reference_sequence_length || "unknown"} aa)
             </span>
             <span className="font-data font-bold text-sky-700">
-              {refPct}% of full reference
+              {refPct == null ? "Not available" : `${refPct}% of full reference`}
             </span>
           </div>
           <div className="h-4 w-full rounded-md bg-slate-200/90 overflow-hidden relative">
-            {/* Kinase domain offset illustration (residues ~695 to 1022) */}
             <div
               className="h-full rounded-md bg-sky-500 transition-all duration-700"
-              style={{ marginLeft: "55%", width: `${refPct}%` }}
-              title="Kinase domain resolved in crystal structure"
+              style={{ width: refPct == null ? "0%" : `${refPct}%` }}
+              title="Observed sequence coverage of the fetched reference"
             />
           </div>
           <p className="mt-1 text-[11px] text-slate-500">
-            Crystallized construct represents the intracellular tyrosine kinase domain (residues 695–1022).
+              Coverage is calculated against the fetched reference sequence; unobserved residues are not inferred.
           </p>
         </div>
       </div>
@@ -723,7 +700,7 @@ export function TargetSequenceCoverageChart({ sequenceValidation, proteinInfo })
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
             Sequence Identity
           </p>
-          <p className="font-data mt-1 text-lg font-bold text-teal-700">{identityPct}%</p>
+          <p className="font-data mt-1 text-lg font-bold text-teal-700">{identityPct == null ? "—" : `${identityPct}%`}</p>
           <p className="text-[10px] text-slate-500">Aligned region</p>
         </div>
 
@@ -764,3 +741,5 @@ export function TargetSequenceCoverageChart({ sequenceValidation, proteinInfo })
     </div>
   );
 }
+
+export { default as ClassicalVsQuantumComparisonGraph } from "./ClassicalVsQuantumComparisonGraph";

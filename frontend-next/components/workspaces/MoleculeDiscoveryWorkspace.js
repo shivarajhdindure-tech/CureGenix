@@ -3,17 +3,25 @@
 import { useState } from "react";
 import CandidateCard from "../CandidateCard";
 import Molecule3DExplorer from "../Molecule3DExplorer";
+import ProteinPDBViewer from "../ProteinPDBViewer";
 import DiscoveryStrategySimulator from "../DiscoveryStrategySimulator";
 import { CandidateScreeningComparisonChart } from "../charts/ScientificCharts";
 
-export default function MoleculeDiscoveryWorkspace({ result, derived, onNavigateToRisk = null }) {
+export default function MoleculeDiscoveryWorkspace({
+  result,
+  derived,
+  activeStructure = null,
+  onNavigateToRisk = null,
+}) {
   const candidates = derived?.candidates || [];
   const featured = derived?.bestNovel;
   const others = candidates.filter((c) => c !== featured);
   const demonstrationCandidates = derived?.demonstrationCandidates || [];
   const hasScoreTies = derived?.hasScoreTies || false;
 
-  const [activeTab, setActiveTab] = useState("cards"); // cards | 3d | simulator
+  const targetPdbId = activeStructure?.pdbId || result?.protein?.pdb_id || "1M17";
+  const targetProteinName = activeStructure?.proteinName || result?.protein_name || "Target Protein Structure";
+  const [activeTab, setActiveTab] = useState("cards"); // cards | protein-pdb | 3d | simulator
 
   return (
     <div className="space-y-8">
@@ -24,12 +32,12 @@ export default function MoleculeDiscoveryWorkspace({ result, derived, onNavigate
             Molecule Discovery &amp; Candidate Prioritization
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Target-aware candidate generation, multi-objective screening, 3D conformational visualization, and evidence passports.
+            Target-aware candidate generation, multi-objective screening, 3D macromolecular protein structure, conformational visualization, and evidence passports.
           </p>
         </div>
 
         {/* View Switcher Pills */}
-        <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-100 p-1 text-xs">
+        <div className="flex flex-wrap items-center gap-1 rounded-lg border border-slate-200 bg-slate-100 p-1 text-xs">
           <button
             type="button"
             onClick={() => setActiveTab("cards")}
@@ -40,6 +48,20 @@ export default function MoleculeDiscoveryWorkspace({ result, derived, onNavigate
             }`}
           >
             Candidate Cards ({candidates.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("protein-pdb")}
+            className={`rounded-md px-3 py-1 font-semibold transition flex items-center gap-1.5 ${
+              activeTab === "protein-pdb"
+                ? "bg-white text-teal-900 shadow-sm font-bold"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <span>Protein Target 3D (PDB)</span>
+            <span className="rounded bg-teal-100 text-teal-800 text-[10px] px-1.5 py-0.2 font-mono">
+              {targetPdbId}
+            </span>
           </button>
           <button
             type="button"
@@ -79,6 +101,40 @@ export default function MoleculeDiscoveryWorkspace({ result, derived, onNavigate
       {/* View Tab 1: Cards */}
       {activeTab === "cards" && (
         <div className="space-y-6">
+          {/* Target Macromolecule PDB Invitation Banner */}
+          <div className="rounded-xl border border-teal-200/80 bg-teal-50/50 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-600 text-white shrink-0 shadow-xs">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <circle cx="12" cy="12" r="3" strokeWidth="1.75" />
+                  <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(30 12 12)" strokeWidth="1.75" />
+                  <ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)" strokeWidth="1.75" />
+                </svg>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-teal-950">
+                    Target Macromolecule: {targetProteinName}
+                  </span>
+                  <span className="rounded bg-teal-200/70 text-teal-900 font-mono text-[10px] font-bold px-1.5 py-0.2">
+                    PDB: {targetPdbId}
+                  </span>
+                </div>
+                <p className="text-[11px] text-teal-800 mt-0.5">
+                  Interactive 3D protein cartoon ribbon, crystallographic provenance, and co-crystallized ligand pocket inspection.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab("protein-pdb")}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-teal-700 transition shrink-0"
+            >
+              <span>Launch 3D Protein Viewer</span>
+              <span aria-hidden="true">&rarr;</span>
+            </button>
+          </div>
+
           {candidates.length === 0 ? (
             <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
               <p className="font-semibold text-slate-800">No primary candidates generated yet.</p>
@@ -134,7 +190,14 @@ export default function MoleculeDiscoveryWorkspace({ result, derived, onNavigate
         </div>
       )}
 
-      {/* View Tab 2: 3D Conformations */}
+      {/* View Tab 2: Dedicated Interactive Protein PDB Viewer */}
+      {activeTab === "protein-pdb" && (
+        <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm">
+          <ProteinPDBViewer defaultPdbId={targetPdbId} />
+        </div>
+      )}
+
+      {/* View Tab 3: 3D Conformations */}
       {activeTab === "3d" && (
         <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm">
           <div className="mb-4">
@@ -149,7 +212,7 @@ export default function MoleculeDiscoveryWorkspace({ result, derived, onNavigate
         </div>
       )}
 
-      {/* View Tab 3: Strategy Simulator */}
+      {/* View Tab 4: Strategy Simulator */}
       {activeTab === "simulator" && (
         <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm">
           <DiscoveryStrategySimulator candidates={candidates} />

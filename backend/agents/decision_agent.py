@@ -151,7 +151,11 @@ Format your response as:
 
 Be concise and scientifically precise. Do NOT use markdown code blocks."""
 
-        llm_reasoning = call_llm(prompt, temperature=0.6, max_tokens=1200)
+        llm_reasoning = (
+            call_llm(prompt, temperature=0.6, max_tokens=1200)
+            if ranked
+            else ""
+        )
 
         # Parse LLM reasoning back into individual candidates
         if llm_reasoning:

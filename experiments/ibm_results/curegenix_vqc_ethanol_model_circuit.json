@@ -1,0 +1,24 @@
+{
+  "model_id": "egfr-vqc-zz-real-amplitudes-v1",
+  "circuit_source": "trained model SamplerQNN circuit",
+  "diagnostic_smiles": "CCO",
+  "preprocessed_angles": [
+    -0.26478612422943115,
+    1.4844111204147339,
+    1.5868207216262817,
+    1.4113008975982666
+  ],
+  "qubits": 4,
+  "trainable_parameters": 8,
+  "shots_requested": 256,
+  "class_interpretation": "Qiskit VQC parity interpretation",
+  "local_sampler_probabilities": [
+    0.45703125,
+    0.54296875
+  ],
+  "local_exact_probabilities": [
+    0.4927137063464443,
+    0.5072862936535554
+  ],
+  "purpose": "diagnostic hardware comparison; not a molecular activity claim"
+}

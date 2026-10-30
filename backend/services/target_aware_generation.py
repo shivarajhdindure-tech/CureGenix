@@ -44,7 +44,79 @@ SUPPORTED_TARGETS = {
                 ],
             }
         ],
-    }
+    },
+    "P00698": {
+        "target_name": "Lysozyme C",
+        "organism": "Gallus gallus",
+        "references": [
+            {
+                "name": "N-acetyl-D-glucosamine",
+                "chembl_id": "CHEMBL447878",
+                "smiles": "CC(=O)N[C@@H]1[C@H](O)O[C@H](CO)[C@@H](O)[C@@H]1O",
+                "scaffold_name": "2-acetamido-2-deoxy-D-glucopyranose",
+                "rationale": (
+                    "N-acetyl-D-glucosamine (NAG) is a canonical crystallographic ligand and "
+                    "competitive subsite-binding inhibitor for hen egg-white lysozyme (HEWL / P00698). "
+                    "It is used only as a documented medicinal-chemistry analog parent. "
+                    "This does not establish antibacterial or enzymatic activity for generated analogs."
+                ),
+                "sources": [
+                    {
+                        "name": "UniProt P00698: chicken Lysozyme C target record",
+                        "url": "https://www.uniprot.org/uniprotkb/P00698/entry",
+                    },
+                    {
+                        "name": "ChEMBL target CHEMBL1932892: Lysozyme C",
+                        "url": "https://www.ebi.ac.uk/chembl/target_report_card/CHEMBL1932892/",
+                    },
+                    {
+                        "name": "ChEMBL compound CHEMBL447878: N-acetyl-D-glucosamine",
+                        "url": "https://www.ebi.ac.uk/chembl/explore/compound/CHEMBL447878",
+                    },
+                    {
+                        "name": "ChEBI entry CHEBI:28009: N-acetyl-D-glucosamine",
+                        "url": "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=28009",
+                    },
+                ],
+            }
+        ],
+    },
+    "P03367": {
+        "target_name": "Gag-Pol polyprotein / HIV-1 retropepsin (Protease)",
+        "organism": "Human immunodeficiency virus type 1",
+        "references": [
+            {
+                "name": "Indinavir",
+                "chembl_id": "CHEMBL115",
+                "smiles": "CC(C)(C)NC(=O)[C@@H]1CN(Cc2cccnc2)CCN1C[C@@H](O)C[C@@H](Cc1ccccc1)C(=O)N[C@H]1c2ccccc2C[C@H]1O",
+                "scaffold_name": "hydroxyethylamine peptidomimetic (indanol-piperazine)",
+                "rationale": (
+                    "Indinavir (MK-639 / Crixivan) is an FDA-approved HIV-1 protease inhibitor and "
+                    "co-crystallized ligand in PDB 1HSG (ligand ID: MK1). It is used only as a "
+                    "documented medicinal-chemistry analog parent. This does not establish protease "
+                    "inhibition or antiviral activity for generated analogs."
+                ),
+                "sources": [
+                    {
+                        "name": "UniProt P03367: HIV-1 Gag-Pol polyprotein / retropepsin",
+                        "url": "https://www.uniprot.org/uniprotkb/P03367/entry",
+                    },
+                    {
+                        "name": "ChEMBL target CHEMBL243: Human immunodeficiency virus type 1 protease",
+                        "url": "https://www.ebi.ac.uk/chembl/target_report_card/CHEMBL243/",
+                    },
+                    {
+                        "name": "ChEMBL compound CHEMBL115: Indinavir",
+                        "url": "https://www.ebi.ac.uk/chembl/explore/compound/CHEMBL115",
+                    },
+                    {
+                        "name": "PDB 1HSG: Crystal structure of HIV-1 protease in complex with MK-639 (indinavir)",
+                        "url": "https://www.rcsb.org/structure/1HSG",
+                    },
+                ],
+            }
+        ],
+    },
 }
 
 

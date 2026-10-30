@@ -1,0 +1,49 @@
+{
+  "job_id": "molecular-7e7b4e53684d494a98372a4436059acf",
+  "experiment_record_id": "molecular-7e7b4e53684d494a98372a4436059acf",
+  "candidate_id": "GEN-46D3EFE3",
+  "smiles": "CC#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1",
+  "input_sha256": "fb03ce31573054b4d35b95f6ed26dbc8c18d7e980868840d2c086ec09dde1033",
+  "basis": "sto3g",
+  "maxiter": 50,
+  "charge": 0,
+  "spin": 0,
+  "status": "skipped",
+  "submitted_at": "2026-10-30T15:43:37.381759+00:00",
+  "request_fingerprint": "17c2f4cac1256303058b22fb42b33ca64bb06691bdcf42bded7ff1aa36a1277e",
+  "started_at": "2026-10-30T15:43:37.384727+00:00",
+  "result": {
+    "status": "skipped_resource_limit",
+    "message": "Quantum calculation skipped before geometry and PySCF setup: Heavy-atom count 30 exceeds configured limit 20.; Estimated STO-3G basis-function count 175 exceeds configured limit 100. This count is a rough size indicator, not an exact memory estimate. Use a smaller supported molecule or a separately resource-validated environment; this policy is not overridden by manual retry.",
+    "resource_eligibility": {
+      "status": "skipped_resource_limit",
+      "eligible": false,
+      "reasons": [
+        "Heavy-atom count 30 exceeds configured limit 20.",
+        "Estimated STO-3G basis-function count 175 exceeds configured limit 100. This count is a rough size indicator, not an exact memory estimate."
+      ],
+      "resource_metrics": {
+        "heavy_atom_count": 30,
+        "total_atom_count": 55,
+        "estimated_sto3g_basis_functions": 175,
+        "estimated_electron_count": 216
+      },
+      "calculation_parameters": {
+        "basis": "sto3g",
+        "charge": 0,
+        "max_vqe_iterations": 50,
+        "benchmark_enabled": false
+      },
+      "limits": {
+        "max_heavy_atoms": 20,
+        "max_total_atoms": 80,
+        "max_estimated_basis_functions": 100,
+        "max_vqe_iterations": 100
+      },
+      "estimation_method": "Atom counts and tabulated STO-3G shell counts only; no memory prediction or PySCF integral estimate."
+    },
+    "elapsed_seconds": 0.004
+  },
+  "finished_at": "2026-10-30T15:43:37.389431+00:00",
+  "elapsed_seconds": 0.004
+}

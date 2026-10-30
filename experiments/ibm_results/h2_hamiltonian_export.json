@@ -1,0 +1,87 @@
+{
+  "molecule": "H2",
+  "bond_distance_angstrom": 0.735,
+  "basis": "STO-3G",
+  "mapping": "Jordan-Wigner",
+  "num_qubits": 4,
+  "num_pauli_terms": 15,
+  "nuclear_repulsion_energy_hartree": 0.7199689944489797,
+  "terms": [
+    {
+      "pauli": "IIII",
+      "real": -0.8105479805373275,
+      "imag": 0.0
+    },
+    {
+      "pauli": "IIIZ",
+      "real": 0.1721839326191556,
+      "imag": 0.0
+    },
+    {
+      "pauli": "IIZI",
+      "real": -0.22575349222402394,
+      "imag": 0.0
+    },
+    {
+      "pauli": "IIZZ",
+      "real": 0.12091263261776623,
+      "imag": 0.0
+    },
+    {
+      "pauli": "IZII",
+      "real": 0.17218393261915566,
+      "imag": 0.0
+    },
+    {
+      "pauli": "IZIZ",
+      "real": 0.16892753870087907,
+      "imag": 0.0
+    },
+    {
+      "pauli": "ZIII",
+      "real": -0.22575349222402394,
+      "imag": 0.0
+    },
+    {
+      "pauli": "ZIIZ",
+      "real": 0.16614543256382408,
+      "imag": 0.0
+    },
+    {
+      "pauli": "YYYY",
+      "real": 0.04523279994605784,
+      "imag": 0.0
+    },
+    {
+      "pauli": "XXYY",
+      "real": 0.04523279994605784,
+      "imag": 0.0
+    },
+    {
+      "pauli": "YYXX",
+      "real": 0.04523279994605784,
+      "imag": 0.0
+    },
+    {
+      "pauli": "XXXX",
+      "real": 0.04523279994605784,
+      "imag": 0.0
+    },
+    {
+      "pauli": "IZZI",
+      "real": 0.16614543256382408,
+      "imag": 0.0
+    },
+    {
+      "pauli": "ZIZI",
+      "real": 0.17464343068300453,
+      "imag": 0.0
+    },
+    {
+      "pauli": "ZZII",
+      "real": 0.12091263261776623,
+      "imag": 0.0
+    }
+  ],
+  "note": "Hamiltonian generated locally with PySCF and Qiskit Nature."
+}

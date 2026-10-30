@@ -115,6 +115,74 @@ class MoleculeMCPServer(BaseMCPServer):
             except Exception:
                 pass
 
+        motif_acetamide = Chem.MolFromSmarts("[CH3:1][C:2](=[O:3])[NH:4]")
+        matches_acetamide = parent.GetSubstructMatches(motif_acetamide)
+
+        for methyl_carbon, carbonyl_carbon, o_atom, n_atom in matches_acetamide:
+            extended = Chem.RWMol(parent)
+            new_c = extended.AddAtom(Chem.Atom("C"))
+            extended.AddBond(methyl_carbon, new_c, Chem.BondType.SINGLE)
+            extended_molecule = extended.GetMol()
+            try:
+                Chem.SanitizeMol(extended_molecule)
+                analog_specs.append(
+                    (
+                        Chem.MolToSmiles(extended_molecule, canonical=True),
+                        "Extended the reference acetamido methyl by one carbon (N-propionyl analog).",
+                    )
+                )
+            except Exception:
+                pass
+
+            glycolyl = Chem.RWMol(parent)
+            new_o = glycolyl.AddAtom(Chem.Atom("O"))
+            glycolyl.AddBond(methyl_carbon, new_o, Chem.BondType.SINGLE)
+            glycolyl_molecule = glycolyl.GetMol()
+            try:
+                Chem.SanitizeMol(glycolyl_molecule)
+                analog_specs.append(
+                    (
+                        Chem.MolToSmiles(glycolyl_molecule, canonical=True),
+                        "Hydroxylated the reference acetamido methyl (N-glycolyl analog).",
+                    )
+                )
+            except Exception:
+                pass
+
+        motif_tbutyl = Chem.MolFromSmarts("[CH3:1][C:2]([CH3:3])([CH3:4])[NH:5]")
+        matches_tbutyl = parent.GetSubstructMatches(motif_tbutyl)
+        for m1, quat, m2, m3, nh in matches_tbutyl:
+            des_methyl = Chem.RWMol(parent)
+            des_methyl.RemoveAtom(m1)
+            des_methyl_molecule = des_methyl.GetMol()
+            try:
+                Chem.SanitizeMol(des_methyl_molecule)
+                analog_specs.append(
+                    (
+                        Chem.MolToSmiles(des_methyl_molecule, canonical=True),
+                        "Homologated the reference tert-butylamide to an N-isopropylamide (des-methyl analog).",
+                    )
+                )
+            except Exception:
+                pass
+
+        motif_pyridine = Chem.MolFromSmarts("[c:1]1[c:2][c:3][c:4][n:5][c:6]1")
+        matches_pyridine = parent.GetSubstructMatches(motif_pyridine)
+        for c1, c2, c3, c4, n5, c6 in matches_pyridine:
+            benzyl = Chem.RWMol(parent)
+            benzyl.GetAtomWithIdx(n5).SetAtomicNum(6)
+            benzyl_molecule = benzyl.GetMol()
+            try:
+                Chem.SanitizeMol(benzyl_molecule)
+                analog_specs.append(
+                    (
+                        Chem.MolToSmiles(benzyl_molecule, canonical=True),
+                        "Substituted the reference 3-pyridylmethyl moiety with a benzyl bioisostere (pyridine N to C).",
+                    )
+                )
+            except Exception:
+                pass
+
         analogs = []
         seen = {parent_canonical}
         for analog_smiles, modification in analog_specs:
@@ -142,7 +210,7 @@ class MoleculeMCPServer(BaseMCPServer):
                 break
 
         return {
-            "strategy": "RDKit rule-based terminal-alkyne analog enumeration",
+            "strategy": "RDKit rule-based analog enumeration",
             "parent": parent_name,
             "analogs_generated": len(analogs),
             "analogs": analogs,

@@ -481,7 +481,13 @@ class WebMCPServer(BaseMCPServer):
                             pages = data2.get("query", {}).get("pages", {})
                             for page_id, page_info in pages.items():
                                 summary = page_info.get("extract", "").strip()
-                                return {"found": True, "summary": summary}
+                                return {
+                                    "found": True,
+                                    "title": title,
+                                    "source": "Wikipedia search context",
+                                    "source_url": f"https://en.wikipedia.org/wiki/{urllib.parse.quote(title.replace(' ', '_'))}",
+                                    "summary": summary,
+                                }
         except Exception as e:
             print(f"Error searching binders: {e}")
         return {"found": False, "summary": ""}

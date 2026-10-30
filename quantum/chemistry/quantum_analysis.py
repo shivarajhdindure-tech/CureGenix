@@ -1,5 +1,6 @@
 
 import os
+import logging
 import time
 
 from quantum.chemistry.smiles_adapter import smiles_to_geometry
@@ -8,6 +9,8 @@ from quantum.chemistry.active_space import reduce_to_active_space
 from quantum.chemistry.hamiltonian import build_qubit_hamiltonian, interpret_vqe_energy
 from quantum.algorithms.vqe import run_vqe
 from backend.services.quantum_resource_policy import assess_smiles_resources
+
+logger = logging.getLogger("curegenix.quantum.chemistry")
 
 
 def analyze_smiles(
@@ -32,9 +35,11 @@ def analyze_smiles(
         smiles, basis=basis, maxiter=maxiter, charge=charge, benchmark=benchmark
     )
     if eligibility.get("status") == "skipped_resource_limit":
+        reasons = eligibility.get("reasons", [])
+        logger.info("Molecular quantum preflight skipped calculation: %s", "; ".join(reasons))
         return {
             "status": "skipped_resource_limit",
-            "message": "Quantum calculation skipped by the configured resource eligibility policy.",
+            "message": "Quantum calculation skipped before geometry and PySCF setup: " + "; ".join(reasons) + " Use a smaller supported molecule or a separately resource-validated environment; this policy is not overridden by manual retry.",
             "resource_eligibility": eligibility,
         }
     if eligibility.get("status") == "invalid_input":
@@ -43,7 +48,9 @@ def analyze_smiles(
         raise RuntimeError("Quantum resource policy could not be evaluated: " + "; ".join(eligibility.get("reasons", [])))
 
     # 1. SMILES -> 3D geometry
+    logger.info("Preparing molecular geometry from validated SMILES.")
     geometry = smiles_to_geometry(smiles)
+    logger.info("Molecular geometry prepared; selecting local PySCF or configured WSL chemistry backend.")
 
     # 2. Check execution environment (local PySCF vs WSL adapter)
     use_wsl = os.getenv("CUREGENIX_QUANTUM_BACKEND", "").lower() == "wsl"
@@ -59,6 +66,7 @@ def analyze_smiles(
     if use_wsl:
         from backend.services.wsl_quantum_adapter import wsl_quantum_adapter
 
+        logger.info("Dispatching molecular calculation to WSL chemistry worker.")
         return wsl_quantum_adapter.analyze_geometry(
             atom=geometry,
             basis=basis,
@@ -69,6 +77,7 @@ def analyze_smiles(
         )
 
     # 2b. Build molecular problem locally if PySCF is available
+    logger.info("Building molecular problem and electronic integrals with PySCF.")
     problem = build_molecular_problem(
         atom=geometry,
         basis=basis,
@@ -95,6 +104,7 @@ def analyze_smiles(
     active_orbitals = [homo_index, lumo_index]
 
     # 4. Reduce to active space
+    logger.info("Reducing electronic problem to the configured HOMO/LUMO active space.")
     active_problem = reduce_to_active_space(
         problem,
         num_electrons=2,
@@ -103,11 +113,13 @@ def analyze_smiles(
     )
 
     # 5. Build qubit Hamiltonian
+    logger.info("Constructing mapped qubit Hamiltonian.")
     qubit_hamiltonian = build_qubit_hamiltonian(active_problem)
 
     # 6. Run VQE and measure runtime
     vqe_start = time.perf_counter()
 
+    logger.info("Starting VQE optimizer (maxiter=%d).", maxiter)
     vqe_result = run_vqe(
         qubit_hamiltonian,
         num_qubits=qubit_hamiltonian.num_qubits,
@@ -115,6 +127,7 @@ def analyze_smiles(
     )
 
     vqe_runtime_seconds = time.perf_counter() - vqe_start
+    logger.info("VQE optimizer returned after %.3fs.", vqe_runtime_seconds)
 
     energy_components = interpret_vqe_energy(
         float(vqe_result["electronic_energy"]), active_problem

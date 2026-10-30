@@ -1,0 +1,59 @@
+{
+  "model_id": "egfr-vqc-zz-real-amplitudes-v1",
+  "circuit_source": "trained model SamplerQNN circuit",
+  "diagnostic_smiles": "CCO",
+  "preprocessed_angles": [
+    -0.26478612422943115,
+    1.4844111204147339,
+    1.5868207216262817,
+    1.4113008975982666
+  ],
+  "qubits": 4,
+  "trainable_parameters": 8,
+  "shots_requested": 256,
+  "class_interpretation": "Qiskit VQC parity interpretation",
+  "local_sampler_probabilities": [
+    0.45703125,
+    0.54296875
+  ],
+  "local_exact_probabilities": [
+    0.4927137063464443,
+    0.5072862936535554
+  ],
+  "purpose": "diagnostic hardware comparison; not a molecular activity claim",
+  "ibm_job_id": "dbhnetune4hc73bd8h70",
+  "backend": "ibm_fez",
+  "status": "DONE",
+  "actual_shots": 256,
+  "hardware_counts": {
+    "0011": 5,
+    "1101": 27,
+    "1100": 40,
+    "1111": 54,
+    "1110": 13,
+    "0101": 11,
+    "1000": 12,
+    "1010": 24,
+    "0110": 11,
+    "1011": 7,
+    "1001": 7,
+    "0010": 13,
+    "0111": 19,
+    "0100": 9,
+    "0001": 1,
+    "0000": 3
+  },
+  "hardware_class_counts": [
+    155,
+    101
+  ],
+  "hardware_class_probabilities": [
+    0.60546875,
+    0.39453125
+  ],
+  "absolute_difference_by_class": [
+    0.11275504365355571,
+    0.11275504365355538
+  ],
+  "comparison_reference": "exact statevector probabilities from the bound saved-model circuit"
+}

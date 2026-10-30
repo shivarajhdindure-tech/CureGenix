@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "collection_id": "egfr_focused_curated_v1",
+  "collection_name": "CureGenix EGFR-Focused Curated Structure Collection",
+  "target_name": "Epidermal growth factor receptor (EGFR)",
+  "target_accession": "P00533",
+  "collection_description": "All four curated structures in this collection represent the human Epidermal Growth Factor Receptor (EGFR / P00533) kinase domain in different conformational states, complexes, or mutational profiles (wild-type, active, inactive, and drug-resistant T790M/V948R). They do not represent four independent protein targets.",
+  "structures": [
+    {
+      "pdb_id": "1M17",
+      "relative_path": "data/structures/egfr/1M17.pdb",
+      "sha256": "5b020cd186307d657de80611793554b074f6936a3443d33f81d9b1a58004962e",
+      "source_url": "https://files.rcsb.org/download/1M17.pdb",
+      "file_format": "PDB",
+      "target_name": "Epidermal growth factor receptor (EGFR)",
+      "target_accession": "P00533",
+      "protein_chains": ["A"],
+      "verified_mutations": [],
+      "mutation_notes": "SEQADV lists cloning-artifact residues 666-670; no engineered amino-acid substitution is annotated for the protein chain.",
+      "ligand_component_ids": ["AQ4"],
+      "verified_structure_description": "EGFR tyrosine kinase domain with erlotinib; annotated component AQ4."
+    },
+    {
+      "pdb_id": "2ITX",
+      "relative_path": "data/structures/egfr/2ITX.pdb",
+      "sha256": "fe46e355433197c8d988e94eda56b34fa1ee9ea85259b49349c9e77f526a9d86",
+      "source_url": "https://files.rcsb.org/download/2ITX.pdb",
+      "file_format": "PDB",
+      "target_name": "Epidermal growth factor receptor (EGFR)",
+      "target_accession": "P00533",
+      "protein_chains": ["A"],
+      "verified_mutations": [],
+      "mutation_notes": "No engineered amino-acid substitution is annotated for this entry. REMARK records describe related PDB entries separately.",
+      "ligand_component_ids": ["ANP"],
+      "verified_structure_description": "EGFR kinase domain in complex with AMP-PNP; annotated component ANP."
+    },
+    {
+      "pdb_id": "4G5J",
+      "relative_path": "data/structures/egfr/4G5J.pdb",
+      "sha256": "cbe4495588a2af01e6ab4635f5c4221eda14e17dd87be82a4c778afb94a28c92",
+      "source_url": "https://files.rcsb.org/download/4G5J.pdb",
+      "file_format": "PDB",
+      "target_name": "Epidermal growth factor receptor (EGFR)",
+      "target_accession": "P00533",
+      "protein_chains": ["A"],
+      "verified_mutations": [],
+      "mutation_notes": "COMPND marks the construct as engineered; no engineered amino-acid substitution is listed in SEQADV.",
+      "ligand_component_ids": ["0WM", "0WN"],
+      "verified_structure_description": "EGFR kinase in complex with BIBW2992; Afatinib-related component records 0WM and 0WN."
+    },
+    {
+      "pdb_id": "7A2A",
+      "relative_path": "data/structures/egfr/7A2A.pdb",
+      "sha256": "8642d6becdcbc08d516b4deec4bfeb8835fa8517e49c8863dfface3c109b2453",
+      "source_url": "https://files.rcsb.org/download/7A2A.pdb",
+      "file_format": "PDB",
+      "target_name": "Epidermal growth factor receptor (EGFR)",
+      "target_accession": "P00533",
+      "protein_chains": ["A", "B"],
+      "verified_mutations": [
+        {
+          "variant": "T790M",
+          "reference_residue": "THR",
+          "observed_residue": "MET",
+          "uniprot_position": 790,
+          "chains": ["A", "B"],
+          "evidence": "SEQADV ENGINEERED MUTATION"
+        },
+        {
+          "variant": "V948R",
+          "reference_residue": "VAL",
+          "observed_residue": "ARG",
+          "uniprot_position": 948,
+          "chains": ["A", "B"],
+          "evidence": "SEQADV ENGINEERED MUTATION"
+        }
+      ],
+      "mutation_notes": "Both substitutions are annotated by SEQADV in chains A and B.",
+      "ligand_component_ids": ["57N", "7G9"],
+      "verified_structure_description": "EGFR T790M/V948R; the entry title lists spebrutinib and EAI001, with components 57N and 7G9. Component-to-compound roles are not assigned here."
+    }
+  ]
+}

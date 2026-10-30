@@ -1,6 +1,6 @@
 "use client";
 
-import { PilotMatchedComparatorChart } from "../charts/ScientificCharts";
+import ClassicalVsQuantumComparisonGraph from "../charts/ClassicalVsQuantumComparisonGraph";
 import BenchmarkResults from "../BenchmarkResults";
 
 export default function BenchmarksWorkspace() {
@@ -13,7 +13,7 @@ export default function BenchmarksWorkspace() {
             Benchmarks &amp; Scientific Validation
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Rigorous scaffold-disjoint evaluation across 2,995 EGFR compounds and matched classical vs. quantum comparisons.
+            Rigorous scaffold-disjoint evaluation across 2,995 EGFR compounds and matched classical vs. quantum performance comparisons.
           </p>
         </div>
 
@@ -30,15 +30,18 @@ export default function BenchmarksWorkspace() {
         </div>
       </div>
 
+      {/* Dedicated Classical vs Quantum Performance Comparison Visualization */}
+      <ClassicalVsQuantumComparisonGraph />
+
       {/* Classical 5-Split Summary Banner */}
       <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
             <h3 className="text-base font-semibold text-slate-900">
-              Full-Cohort Classical Scaffold Validation (5 Seeds · 2,995 Compounds)
+              Full-Cohort Classical Scaffold Validation (5 Seeds &middot; 2,995 Compounds)
             </h3>
             <p className="text-xs text-slate-500">
-              Evaluated across 1,129 unique Murcko scaffold groups with zero scaffold overlap between train, validation, and test sets.
+              Evaluated across 1,129 unique Murcko scaffold groups with zero scaffold overlap within each split; test compound counts vary by seed because scaffold sizes vary.
             </p>
           </div>
           <span className="rounded bg-teal-50 text-teal-800 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold">
@@ -58,17 +61,17 @@ export default function BenchmarksWorkspace() {
             <div className="mt-4 grid grid-cols-3 gap-2 border-t border-slate-200 pt-3">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">MAE (pIC50)</p>
-                <p className="font-data mt-1 text-base font-bold text-slate-900">0.5607 ± 0.0689</p>
+                <p className="font-data mt-1 text-base font-bold text-slate-900">0.5607 &plusmn; 0.0689</p>
                 <p className="text-[10px] text-slate-400">Lower is better</p>
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">RMSE</p>
-                <p className="font-data mt-1 text-base font-bold text-slate-900">0.7609 ± 0.0883</p>
+                <p className="font-data mt-1 text-base font-bold text-slate-900">0.7609 &plusmn; 0.0883</p>
                 <p className="text-[10px] text-slate-400">Lower is better</p>
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">R² Score</p>
-                <p className="font-data mt-1 text-base font-bold text-emerald-700">0.6061 ± 0.0496</p>
+                <p className="font-data mt-1 text-base font-bold text-emerald-700">0.6061 &plusmn; 0.0496</p>
                 <p className="text-[10px] text-slate-400">Higher is better</p>
               </div>
             </div>
@@ -85,26 +88,23 @@ export default function BenchmarksWorkspace() {
             <div className="mt-4 grid grid-cols-3 gap-2 border-t border-slate-200 pt-3">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">MAE (pIC50)</p>
-                <p className="font-data mt-1 text-base font-bold text-slate-900">0.5270 ± 0.0672</p>
+                <p className="font-data mt-1 text-base font-bold text-slate-900">0.5270 &plusmn; 0.0672</p>
                 <p className="text-[10px] text-slate-400">Lower is better</p>
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">RMSE</p>
-                <p className="font-data mt-1 text-base font-bold text-slate-900">0.7286 ± 0.0758</p>
+                <p className="font-data mt-1 text-base font-bold text-slate-900">0.7286 &plusmn; 0.0758</p>
                 <p className="text-[10px] text-slate-400">Lower is better</p>
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">R² Score</p>
-                <p className="font-data mt-1 text-base font-bold text-emerald-700">0.6386 ± 0.0394</p>
+                <p className="font-data mt-1 text-base font-bold text-emerald-700">0.6386 &plusmn; 0.0394</p>
                 <p className="text-[10px] text-slate-400">Higher is better</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Visualization 2: Matched 16D Quantum-Kernel Pilot Charts */}
-      <PilotMatchedComparatorChart />
 
       {/* Deep Interactive Classical & Quantum Drill-Down (Embeds BenchmarkResults) */}
       <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm">

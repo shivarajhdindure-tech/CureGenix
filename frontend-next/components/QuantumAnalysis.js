@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { optimizerStatusLabel } from "../lib/quantumLabTransparency.mjs";
 import { fmt, isNum, fmtSeconds } from "@/lib/analysis";
 
 function QMetric({ value, label, sub, accent = false, mono = true }) {
@@ -226,9 +227,7 @@ export default function QuantumAnalysis({ derived }) {
                   sub="Includes active-space and nuclear-repulsion corrections"
                 />
                 <QMetric
-                  value={q.vqe?.optimizer_status_available
-                    ? (q.vqe.optimizer_success ? "Reported converged" : "Reported not converged")
-                    : "Not reported"}
+                  value={optimizerStatusLabel(q.vqe?.optimizer_success)}
                   label="Optimizer status"
                   mono={false}
                 />
@@ -238,9 +237,7 @@ export default function QuantumAnalysis({ derived }) {
                   sub="Includes active-space and nuclear-repulsion corrections"
                 />
                 <QMetric
-                  value={q.vqe?.optimizer_status_available
-                    ? (q.vqe.optimizer_success ? "Reported converged" : "Reported not converged")
-                    : "Not reported"}
+                  value={optimizerStatusLabel(q.vqe?.optimizer_success)}
                   label="Optimizer status"
                   mono={false}
                 />

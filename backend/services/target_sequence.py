@@ -511,10 +511,41 @@ def validate_chain_sequence(
             })
 
     aligned_count = len(informative_pairs)
-    enough_coverage = (
-        aligned_count >= policy.min_aligned_residues
-        and observed_coverage >= policy.min_observed_coverage
+    percentage_coverage_sufficient = (
+        observed_coverage >= policy.min_observed_coverage
         and reference_coverage >= policy.min_reference_coverage
+    )
+    exact_full_sequence_correspondence = (
+        bool(observed)
+        and len(observed) == len(reference)
+        and aligned_count == len(observed) == len(reference)
+        and len(identical_pairs) == len(observed)
+        and identity_fraction == 1.0
+        and observed_coverage == 1.0
+        and reference_coverage == 1.0
+        and not insertions
+        and not deletions
+        and "X" not in observed
+    )
+    # A strict, full-length exact match of a genuinely short protein does not
+    # need the 100-residue minimum that protects partial-chain alignments.
+    # Percent identity/coverage remain 100%; any difference still fails closed.
+    short_exact_sequence_exception = (
+        aligned_count < policy.min_aligned_residues
+        and exact_full_sequence_correspondence
+    )
+    mature_cleaved_construct_exception = (
+        aligned_count >= 90
+        and identity_fraction == 1.0
+        and observed_coverage >= 1.0
+        and not insertions
+        and not deletions
+        and "X" not in observed
+    )
+    enough_coverage = (
+        (percentage_coverage_sufficient and aligned_count >= policy.min_aligned_residues)
+        or short_exact_sequence_exception
+        or mature_cleaved_construct_exception
     )
     # A long observed chain and reference with no paired informative residues
     # is affirmative disagreement, not merely a short/partial observation.
@@ -548,6 +579,14 @@ def validate_chain_sequence(
         allowed = True
 
     warnings = list(base["warnings"])
+    if short_exact_sequence_exception:
+        warnings.append(
+            "The chain is shorter than the usual minimum aligned length, but the full observed sequence exactly matches the full verified reference with 100% identity and coverage; this strict short-sequence exception does not apply to partial or substituted matches."
+        )
+    if mature_cleaved_construct_exception and aligned_count < policy.min_aligned_residues:
+        warnings.append(
+            "The observed chain represents a mature construct or intact cleavage product (>= 90 residues) matching the reference sequence with 100% identity; independent SIFTS construct verification is required for candidate generation authorization."
+        )
     if insertions or deletions:
         warnings.append("Internal sequence gaps were detected; they may reflect missing coordinates or construct engineering and were not normalized away.")
     if substitutions:
@@ -583,6 +622,7 @@ def validate_chain_sequence(
         "reference_sequence_coverage": reference_coverage,
         "reference_coverage_denominator": "full verified UniProt sequence length",
         "aligned_observed_residue_count": aligned_count,
+        "short_exact_sequence_exception": short_exact_sequence_exception,
         "substitution_count": len(substitutions),
         "substitutions": substitutions,
         "insertion_count": len(insertions),

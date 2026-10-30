@@ -2,6 +2,8 @@
 
 import { TargetSequenceCoverageChart } from "../charts/ScientificCharts";
 import UploadPanel from "../UploadPanel";
+import StructureAnalysisPanel from "../target-analysis/StructureAnalysisPanel";
+import CentralPDBSelector from "../CentralPDBSelector";
 
 export default function TargetAnalysisWorkspace({
   result,
@@ -16,6 +18,12 @@ export default function TargetAnalysisWorkspace({
   onTargetUniprotIdChange,
   targetChainId,
   onTargetChainIdChange,
+  activeStructure = null,
+  curatedStructures = [],
+  collectionMeta = null,
+  onSelectCurated = null,
+  onUploadCustom = null,
+  structureLoading = false,
 }) {
   const proteinInfo = derived?.proteinInfo || result?.protein_info || {};
   const identity = proteinInfo?.target_identity || {};
@@ -43,16 +51,26 @@ export default function TargetAnalysisWorkspace({
         </div>
       </div>
 
-      {/* Target Upload & Configuration Card */}
-      <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm">
-        <h3 className="text-base font-semibold text-slate-900 mb-2">
-          Protein Target Structure &amp; Parameters
-        </h3>
-        <p className="text-xs text-slate-500 mb-6">
-          Provide a crystallographic PDB file to initialize autonomous sequence alignment, pocket identification, and candidate generation.
-        </p>
+      {/* Central PDB Structure Selector */}
+      <CentralPDBSelector
+        curatedStructures={curatedStructures}
+        collectionMeta={collectionMeta}
+        activePdbId={activeStructure?.pdbId || "1M17"}
+        activeStructure={activeStructure}
+        onSelectCurated={onSelectCurated}
+        onUploadCustom={onUploadCustom}
+        loading={structureLoading}
+      />
 
-        <div className="max-w-3xl">
+      {/* Main discovery input and synchronized structure preview */}
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border border-slate-200/90 bg-white p-6 shadow-sm">
+          <h3 className="text-base font-semibold text-slate-900 mb-2">
+            Protein Target Structure &amp; Parameters
+          </h3>
+          <p className="text-xs text-slate-500 mb-6">
+            Select a PDB to validate and preview it. Discovery runs only when you choose Start.
+          </p>
           <UploadPanel
             file={file}
             validation={validation}
@@ -66,6 +84,7 @@ export default function TargetAnalysisWorkspace({
             onTargetChainIdChange={onTargetChainIdChange}
           />
         </div>
+        <StructureAnalysisPanel file={file} validation={validation} />
       </div>
 
       {/* Visualization 6: Target Sequence Coverage Visualization */}
@@ -93,19 +112,19 @@ export default function TargetAnalysisWorkspace({
             <div className="mt-3 space-y-2 text-xs">
               <div className="flex justify-between py-1 border-b border-slate-200/60">
                 <span className="text-slate-500">Target Name:</span>
-                <span className="font-semibold text-slate-900">{identity.protein_name || "Epidermal Growth Factor Receptor (EGFR)"}</span>
+                <span className="font-semibold text-slate-900">{activeStructure?.proteinName || identity.protein_name || proteinInfo.protein_name || "Not established"}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-200/60">
                 <span className="text-slate-500">UniProt Accession:</span>
-                <span className="font-mono font-bold text-teal-700">{identity.uniprot_id || "P00533"}</span>
+                <span className="font-mono font-bold text-teal-700">{activeStructure?.targetAccession || identity.uniprot_id || identity.selected_uniprot_id || "Not established"}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-200/60">
                 <span className="text-slate-500">Selected Chain:</span>
-                <span className="font-mono font-semibold text-slate-900">{identity.selected_chain_id || "A"}</span>
+                <span className="font-mono font-semibold text-slate-900">{activeStructure?.selectedChainId || identity.selected_chain_id || "Not selected"}</span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-slate-500">UniProt Lookup Status:</span>
-                <span className="text-slate-800">{identity.uniprot_lookup?.status || "verified (local cache / API)"}</span>
+                <span className="text-slate-800">{identity.uniprot_lookup?.status || "Not attempted"}</span>
               </div>
             </div>
           </div>
@@ -123,9 +142,7 @@ export default function TargetAnalysisWorkspace({
                   </div>
                 ))
               ) : (
-                <div className="py-2 text-slate-500">
-                  Chain A &rarr; P00533 (EGFR_HUMAN) confirmed via crystallographic DBREF.
-                </div>
+                <div className="py-2 text-slate-500">No DBREF-linked UniProt accession was parsed.</div>
               )}
             </div>
           </div>
@@ -151,10 +168,10 @@ export default function TargetAnalysisWorkspace({
           Detected Catalytic &amp; Binding Pockets
         </h3>
         <p className="text-xs text-slate-500 mb-4">
-          Residues comprising the ATP-binding cleft of the EGFR kinase domain (Hinges, DFG motif, P-loop).
+          Target-specific pocket annotations are shown only for a sequence-validated EGFR identity. PDB identity checks do not establish binding or affinity.
         </p>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        {identity.identity_state === "structure_linked_sequence_validated" && identity.uniprot_id === "P00533" ? <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
             <p className="text-xs font-semibold text-slate-800">ATP Cleft Pocket 1</p>
             <p className="mt-1 text-xs text-slate-600">Key residues: Met793 (hinge), Thr790 (gatekeeper), Leu718</p>
@@ -178,7 +195,7 @@ export default function TargetAnalysisWorkspace({
               Phosphate Region
             </span>
           </div>
-        </div>
+        </div> : <p role="note" className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">No target-specific EGFR pocket annotations are being applied to this structure because its identity is not validated as EGFR.</p>}
       </div>
     </div>
   );

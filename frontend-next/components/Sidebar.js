@@ -247,10 +247,10 @@ export default function Sidebar({
           <div className="p-3 m-2 rounded-xl bg-slate-900/80 border border-slate-800 text-xs">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Current Target</p>
             <p className="font-semibold text-slate-100 mt-0.5 truncate">
-              {targetInfo?.name || "EGFR (Epidermal Growth Factor)"}
+              {targetInfo?.pdbId ? `${targetInfo.name} (${targetInfo.pdbId})` : (targetInfo?.name || "No structure selected")}
             </p>
             <p className="text-[10px] text-teal-400/90 font-mono mt-0.5 truncate">
-              UniProt: {targetInfo?.uniprot || "P00533"} · Chain {targetInfo?.chain || "A"}
+              {targetInfo?.uniprot ? `UniProt: ${targetInfo.uniprot}` : "UniProt: Not mapped"} · {targetInfo?.chain ? `Chain ${targetInfo.chain}` : "Chain: None"}
             </p>
           </div>
         )}

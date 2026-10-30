@@ -94,12 +94,13 @@ def _run_molecular_analysis(payload: Dict[str, Any]) -> Dict[str, Any]:
     )
     preflight_seconds = round(time.perf_counter() - preflight_start, 3)
     if eligibility.get("status") == "skipped_resource_limit":
+        reasons = eligibility.get("reasons", [])
         return {
             "status": "skipped_resource_limit",
             "action": "analyze_molecule",
             "result": {
                 "status": "skipped_resource_limit",
-                "message": "Quantum calculation skipped by the configured resource eligibility policy.",
+                "message": "Quantum calculation skipped before PySCF setup: " + "; ".join(reasons) + " Use a smaller supported molecule or a separately resource-validated environment; this policy is not overridden by manual retry.",
                 "resource_eligibility": eligibility,
                 "stage_diagnostics": {
                     "resource_preflight": {"status": "completed", "elapsed_seconds": preflight_seconds},
@@ -269,6 +270,44 @@ def _run_molecular_analysis(payload: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _run_h2o_classical(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from quantum.chemistry.h2o_experiment import run_h2o_classical_reference, water_configuration
+
+    configuration = payload.get("configuration") or water_configuration(
+        payload.get("oh_bond_length_angstrom", 0.9572),
+        payload.get("hoh_angle_degrees", 104.5),
+    )
+    record = run_h2o_classical_reference(configuration)
+    return {"status": "success", "action": "h2o_classical_reference", "result": record}
+
+
+def _run_h2o_simulator(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from quantum.chemistry.h2o_experiment import run_h2o_simulator
+
+    record = run_h2o_simulator(payload["classical_record"], int(payload.get("maxiter", 50)))
+    return {"status": "success", "action": "h2o_simulator", "result": record}
+
+
+def _run_h2o_statevector(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from quantum.chemistry.h2o_experiment import reconstruct_h2o_statevector
+
+    result = reconstruct_h2o_statevector(payload["simulator_record"])
+    return {"status": "success", "action": "h2o_statevector", "result": result}
+
+
+def _run_h2o_hardware(payload: Dict[str, Any]) -> Dict[str, Any]:
+    from quantum.chemistry.h2o_experiment import run_h2o_hardware_evaluation
+
+    result = run_h2o_hardware_evaluation(
+        payload["simulator_record"],
+        payload["backend_name"],
+        float(payload.get("precision", 0.05)),
+        payload.get("confirm_submission") is True,
+        payload.get("mitigation_config"),
+    )
+    return {"status": "success", "action": "h2o_hardware_evaluation", "result": result}
+
+
 def main():
     # Save original stdout and redirect any spurious logging/prints to stderr
     real_stdout = sys.stdout
@@ -291,8 +330,16 @@ def main():
             response_payload = _run_smoke_test(data)
         elif action == "analyze_molecule":
             response_payload = _run_molecular_analysis(data)
+        elif action == "h2o_classical_reference":
+            response_payload = _run_h2o_classical(data)
+        elif action == "h2o_simulator":
+            response_payload = _run_h2o_simulator(data)
+        elif action == "h2o_statevector":
+            response_payload = _run_h2o_statevector(data)
+        elif action == "h2o_hardware_evaluation":
+            response_payload = _run_h2o_hardware(data)
         else:
-            raise ValueError(f"Unknown action: '{action}'. Allowed: ['smoke_test', 'analyze_molecule']")
+            raise ValueError(f"Unknown action: '{action}'.")
 
     except Exception as exc:
         response_payload = {

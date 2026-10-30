@@ -59,3 +59,13 @@ parse-pdb/output.json
 curegenix_render_free_test.pdb
 test-small.pdb
 test_structure.pdb
+
+# Local IBM Quantum environment
+.venv-ibm/
+
+# User-uploaded PDB structure files (stored outside the curated registry)
+backend/structure_uploads/
+
+# Python temporary files
+__pycache__/
+*.py[cod]

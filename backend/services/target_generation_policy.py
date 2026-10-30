@@ -40,6 +40,13 @@ def authorize_target_generation(
         independent = independent_structure_evidence or {}
         mapping = independent.get("mapping") or {}
         entity_validation = independent.get("entity_sequence_validation") or {}
+        construct_aligned = entity_validation.get("informative_aligned_residues", 0)
+        construct_exact = (
+            construct_aligned >= 90
+            and entity_validation.get("validation_outcome") == "passed_full"
+            and entity_validation.get("substitution_count", 0) == 0
+        )
+        construct_passed = construct_aligned >= 100 or construct_exact
         verified = (
             independent.get("status") == "verified"
             and str(independent.get("pdb_id") or "").upper() == str(independent.get("requested_pdb_id") or "").upper()
@@ -48,7 +55,7 @@ def authorize_target_generation(
             and mapping.get("database_name") == "UniProt"
             and mapping.get("provenance_source") == "SIFTS"
             and entity_validation.get("validation_outcome") in {"passed_full", "passed_partial"}
-            and entity_validation.get("informative_aligned_residues", 0) >= 100
+            and construct_passed
         )
         if verified:
             return {

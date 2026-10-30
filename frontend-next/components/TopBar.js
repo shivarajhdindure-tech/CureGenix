@@ -12,6 +12,7 @@ export default function TopBar({
   onReset = null,
   onCancel = null,
   canStart = false,
+  onChangeStructure = null,
 }) {
   const currentDest = DESTINATIONS.find((d) => d.id === activeWorkspace) || DESTINATIONS[0];
 
@@ -51,9 +52,18 @@ export default function TopBar({
         {/* Target Indicator */}
         <div className="hidden md:flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 text-xs">
           <span className="text-slate-500 font-medium">Target:</span>
-          <span className="font-semibold text-slate-800">
-            {targetInfo?.pdbId ? `PDB ${targetInfo.pdbId}` : targetInfo?.uniprot ? `UniProt ${targetInfo.uniprot}` : "EGFR (P00533)"}
+          <span className="font-semibold text-slate-800 font-mono">
+            {targetInfo?.pdbId ? `${targetInfo.pdbId} (Chain ${targetInfo.chain || "A"})` : "None"}
           </span>
+          {onChangeStructure && (
+            <button
+              type="button"
+              onClick={onChangeStructure}
+              className="ml-1 text-[11px] font-bold text-teal-700 hover:text-teal-900 underline"
+            >
+              Change
+            </button>
+          )}
         </div>
 
         {/* Phase Pill */}

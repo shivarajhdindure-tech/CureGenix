@@ -1,0 +1,20 @@
+{
+  "model_id": "egfr-vqc-zz-real-amplitudes-v1",
+  "circuit_type": "saved trained CureGenix VQC",
+  "diagnostic_smiles": "CCO",
+  "preprocessed_feature_angles": [
+    -0.26478612422943115,
+    1.4844111204147339,
+    1.5868207216262817,
+    1.4113008975982666
+  ],
+  "qubits": 4,
+  "trainable_parameter_count": 8,
+  "shots_requested": 256,
+  "class_interpretation": "parity of measured four-bit output; even parity is class 0, odd parity is class 1",
+  "local_exact_class_probabilities": [
+    0.6259772481182152,
+    0.37402275188178435
+  ],
+  "purpose": "hardware-versus-simulator diagnostic; not evidence of molecular activity"
+}

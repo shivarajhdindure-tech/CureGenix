@@ -1,0 +1,21 @@
+{
+  "experiment": "two_qubit_bell_state",
+  "timestamp_utc": "2026-10-29T14:33:46.828893+00:00",
+  "backend": "ibm_fez",
+  "job_id": "dbhlhclep8hs73amdesg",
+  "job_status": "DONE",
+  "shots": 256,
+  "logical_qubits": 2,
+  "transpiled_depth": 8,
+  "hardware_counts": {
+    "11": 126,
+    "00": 110,
+    "10": 16,
+    "01": 4
+  },
+  "simulator_counts": {
+    "11": 126,
+    "00": 130
+  },
+  "note": "Bell-state hardware demonstration; not an EGFR prediction or evidence of quantum advantage."
+}

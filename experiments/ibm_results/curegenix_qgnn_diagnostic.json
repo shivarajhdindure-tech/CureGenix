@@ -1,0 +1,14 @@
+{
+  "model_id": "egfr-qgnn-message-passing-pqc-v1",
+  "circuit_type": "saved trained CureGenix QGNN quantum component",
+  "input_angles": [
+    0.1,
+    0.2,
+    0.3,
+    0.4
+  ],
+  "expected_local_probability_qubit0_is_1": 0.42844793340541254,
+  "qubits": 4,
+  "shots_requested": 256,
+  "purpose": "diagnostic hardware-vs-statevector comparison; not a molecular prediction"
+}

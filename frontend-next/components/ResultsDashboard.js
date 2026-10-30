@@ -60,8 +60,10 @@ export default function ResultsDashboard({ result, derived, onReset }) {
   const infoChips = [
     result.protein?.pdb_id && { k: "PDB", v: result.protein.pdb_id },
     proteinInfo.target_identity?.uniprot_id && {
-      k: "Verified target",
-      v: `${proteinInfo.target_identity.protein_name} (${proteinInfo.target_identity.uniprot_id})`,
+      k: ["structure_linked_sequence_validated", "structure_linked_partial_sequence_support"].includes(identity.identity_state)
+        ? "Sequence-validated target"
+        : "DBREF accession · sequence not validated",
+      v: `${identity.protein_name || "Target"} (${identity.uniprot_id})`,
     },
     !proteinInfo.target_identity?.uniprot_id &&
       proteinInfo.target_identity?.identity_status && {

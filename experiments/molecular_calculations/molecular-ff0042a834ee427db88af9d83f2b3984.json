@@ -1,0 +1,49 @@
+{
+  "job_id": "molecular-ff0042a834ee427db88af9d83f2b3984",
+  "experiment_record_id": "molecular-ff0042a834ee427db88af9d83f2b3984",
+  "candidate_id": "0WM-A-1102",
+  "smiles": "CN(C)C/C=C/C(=O)Nc1cc2c(Nc3ccc(F)c(Cl)c3)ncnc2cc1O[C@@H]1COCC1",
+  "input_sha256": "1bef2566c2f9014280f405b67cc4ae3fb146fd5f9ef6707919d12bbbe912e077",
+  "basis": "sto3g",
+  "maxiter": 50,
+  "charge": 0,
+  "spin": 0,
+  "status": "skipped",
+  "submitted_at": "2026-10-30T17:17:30.173567+00:00",
+  "request_fingerprint": "b3008eff91ef00bf93f9882dff972a054b1f67b800227157b10ad4924d2823ea",
+  "started_at": "2026-10-30T17:17:30.177085+00:00",
+  "result": {
+    "status": "skipped_resource_limit",
+    "message": "Quantum calculation skipped before geometry and PySCF setup: Heavy-atom count 34 exceeds configured limit 20.; Estimated STO-3G basis-function count 199 exceeds configured limit 100. This count is a rough size indicator, not an exact memory estimate. Use a smaller supported molecule or a separately resource-validated environment; this policy is not overridden by manual retry.",
+    "resource_eligibility": {
+      "status": "skipped_resource_limit",
+      "eligible": false,
+      "reasons": [
+        "Heavy-atom count 34 exceeds configured limit 20.",
+        "Estimated STO-3G basis-function count 199 exceeds configured limit 100. This count is a rough size indicator, not an exact memory estimate."
+      ],
+      "resource_metrics": {
+        "heavy_atom_count": 34,
+        "total_atom_count": 59,
+        "estimated_sto3g_basis_functions": 199,
+        "estimated_electron_count": 254
+      },
+      "calculation_parameters": {
+        "basis": "sto3g",
+        "charge": 0,
+        "max_vqe_iterations": 50,
+        "benchmark_enabled": false
+      },
+      "limits": {
+        "max_heavy_atoms": 20,
+        "max_total_atoms": 80,
+        "max_estimated_basis_functions": 100,
+        "max_vqe_iterations": 100
+      },
+      "estimation_method": "Atom counts and tabulated STO-3G shell counts only; no memory prediction or PySCF integral estimate."
+    },
+    "elapsed_seconds": 0.003
+  },
+  "finished_at": "2026-10-30T17:17:30.179061+00:00",
+  "elapsed_seconds": 0.003
+}

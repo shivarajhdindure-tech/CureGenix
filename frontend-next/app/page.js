@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
@@ -40,10 +40,18 @@ export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
+  // Global Active Structure Context
+  const [curatedList, setCuratedList] = useState([]);
+  const [collectionMeta, setCollectionMeta] = useState(null);
+  const [activeStructure, setActiveStructure] = useState(null);
+  const [structureLoading, setStructureLoading] = useState(false);
+
+  // File & validation state for upload panel backward compatibility
   const [file, setFile] = useState(null);
   const [targetUniprotId, setTargetUniprotId] = useState("");
   const [targetChainId, setTargetChainId] = useState("");
   const [validation, setValidation] = useState(null);
+
   const [phase, setPhase] = useState("idle"); // idle | running | done | error
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
@@ -53,6 +61,7 @@ export default function Home() {
 
   const abortRef = useRef(null);
   const cancelledRef = useRef(false);
+  const requestTokenRef = useRef(0);
   const validationToken = useRef(0);
 
   // ---- Hash Routing Synchronization --------------------------------------
@@ -90,6 +99,190 @@ export default function Home() {
     };
   }, []);
 
+  // ---- Atomic Curated Structure Selection --------------------------------
+  const selectCuratedStructure = useCallback(async (pdbId, chainId = "") => {
+    const token = ++requestTokenRef.current;
+    setStructureLoading(true);
+    setError("");
+    setNotice("");
+
+    // ATOMIC CLEAR: Wipe previous discovery result, candidates, molecular input, quantum job
+    setResult(null);
+    setFile(null);
+    setValidation({ status: "valid", message: `Curated structure ${pdbId} selected` });
+
+    setActiveStructure({
+      structureSource: "curated",
+      pdbId: pdbId,
+      uploadId: null,
+      sha256: "",
+      fileUrl: `/api/structures/curated/${pdbId}/file`,
+      proteinName: `Loading ${pdbId}…`,
+      targetAccession: "P00533",
+      availableChains: [],
+      selectedChainId: chainId,
+      sequenceValidation: null,
+      structureAnalysisRecordId: pdbId,
+      discoveryResult: null,
+      candidateGenerationStatus: null,
+      coCrystallizedLigands: [],
+      activeMolecularInput: null,
+      activeQuantumJob: null,
+      validationStatus: "checking",
+      warnings: [],
+      mutationAnnotations: [],
+    });
+    setPhase("idle");
+
+    try {
+      const query = chainId ? `?chain_id=${encodeURIComponent(chainId)}` : "";
+      const res = await fetch(`${API_URL}/api/structures/curated/${encodeURIComponent(pdbId)}${query}`);
+      if (!res.ok) throw new Error(`Could not load structure ${pdbId}`);
+      const data = await res.json();
+      if (token !== requestTokenRef.current) return; // Stale protection
+
+      const defaultChain = data.selected_chain_id || data.protein_chains?.[0] || "A";
+
+      setActiveStructure({
+        structureSource: "curated",
+        pdbId: data.source?.pdb_id || pdbId,
+        uploadId: null,
+        sha256: data.source?.sha256 || "",
+        sourceUrl: data.source?.source_url || null,
+        fileUrl: data.source?.file_url || `/api/structures/curated/${pdbId}/file`,
+        proteinName: data.title || "Epidermal growth factor receptor (EGFR)",
+        targetAccession: data.target_identity?.accession || "P00533",
+        availableChains: data.protein_chains || ["A"],
+        selectedChainId: defaultChain,
+        sequenceValidation: data.sequence_annotations || null,
+        structureAnalysisRecordId: data.source?.sha256 || pdbId,
+        discoveryResult: null,
+        candidateGenerationStatus: null,
+        coCrystallizedLigands: data.co_crystallized_ligands || [],
+        activeMolecularInput: null,
+        activeQuantumJob: null,
+        validationStatus: data.validation?.status || "valid",
+        warnings: data.validation?.warnings || [],
+        mutationAnnotations: data.mutation_annotations || [],
+      });
+      setTargetChainId(defaultChain);
+      setTargetUniprotId(data.target_identity?.accession || "P00533");
+    } catch (err) {
+      if (token !== requestTokenRef.current) return;
+      setError(err.message || `Failed to load curated structure ${pdbId}.`);
+    } finally {
+      if (token === requestTokenRef.current) setStructureLoading(false);
+    }
+  }, []);
+
+  // ---- Atomic Custom Structure Upload ------------------------------------
+  const uploadCustomStructure = useCallback(async (fileToUpload, chainId = "") => {
+    const token = ++requestTokenRef.current;
+    setStructureLoading(true);
+    setError("");
+    setNotice("");
+
+    const customPdbName = fileToUpload.name.replace(/\.pdb$/i, "").toUpperCase();
+
+    // ATOMIC CLEAR
+    setResult(null);
+    setFile(fileToUpload);
+    setValidation({ status: "checking", message: "Uploading and validating custom structure…" });
+
+    setActiveStructure({
+      structureSource: "custom",
+      pdbId: customPdbName,
+      uploadId: null,
+      sha256: "",
+      fileUrl: "",
+      proteinName: fileToUpload.name,
+      targetAccession: null,
+      availableChains: [],
+      selectedChainId: chainId,
+      sequenceValidation: null,
+      structureAnalysisRecordId: customPdbName,
+      discoveryResult: null,
+      candidateGenerationStatus: null,
+      coCrystallizedLigands: [],
+      activeMolecularInput: null,
+      activeQuantumJob: null,
+      validationStatus: "checking",
+      warnings: [],
+      mutationAnnotations: [],
+      originalFilename: fileToUpload.name,
+    });
+    setPhase("idle");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", fileToUpload);
+      if (chainId) formData.append("chain_id", chainId);
+
+      const res = await fetch(`${API_URL}/api/structures/uploads`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || "Custom structure upload failed.");
+      }
+      const data = await res.json();
+      if (token !== requestTokenRef.current) return; // Stale protection
+
+      const defaultChain = data.selected_chain_id || data.protein_chains?.[0] || "";
+
+      setActiveStructure({
+        structureSource: "custom",
+        pdbId: data.source?.pdb_id || data.pdb_id || customPdbName,
+        uploadId: data.upload_id,
+        sha256: data.source?.sha256 || "",
+        sourceUrl: null,
+        fileUrl: data.source?.file_url || `/api/structures/uploads/${data.upload_id}/file`,
+        proteinName: data.title || fileToUpload.name,
+        targetAccession: data.target_identity?.accession || null,
+        availableChains: data.protein_chains || [],
+        selectedChainId: defaultChain,
+        sequenceValidation: data.sequence_annotations || null,
+        structureAnalysisRecordId: data.upload_id,
+        discoveryResult: null,
+        candidateGenerationStatus: null,
+        coCrystallizedLigands: data.co_crystallized_ligands || [],
+        activeMolecularInput: null,
+        activeQuantumJob: null,
+        validationStatus: data.validation?.status || "valid",
+        warnings: data.validation?.warnings || [],
+        mutationAnnotations: data.mutation_annotations || [],
+        originalFilename: fileToUpload.name,
+      });
+      setValidation({ status: "valid", message: `${fileToUpload.name} validated successfully` });
+      setTargetChainId(defaultChain);
+      setTargetUniprotId(data.target_identity?.accession || "");
+    } catch (err) {
+      if (token !== requestTokenRef.current) return;
+      setError(err.message || "Failed to upload custom PDB.");
+      setValidation({ status: "invalid", message: err.message || "Invalid structure" });
+    } finally {
+      if (token === requestTokenRef.current) setStructureLoading(false);
+    }
+  }, []);
+
+  // ---- Fetch Curated Structure Registry on Mount -------------------------
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${API_URL}/api/structures/curated`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return;
+        setCuratedList(data.structures || []);
+        if (data.collection) setCollectionMeta(data.collection);
+        if (data.structures?.length > 0) {
+          selectCuratedStructure("1M17");
+        }
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [selectCuratedStructure]);
+
   // ---- Elapsed timer for pipeline ----------------------------------------
   useEffect(() => {
     if (phase !== "running") return undefined;
@@ -110,7 +303,7 @@ export default function Home() {
     return () => window.removeEventListener("beforeunload", handler);
   }, [phase]);
 
-  // ---- File handling -----------------------------------------------------
+  // ---- File handling for UploadPanel -------------------------------------
   async function handleSelect(selected) {
     const token = ++validationToken.current;
     setFile(selected);
@@ -118,7 +311,12 @@ export default function Home() {
     setNotice("");
     setValidation({ status: "checking" });
     const v = await validatePdb(selected);
-    if (token === validationToken.current) setValidation(v);
+    if (token === validationToken.current) {
+      setValidation(v);
+      if (v.status === "valid") {
+        uploadCustomStructure(selected);
+      }
+    }
   }
 
   function handleRemove() {
@@ -126,12 +324,12 @@ export default function Home() {
     setFile(null);
     setValidation(null);
     setError("");
+    selectCuratedStructure("1M17");
   }
 
-  // ---- Analysis request --------------------------------------------------
+  // ---- Analysis request (Unified for curated and custom) -----------------
   async function runAnalysis() {
-    if (!file || validation?.status !== "valid") {
-      // If user clicks run without file, guide them to target analysis
+    if (!activeStructure?.pdbId) {
       handleSelectWorkspace("target-analysis");
       return;
     }
@@ -148,12 +346,24 @@ export default function Home() {
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
-      if (targetUniprotId.trim()) {
-        formData.append("target_uniprot_id", targetUniprotId.trim());
+
+      // Retrieve file blob from active structure fileUrl
+      if (activeStructure.fileUrl) {
+        const fileRes = await fetch(`${API_URL}${activeStructure.fileUrl}`, { signal: controller.signal });
+        if (!fileRes.ok) throw new Error("Could not retrieve active structure coordinates for pipeline.");
+        const blob = await fileRes.blob();
+        formData.append("file", blob, `${activeStructure.pdbId}.pdb`);
+      } else if (file) {
+        formData.append("file", file);
+      } else {
+        throw new Error("No structure coordinate file available for analysis.");
       }
-      if (targetChainId.trim()) {
-        formData.append("target_chain_id", targetChainId.trim());
+
+      if (activeStructure.targetAccession || targetUniprotId.trim()) {
+        formData.append("target_uniprot_id", (activeStructure.targetAccession || targetUniprotId).trim());
+      }
+      if (activeStructure.selectedChainId || targetChainId.trim()) {
+        formData.append("target_chain_id", (activeStructure.selectedChainId || targetChainId).trim());
       }
 
       const response = await fetch(`${API_URL}/api/discover`, {
@@ -183,6 +393,11 @@ export default function Home() {
       if (!data) throw new Error("The server returned an unreadable response.");
 
       setResult(data);
+      setActiveStructure((prev) => (prev ? {
+        ...prev,
+        discoveryResult: data,
+        candidateGenerationStatus: data.candidate_generation || null,
+      } : null));
       setPhase("done");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -222,17 +437,20 @@ export default function Home() {
     setError("");
     setNotice("");
     setPhase("idle");
+    selectCuratedStructure("1M17");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const derived = useMemo(() => (result ? deriveResults(result) : null), [result]);
 
   const targetInfo = {
-    name: result?.protein_name || result?.protein?.name || (file ? file.name : "EGFR (P00533)"),
-    pdbId: result?.protein?.pdb_id || (file ? file.name.replace(".pdb", "") : "1M17"),
-    uniprot: result?.protein_info?.target_identity?.uniprot_id || targetUniprotId || "P00533",
-    chain: result?.protein_info?.target_identity?.selected_chain_id || targetChainId || "A",
+    name: activeStructure?.proteinName || result?.protein_name || result?.protein?.name || "No structure selected",
+    pdbId: activeStructure?.pdbId || result?.protein?.pdb_id || "",
+    uniprot: activeStructure?.targetAccession || result?.protein_info?.target_identity?.uniprot_id || "",
+    chain: activeStructure?.selectedChainId || result?.protein_info?.target_identity?.selected_chain_id || "",
   };
+
+  const canStartPipeline = Boolean(activeStructure?.pdbId && !structureLoading && phase !== "running");
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
@@ -262,7 +480,8 @@ export default function Home() {
           onStartAnalysis={runAnalysis}
           onReset={resetAll}
           onCancel={cancelAnalysis}
-          canStart={file && validation?.status === "valid"}
+          canStart={canStartPipeline}
+          onChangeStructure={() => handleSelectWorkspace("target-analysis")}
         />
 
         {/* Workspace Content Container */}
@@ -286,17 +505,17 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={runAnalysis}
-                  disabled={!file || validation?.status !== "valid"}
-                  className="rounded bg-rose-600 text-white px-3 py-1.5 font-semibold text-xs hover:bg-rose-700"
+                  disabled={!canStartPipeline}
+                  className="rounded bg-rose-600 text-white px-3 py-1.5 font-semibold text-xs hover:bg-rose-700 disabled:opacity-50"
                 >
                   Retry Analysis
                 </button>
                 <button
                   type="button"
-                  onClick={handleRemove}
+                  onClick={() => handleSelectWorkspace("target-analysis")}
                   className="rounded border border-rose-300 bg-white text-rose-700 px-3 py-1.5 font-semibold text-xs hover:bg-rose-50"
                 >
-                  Choose Another PDB File
+                  Select Another PDB Structure
                 </button>
               </div>
             </div>
@@ -314,6 +533,7 @@ export default function Home() {
                 <OverviewWorkspace
                   result={result}
                   derived={derived}
+                  activeStructure={activeStructure}
                   onNavigate={handleSelectWorkspace}
                   onStartAnalysis={runAnalysis}
                 />
@@ -333,6 +553,12 @@ export default function Home() {
                   onTargetUniprotIdChange={setTargetUniprotId}
                   targetChainId={targetChainId}
                   onTargetChainIdChange={setTargetChainId}
+                  activeStructure={activeStructure}
+                  curatedStructures={curatedList}
+                  collectionMeta={collectionMeta}
+                  onSelectCurated={selectCuratedStructure}
+                  onUploadCustom={uploadCustomStructure}
+                  structureLoading={structureLoading}
                 />
               )}
 
@@ -340,6 +566,7 @@ export default function Home() {
                 <MoleculeDiscoveryWorkspace
                   result={result}
                   derived={derived}
+                  activeStructure={activeStructure}
                 />
               )}
 
@@ -347,6 +574,7 @@ export default function Home() {
                 <QuantumLabWorkspace
                   result={result}
                   derived={derived}
+                  activeStructure={activeStructure}
                 />
               )}
 

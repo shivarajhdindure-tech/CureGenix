@@ -123,7 +123,7 @@ class WSLQuantumAdapter:
     def resolve_wsl_python(self) -> str:
         """
         Determine the path to the Linux virtualenv Python in WSL.
-        Resolves ~/curegenix-quantum/.venv/bin/python to /home/<user>/... if needed.
+        Resolves ~/curegenix-chem-venv/bin/python to /home/<user>/... if needed.
         """
         if self._resolved_python_path:
             return self._resolved_python_path
@@ -156,7 +156,7 @@ class WSLQuantumAdapter:
         if candidate and candidate.startswith("~"):
             resolved = candidate.replace("~", f"/home/{username}", 1)
         else:
-            resolved = f"/home/{username}/curegenix-quantum/.venv/bin/python"
+            resolved = f"/home/{username}/curegenix-chem-venv/bin/python"
 
         clean_resolved = resolved.replace("\x00", "").strip()
         self._resolved_python_path = clean_resolved
@@ -253,10 +253,13 @@ class WSLQuantumAdapter:
                 elapsed = time.perf_counter() - started
                 details = self._clean_process_text(exc.stderr) or self._clean_process_text(exc.stdout)
                 suffix = f" Process output: {details[:2000]}" if details else ""
-                raise WSLTimeoutError(
+                timeout_error = WSLTimeoutError(
                     f"WSL quantum calculation timed out after {effective_timeout}s "
                     f"(elapsed {elapsed:.2f}s).{suffix}"
-                ) from exc
+                )
+                timeout_error.timeout_seconds = effective_timeout
+                timeout_error.elapsed_seconds = round(elapsed, 3)
+                raise timeout_error from exc
             except FileNotFoundError as exc:
                 raise WSLNotAvailableError(f"Could not execute '{cmd[0]}': {exc}") from exc
             except Exception as exc:
@@ -364,6 +367,74 @@ class WSLQuantumAdapter:
         res = self._execute_worker(payload, timeout=timeout)
         return res
 
+    def run_h2o_classical_reference(
+        self, oh_bond_length_angstrom: float = 0.9572,
+        hoh_angle_degrees: float = 104.5, timeout: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Run the dedicated H2O/STO-3G classical and Hamiltonian audit in WSL."""
+        payload = {
+            "action": "h2o_classical_reference",
+            "oh_bond_length_angstrom": oh_bond_length_angstrom,
+            "hoh_angle_degrees": hoh_angle_degrees,
+        }
+        response = self._execute_worker(payload, timeout=timeout)
+        result = response.get("result")
+        if not isinstance(result, dict):
+            raise WSLCalculationError("H2O worker response did not contain a result object.")
+        result["adapter_diagnostics"] = response.get("adapter_diagnostics", {})
+        return result
+
+    def run_h2o_simulator(
+        self, classical_record: Dict[str, Any], maxiter: int = 50,
+        timeout: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Run H2O active-space VQE on the local WSL statevector simulator."""
+        if not isinstance(classical_record, dict):
+            raise WSLInputValidationError("A saved classical H2O result is required.")
+        if not isinstance(maxiter, int) or not 1 <= maxiter <= 500:
+            raise WSLInputValidationError("maxiter must be an integer between 1 and 500.")
+        response = self._execute_worker({
+            "action": "h2o_simulator", "classical_record": classical_record, "maxiter": maxiter,
+        }, timeout=timeout)
+        result = response.get("result")
+        if not isinstance(result, dict):
+            raise WSLCalculationError("H2O simulator response did not contain a result object.")
+        result["adapter_diagnostics"] = response.get("adapter_diagnostics", {})
+        return result
+
+    def reconstruct_h2o_statevector(
+        self, simulator_record: Dict[str, Any], timeout: int = 120,
+    ) -> Dict[str, Any]:
+        """Rebuild a saved H2O circuit's final state without rerunning VQE."""
+        if not isinstance(simulator_record, dict):
+            raise WSLInputValidationError("A saved H2O simulator result is required.")
+        response = self._execute_worker({
+            "action": "h2o_statevector", "simulator_record": simulator_record,
+        }, timeout=timeout)
+        result = response.get("result")
+        if not isinstance(result, dict):
+            raise WSLCalculationError("Statevector worker response did not contain a result object.")
+        return result
+
+    def run_h2o_hardware_evaluation(
+        self, simulator_record: Dict[str, Any], backend_name: str,
+        precision: float = 0.05, confirm_submission: bool = False,
+        timeout: Optional[int] = None, mitigation_config: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Explicitly evaluate fixed simulator parameters using IBM Runtime in WSL."""
+        if confirm_submission is not True:
+            raise WSLInputValidationError("Explicit hardware submission confirmation is required.")
+        response = self._execute_worker({
+            "action": "h2o_hardware_evaluation", "simulator_record": simulator_record,
+            "backend_name": backend_name, "precision": precision,
+            "confirm_submission": True, "mitigation_config": mitigation_config,
+        }, timeout=timeout)
+        result = response.get("result")
+        if not isinstance(result, dict):
+            raise WSLCalculationError("H2O hardware response did not contain a result object.")
+        result["adapter_diagnostics"] = response.get("adapter_diagnostics", {})
+        return result
+
     def analyze_geometry(
         self,
         atom: str,
@@ -416,9 +487,10 @@ class WSLQuantumAdapter:
             atom, basis=basis, maxiter=maxiter, charge=charge, benchmark=benchmark
         )
         if eligibility.get("status") == "skipped_resource_limit":
+            reasons = eligibility.get("reasons", [])
             return {
                 "status": "skipped_resource_limit",
-                "message": "Quantum calculation skipped by the configured resource eligibility policy.",
+                "message": "Quantum calculation skipped before WSL worker launch: " + "; ".join(reasons) + " Use a smaller supported molecule or a separately resource-validated environment; this policy is not overridden by manual retry.",
                 "resource_eligibility": eligibility,
                 "adapter_diagnostics": {"stage": "resource_preflight", "elapsed_seconds": 0.0},
             }

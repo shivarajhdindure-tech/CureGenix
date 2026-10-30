@@ -15,6 +15,7 @@ from backend.services.target_sequence import (
     extract_pdb_chain_sequence,
     validate_chain_sequence,
 )
+from backend.services.target_generation_policy import authorize_target_generation
 from backend.services.target_aware_generation import get_target_references
 
 
@@ -207,16 +208,39 @@ class TargetAwareGenerationTests(unittest.TestCase):
         self.assertEqual(default_result["identity_state"], "insufficient_sequence_evidence")
         self.assertFalse(default_result["candidate_generation_allowed"])
         self.assertAlmostEqual(default_result["identity_fraction"], 45 / 46)
+        self.assertEqual(default_result["aligned_observed_residue_count"], 46)
         self.assertEqual(default_result["substitutions"][0]["reference_position"], 25)
-        policy = SequenceValidationPolicy(
-            min_aligned_residues=40, min_observed_coverage=0.95,
-            min_reference_coverage=0.8,
+        self.assertEqual(default_result["substitution_count"], 1)
+        self.assertEqual(default_result["substitutions"][0]["observed_amino_acid"], "I")
+        self.assertEqual(default_result["substitutions"][0]["reference_amino_acid"], "L")
+
+        exact_entity = validate_chain_sequence(chain, chain["sequence"])
+        independent_evidence = {
+            "status": "verified", "pdb_id": "1CRN", "requested_pdb_id": "1CRN",
+            "auth_chain_id": "A",
+            "mapping": {"database_accession": "P01542", "database_name": "UniProt", "provenance_source": "SIFTS"},
+            "entity_sequence_validation": exact_entity,
+        }
+        policy = authorize_target_generation(
+            "structure_linked_partial_sequence_support", default_result,
+            selected_chain_id="A", uniprot_accession="P01542",
         )
-        result = validate_chain_sequence(chain, reference, policy)
-        self.assertEqual(result["identity_state"], "structure_linked_partial_sequence_support")
-        self.assertEqual(result["substitution_count"], 1)
-        self.assertEqual(result["substitutions"][0]["observed_amino_acid"], "I")
-        self.assertEqual(result["substitutions"][0]["reference_amino_acid"], "L")
+        self.assertFalse(policy["allowed"])
+        allowed = authorize_target_generation(
+            "structure_linked_partial_sequence_support", default_result,
+            selected_chain_id="A", uniprot_accession="P01542",
+            independent_structure_evidence=independent_evidence,
+        )
+        self.assertFalse(allowed["allowed"])
+        self.assertEqual(allowed["policy_state"], "partial_support_unverified")
+
+        altered_entity = dict(exact_entity, substitution_count=1)
+        rejected = authorize_target_generation(
+            "structure_linked_partial_sequence_support", default_result,
+            selected_chain_id="A", uniprot_accession="P01542",
+            independent_structure_evidence={**independent_evidence, "entity_sequence_validation": altered_entity},
+        )
+        self.assertFalse(rejected["allowed"])
 
     def test_observed_chain_extraction_altloc_insertion_gap_modified_unknown_and_blank_chain(self):
         seqres = "SEQRES   1 A    4  ALA GLY MSE XAA"

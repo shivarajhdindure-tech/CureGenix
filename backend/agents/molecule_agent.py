@@ -60,7 +60,11 @@ class MoleculeAgent(BaseAgent):
                 })
 
         if not refs:
-            generation_method = "disabled: target identity or configured references unavailable"
+            generation_method = (
+                "disabled: no configured target references"
+                if target_identity.get("candidate_generation_allowed") is True
+                else "disabled: target identity is not accepted"
+            )
         elif not candidates and not warning:
             warning = "Configured reference was available, but no valid unique analogs were generated."
 

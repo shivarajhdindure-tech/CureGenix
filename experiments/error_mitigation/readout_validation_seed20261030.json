@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "execution_type": "local_noisy_simulation",
+  "simulator": "Qiskit Aer AerSimulator",
+  "qiskit_versions": {
+    "qiskit": "2.5.2",
+    "qiskit_aer": "0.17.2"
+  },
+  "seed": 20261030,
+  "shots_per_scenario": 8192,
+  "measurement_setup": {
+    "qubits": 1,
+    "prepared_state": "|1>",
+    "observable": "Pauli Z",
+    "bit_convention": "measured 0 maps to +1; measured 1 maps to -1",
+    "ideal_expectation_z": -1.0
+  },
+  "controlled_readout_noise": {
+    "assumption": "independent assignment errors; p(measure 1 | prepare 0)=0.05; p(measure 0 | prepare 1)=0.20",
+    "calibration": "exact synthetic assignment matrix matching the configured simulator noise",
+    "ideal_expectation_z": -1.0,
+    "counts": {
+      "1": 6629,
+      "0": 1563
+    },
+    "raw_unmitigated": {
+      "expectation_z": -0.618408203125,
+      "standard_error": 0.008682575705812849
+    },
+    "readout_mitigated": {
+      "expectation_z": -1.0245442708333332,
+      "standard_error_conditional_on_calibration": 0.011577474262267082,
+      "method": "inverse of the declared 2x2 readout assignment matrix"
+    },
+    "absolute_error_from_ideal": {
+      "raw": 0.381591796875,
+      "readout_mitigated": 0.024544270833333215
+    }
+  },
+  "calibration_mismatch_counterexample": {
+    "assumption": "actual readout is ideal; mitigation incorrectly assumes symmetric 10% assignment errors",
+    "calibration": "intentionally mismatched synthetic assignment matrix",
+    "ideal_expectation_z": -1.0,
+    "counts": {
+      "1": 8192
+    },
+    "raw_unmitigated": {
+      "expectation_z": -1.0,
+      "standard_error": 0.0
+    },
+    "readout_mitigated": {
+      "expectation_z": -1.25,
+      "standard_error_conditional_on_calibration": 0.0,
+      "method": "inverse of the declared 2x2 readout assignment matrix"
+    },
+    "absolute_error_from_ideal": {
+      "raw": 0.0,
+      "readout_mitigated": 0.25
+    }
+  },
+  "limitations": [
+    "Synthetic one-qubit readout noise only; no gate, crosstalk, drift, or hardware noise model.",
+    "Mitigated standard error is conditional on the supplied calibration matrix and excludes calibration-estimation uncertainty.",
+    "No VQE, IBM Runtime, credentials, or hardware jobs are used."
+  ]
+}

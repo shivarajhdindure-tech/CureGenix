@@ -1,0 +1,29 @@
+{
+  "molecule": "H2",
+  "bond_distance_angstrom": 0.735,
+  "basis": "STO-3G",
+  "mapping": "Jordan-Wigner",
+  "method": "VQE",
+  "simulator": "StatevectorEstimator",
+  "optimizer": "SLSQP",
+  "maxiter": 100,
+  "num_qubits": 4,
+  "vqe_eigenvalue_hartree": -1.8369679413555875,
+  "exact_reference_eigenvalue_hartree": -1.8572750302023775,
+  "absolute_energy_error_hartree": 0.02030708884679,
+  "optimal_parameters": {
+    "\u03b8[0]": -0.0005414282449277647,
+    "\u03b8[1]": -3.980479369120668,
+    "\u03b8[2]": -1.1977601898525885,
+    "\u03b8[3]": -0.0005560960149629218,
+    "\u03b8[4]": 3.1412319625332765,
+    "\u03b8[5]": 4.4401155537861055,
+    "\u03b8[6]": 1.6093760438336575,
+    "\u03b8[7]": 3.141085082358002,
+    "\u03b8[8]": 6.2837750124889595,
+    "\u03b8[9]": -5.168799603750725,
+    "\u03b8[10]": -5.401852372745225,
+    "\u03b8[11]": 3.1422201150908067
+  },
+  "note": "Local simulation only; not a hardware result."
+}

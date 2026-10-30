@@ -1,0 +1,96 @@
+{
+  "job_id": "molecular-11ca6cb05a2241059450f277f1fd9d1d",
+  "experiment_record_id": "molecular-11ca6cb05a2241059450f277f1fd9d1d",
+  "candidate_id": "GEN-A21F9E2F",
+  "smiles": "O=C(CO)N[C@H]1[C@@H](O)[C@H](O)[C@@H](CO)O[C@H]1O",
+  "input_sha256": "acab017570eba377c5233f9c03a53b136b34b81c0c6093a76245ebd6104850c0",
+  "basis": "sto3g",
+  "maxiter": 50,
+  "charge": 0,
+  "spin": 0,
+  "status": "completed",
+  "submitted_at": "2026-10-30T17:59:25.974834+00:00",
+  "request_fingerprint": "d3678f87b2c41bb6494cac12e3b86ea21492d92a9c6e1af32804c70b5e3055d1",
+  "started_at": "2026-10-30T17:59:25.979726+00:00",
+  "result": {
+    "status": "success",
+    "method": "VQE",
+    "basis": "sto3g",
+    "charge": 0,
+    "spin": 0,
+    "active_space": {
+      "electrons": 2,
+      "spatial_orbitals": 2,
+      "selected_orbitals": [
+        62,
+        63
+      ],
+      "selection_method": "HOMO-LUMO"
+    },
+    "molecular_system": {
+      "total_electrons": 126,
+      "spatial_orbitals": 95,
+      "spin_orbitals": 190
+    },
+    "homo": {
+      "orbital": 62,
+      "energy_hartree": -0.293587986058077
+    },
+    "lumo": {
+      "orbital": 63,
+      "energy_hartree": 0.31438629544588326
+    },
+    "homo_lumo_gap_hartree": 0.6079742815039603,
+    "hamiltonian": {
+      "qubits": 4,
+      "pauli_terms": 27,
+      "mapping": "Jordan-Wigner"
+    },
+    "vqe": {
+      "electronic_energy_hartree": -2144.013722530934,
+      "raw_active_space_energy_hartree": -1.0316112868065894,
+      "total_molecular_energy_hartree": -878.6039635680017,
+      "active_space_correction_hartree": -2142.9821112441273,
+      "nuclear_repulsion_energy_hartree": 1265.4097589629323,
+      "optimizer": "SLSQP",
+      "ansatz": "n_local",
+      "max_iterations": 50,
+      "runtime_seconds": 4.898,
+      "optimizer_success": null,
+      "optimizer_message": "",
+      "optimizer_status_available": false
+    },
+    "stage_diagnostics": {
+      "resource_preflight": {
+        "status": "completed",
+        "elapsed_seconds": 0.001
+      },
+      "pyscf_driver": {
+        "status": "completed",
+        "elapsed_seconds": 28.063
+      },
+      "active_space_reduction": {
+        "status": "completed",
+        "elapsed_seconds": 11.988
+      },
+      "hamiltonian_mapping": {
+        "status": "completed",
+        "elapsed_seconds": 0.178
+      },
+      "vqe": {
+        "status": "completed",
+        "elapsed_seconds": 4.898
+      },
+      "total_elapsed_seconds": 52.998
+    },
+    "adapter_diagnostics": {
+      "attempts": 1,
+      "transient_service_retries": 0,
+      "elapsed_seconds": 50.759,
+      "timeout_seconds": 600
+    },
+    "elapsed_seconds": 50.927
+  },
+  "finished_at": "2026-10-30T18:00:16.906667+00:00",
+  "elapsed_seconds": 50.927
+}

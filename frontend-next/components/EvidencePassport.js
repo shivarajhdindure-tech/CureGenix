@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { fmt, isNum } from "@/lib/analysis";
+import { fmt, isNum, API_URL } from "@/lib/analysis";
+import { isSafeHttpUrl, ReferenceLink } from "./ReferenceLink.mjs";
+import { getQuantumCalculationDisplay } from "@/lib/quantumCalculationDisplay.mjs";
 
 function EvidenceRow({ label, value, status }) {
   return (
@@ -12,23 +14,62 @@ function EvidenceRow({ label, value, status }) {
           {value ?? "Not available"}
         </p>
       </div>
-      {status && (
+      {status && (isSafeHttpUrl(status) ? (
+        <ReferenceLink href={status} className="max-w-[55%] text-right text-xs">
+          {status}
+        </ReferenceLink>
+      ) : (
         <span className="badge border-white/10 bg-white/[0.04] text-slate-400">
           {status}
         </span>
-      )}
+      ))}
     </div>
   );
 }
 
-export default function EvidencePassport({ candidate: c }) {
+export default function EvidencePassport({ candidate: c, activeStructure = null }) {
   const [open, setOpen] = useState(false);
+  const [quantumJob, setQuantumJob] = useState(null);
+  const [quantumRequestError, setQuantumRequestError] = useState("");
 
   const verified =
     c.verificationStatus === "verified" &&
     c.targetAssociationVerified === true;
 
-  const q = c.quantumState === "vqe" ? c.quantum : null;
+  const quantumDisplay = getQuantumCalculationDisplay(c, quantumJob);
+  const q = quantumDisplay.quantum;
+  const quantumBusy = quantumDisplay.status === "queued" || quantumDisplay.status === "running";
+
+  async function runQuantumCalculation() {
+    if (quantumBusy || !c.smiles || !c.id) return;
+    setQuantumRequestError("");
+    setQuantumJob({ status: "queued" });
+    try {
+      const submitted = await fetch(`${API_URL}/api/quantum-calculations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidate_id: c.id, smiles: c.smiles }),
+      });
+      if (!submitted.ok) {
+        const body = await submitted.json().catch(() => ({}));
+        throw new Error(typeof body.detail === "string" ? body.detail : "Backend could not accept the calculation request.");
+      }
+      const accepted = await submitted.json();
+      setQuantumJob({ job_id: accepted.job_id, status: accepted.status, duplicate: accepted.duplicate });
+
+      while (true) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const response = await fetch(`${API_URL}/api/quantum-calculations/${encodeURIComponent(accepted.job_id)}`, { cache: "no-store" });
+        if (!response.ok) throw new Error("Could not retrieve the backend calculation status.");
+        const current = await response.json();
+        setQuantumJob(current);
+        if (["completed", "failed", "skipped"].includes(current.status)) break;
+      }
+    } catch (error) {
+      setQuantumJob(null);
+      setQuantumRequestError(error instanceof Error ? error.message : "Quantum calculation request failed.");
+    }
+  }
   const screening = c.screening;
   const provenance = c.candidateMetadata;
 
@@ -96,8 +137,12 @@ export default function EvidencePassport({ candidate: c }) {
                 <>
                   <EvidenceRow
                     label="Target-informed context"
-                    value={`${provenance.target?.name || "Unknown target"} (${provenance.target?.uniprot_id || "no accession"}); ${provenance.target?.identity_state || "unresolved"}; chain ${provenance.target?.selected_chain_id || "not selected"}`}
+                    value={`${activeStructure?.proteinName || provenance.target?.name || "Unknown target"} (${activeStructure?.targetAccession || provenance.target?.uniprot_id || "no accession"}); ${provenance.target?.identity_state || "unresolved"}; chain ${activeStructure?.selectedChainId || provenance.target?.selected_chain_id || "not selected"}`}
                   />
+                  <EvidenceRow label="Target Structure PDB ID" value={activeStructure?.pdbId || "Not established"} />
+                  {activeStructure?.sha256 && (
+                    <EvidenceRow label="Structure Checksum" value={activeStructure.sha256.slice(0, 16) + "…"} />
+                  )}
                   <EvidenceRow label="Identity source" value={provenance.target?.identity_source} />
                   <EvidenceRow label="Identity warnings" value={(provenance.target?.warnings || []).join(" ") || "None"} />
                   {provenance.target?.evidence?.sequence_validation && (
@@ -193,11 +238,13 @@ export default function EvidencePassport({ candidate: c }) {
             <div className="mt-2">
               <EvidenceRow
                 label="Calculation status"
-                value={c.quantumState || "Unknown"}
+                value={quantumDisplay.status === "completed" ? "completed · VQE result available" : quantumDisplay.status === "skipped" ? "skipped_resource_limit" : quantumDisplay.status}
                 status={
-                  c.quantumState === "vqe"
+                  quantumDisplay.status === "completed" || c.quantumState === "vqe"
                     ? "VQE result available"
-                    : "No VQE result available"
+                    : quantumDisplay.status === "running" || quantumDisplay.status === "queued"
+                      ? "Calculation in progress"
+                      : "No VQE result available"
                 }
               />
               <EvidenceRow
@@ -228,6 +275,29 @@ export default function EvidencePassport({ candidate: c }) {
                   ? (q.vqe.optimizer_success ? "Reported converged" : "Reported not converged")
                   : "Not reported by optimizer"}
               />
+              {quantumJob?.experiment_record_id && (
+                <EvidenceRow label="Experiment record" value={quantumJob.experiment_record_id} />
+              )}
+              {isNum(quantumJob?.elapsed_seconds) && (
+                <EvidenceRow label="Calculation elapsed time" value={`${quantumJob.elapsed_seconds.toFixed(2)} s`} />
+              )}
+              {quantumDisplay.message && quantumDisplay.status !== "completed" && (
+                <div role="status" className={`mt-2 rounded-lg border p-3 text-xs leading-5 ${quantumDisplay.status === "failed" ? "border-red-400/25 bg-red-400/[0.05] text-red-200" : "border-amber-400/25 bg-amber-400/[0.05] text-amber-100"}`}>
+                  {quantumDisplay.message}
+                  {quantumDisplay.eligibilityReasons.length > 0 && (
+                    <ul className="mt-1 list-disc pl-4">{quantumDisplay.eligibilityReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
+                  )}
+                </div>
+              )}
+              {c.smiles && c.id && (
+                <div className="mt-3">
+                  <button type="button" onClick={runQuantumCalculation} disabled={quantumBusy} aria-busy={quantumBusy} className="rounded-lg border border-cyan-300/30 bg-cyan-300/10 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-300/20 disabled:cursor-wait disabled:opacity-60">
+                    {quantumBusy ? "Running quantum calculation…" : "Run Quantum Calculations"}
+                  </button>
+                  <p className="mt-1 text-[11px] leading-4 text-slate-500">Runs only after this button is selected. Resource eligibility safeguards remain active.</p>
+                  {quantumRequestError && <p role="alert" className="mt-2 text-xs text-red-200">{quantumRequestError}</p>}
+                </div>
+              )}
               <p className="mt-2 text-xs leading-5 text-slate-400">
                 Quantum-derived descriptors are computational results.
                 They do not establish target binding, clinical efficacy,
@@ -253,12 +323,12 @@ export default function EvidencePassport({ candidate: c }) {
                   does not establish safety or exclude toxicity.
                 </li>
               )}
-              {c.quantumState !== "vqe" && (
+              {c.quantumState !== "vqe" && quantumDisplay.status !== "completed" && (
                 <li>
-                  {c.quantumState === "resource_skipped"
-                    ? `• Quantum calculation was skipped by resource policy: ${c.quantum?.message || "molecule exceeded a configured eligibility limit"}.`
-                    : c.quantumState === "failed"
-                      ? `• Quantum calculation failed: ${c.quantum?.message || "no failure detail available"}.`
+                  {quantumDisplay.status === "skipped" || c.quantumState === "resource_skipped"
+                    ? `• Quantum calculation was skipped by resource policy: ${quantumDisplay.message || "molecule exceeded a configured eligibility limit"}.`
+                    : quantumDisplay.status === "failed" || c.quantumState === "failed"
+                      ? `• Quantum calculation failed: ${quantumDisplay.message || "no failure detail available"}.`
                       : "• A successful VQE result is not available for this candidate."}
                 </li>
               )}

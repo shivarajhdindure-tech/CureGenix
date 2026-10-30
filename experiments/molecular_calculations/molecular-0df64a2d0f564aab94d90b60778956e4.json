@@ -1,0 +1,50 @@
+{
+  "job_id": "molecular-0df64a2d0f564aab94d90b60778956e4",
+  "experiment_record_id": "molecular-0df64a2d0f564aab94d90b60778956e4",
+  "candidate_id": "GEN-1A93216A",
+  "smiles": "CC(C)(C)NC(=O)[C@@H]1CN(Cc2ccccc2)CCN1C[C@@H](O)C[C@@H](Cc1ccccc1)C(=O)N[C@H]1c2ccccc2C[C@H]1O",
+  "input_sha256": "38d23d434c265405b7047771a5c1dc016ffae3162e70e6f519bcdafe6ef63069",
+  "basis": "sto3g",
+  "maxiter": 50,
+  "charge": 0,
+  "spin": 0,
+  "status": "skipped",
+  "submitted_at": "2026-10-30T18:46:39.665506+00:00",
+  "request_fingerprint": "3e6df910f15039b90d5f9003dce1eb3155330c203796ff47d3d8abf47d3dddca",
+  "started_at": "2026-10-30T18:46:39.670507+00:00",
+  "result": {
+    "status": "skipped_resource_limit",
+    "message": "Quantum calculation skipped before geometry and PySCF setup: Heavy-atom count 45 exceeds configured limit 20.; Total atom count 93 exceeds configured limit 80.; Estimated STO-3G basis-function count 273 exceeds configured limit 100. This count is a rough size indicator, not an exact memory estimate. Use a smaller supported molecule or a separately resource-validated environment; this policy is not overridden by manual retry.",
+    "resource_eligibility": {
+      "status": "skipped_resource_limit",
+      "eligible": false,
+      "reasons": [
+        "Heavy-atom count 45 exceeds configured limit 20.",
+        "Total atom count 93 exceeds configured limit 80.",
+        "Estimated STO-3G basis-function count 273 exceeds configured limit 100. This count is a rough size indicator, not an exact memory estimate."
+      ],
+      "resource_metrics": {
+        "heavy_atom_count": 45,
+        "total_atom_count": 93,
+        "estimated_sto3g_basis_functions": 273,
+        "estimated_electron_count": 330
+      },
+      "calculation_parameters": {
+        "basis": "sto3g",
+        "charge": 0,
+        "max_vqe_iterations": 50,
+        "benchmark_enabled": false
+      },
+      "limits": {
+        "max_heavy_atoms": 20,
+        "max_total_atoms": 80,
+        "max_estimated_basis_functions": 100,
+        "max_vqe_iterations": 100
+      },
+      "estimation_method": "Atom counts and tabulated STO-3G shell counts only; no memory prediction or PySCF integral estimate."
+    },
+    "elapsed_seconds": 0.005
+  },
+  "finished_at": "2026-10-30T18:46:39.674964+00:00",
+  "elapsed_seconds": 0.005
+}

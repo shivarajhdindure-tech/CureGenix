@@ -1,0 +1,16 @@
+{
+  "molecule": "H2",
+  "bond_distance_angstrom": 0.735,
+  "basis": "STO-3G",
+  "mapping": "Jordan-Wigner",
+  "num_qubits": 4,
+  "num_particles": [
+    1,
+    1
+  ],
+  "num_spatial_orbitals": 2,
+  "num_pauli_terms": 15,
+  "exact_qubit_hamiltonian_eigenvalue_hartree": -1.8572750302023775,
+  "nuclear_repulsion_energy_hartree": 0.7199689944489797,
+  "note": "Local exact reference; not a hardware result."
+}

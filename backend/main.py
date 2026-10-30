@@ -33,6 +33,9 @@ from backend.services.molecular_activity_api import router as molecular_activity
 from backend.services.benchmark_api import (
     router as benchmark_router,
 )
+from backend.services.molecular_risk_api import (
+    router as molecular_risk_router,
+)
 
 PROTEIN_NAME_SCORE_SARS_COV = 8
 PROTEIN_NAME_SCORE_SPIKE_GLYCO = 6
@@ -50,6 +53,7 @@ app.include_router(quantum_kernel_router)
 app.include_router(vqc_router)
 app.include_router(molecular_activity_router)
 app.include_router(benchmark_router)
+app.include_router(molecular_risk_router)
 
 app.add_middleware(
     CORSMiddleware,

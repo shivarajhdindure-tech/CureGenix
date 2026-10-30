@@ -6,7 +6,7 @@ import Molecule3DExplorer from "../Molecule3DExplorer";
 import DiscoveryStrategySimulator from "../DiscoveryStrategySimulator";
 import { CandidateScreeningComparisonChart } from "../charts/ScientificCharts";
 
-export default function MoleculeDiscoveryWorkspace({ result, derived }) {
+export default function MoleculeDiscoveryWorkspace({ result, derived, onNavigateToRisk = null }) {
   const candidates = derived?.candidates || [];
   const featured = derived?.bestNovel;
   const others = candidates.filter((c) => c !== featured);
@@ -94,7 +94,7 @@ export default function MoleculeDiscoveryWorkspace({ result, derived }) {
                     </span>
                     <span className="text-xs text-slate-500">Highest composite discovery score</span>
                   </div>
-                  <CandidateCard candidate={featured} featured />
+                  <CandidateCard candidate={featured} featured onSelectForRisk={onNavigateToRisk} />
                 </div>
               )}
 
@@ -105,7 +105,7 @@ export default function MoleculeDiscoveryWorkspace({ result, derived }) {
                   </h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     {others.map((c) => (
-                      <CandidateCard key={c.id} candidate={c} />
+                      <CandidateCard key={c.id} candidate={c} onSelectForRisk={onNavigateToRisk} />
                     ))}
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export default function MoleculeDiscoveryWorkspace({ result, derived }) {
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 {demonstrationCandidates.map((c) => (
-                  <CandidateCard key={c.id} candidate={c} />
+                  <CandidateCard key={c.id} candidate={c} onSelectForRisk={onNavigateToRisk} />
                 ))}
               </div>
             </div>

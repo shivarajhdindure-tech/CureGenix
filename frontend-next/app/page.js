@@ -16,6 +16,7 @@ import MolecularActivityWorkspace from "@/components/workspaces/MolecularActivit
 import BenchmarksWorkspace from "@/components/workspaces/BenchmarksWorkspace";
 import RiskEvidenceWorkspace from "@/components/workspaces/RiskEvidenceWorkspace";
 import ReportsProvenanceWorkspace from "@/components/workspaces/ReportsProvenanceWorkspace";
+import MolecularRiskDigitalTwinWorkspace from "@/components/workspaces/MolecularRiskDigitalTwinWorkspace";
 
 import {
   API_URL,
@@ -28,6 +29,7 @@ const VALID_WORKSPACES = [
   "overview",
   "target-analysis",
   "molecule-discovery",
+  "molecular-risk",
   "quantum-lab",
   "molecular-activity",
   "benchmarks",
@@ -39,6 +41,7 @@ export default function Home() {
   const [activeWorkspace, setActiveWorkspace] = useState("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [riskCandidateId, setRiskCandidateId] = useState(null);
 
   // Global Active Structure Context
   const [curatedList, setCuratedList] = useState([]);
@@ -567,6 +570,18 @@ export default function Home() {
                   result={result}
                   derived={derived}
                   activeStructure={activeStructure}
+                  onNavigateToRisk={(candId) => {
+                    setRiskCandidateId(candId);
+                    handleSelectWorkspace("molecular-risk");
+                  }}
+                />
+              )}
+
+              {activeWorkspace === "molecular-risk" && (
+                <MolecularRiskDigitalTwinWorkspace
+                  result={result}
+                  derived={derived}
+                  preselectedCandidateId={riskCandidateId}
                 />
               )}
 

@@ -36,6 +36,9 @@ from backend.services.benchmark_api import (
 from backend.services.h2o_quantum_api import router as h2o_quantum_router
 from backend.services.structure_api import router as structure_router
 from backend.services.quantum_calculation_api import router as quantum_calculation_router
+from backend.services.molecular_risk_api import (
+    router as molecular_risk_router,
+)
 
 PROTEIN_NAME_SCORE_SARS_COV = 8
 PROTEIN_NAME_SCORE_SPIKE_GLYCO = 6
@@ -56,6 +59,7 @@ app.include_router(benchmark_router)
 app.include_router(h2o_quantum_router)
 app.include_router(structure_router)
 app.include_router(quantum_calculation_router)
+app.include_router(molecular_risk_router)
 
 app.add_middleware(
     CORSMiddleware,

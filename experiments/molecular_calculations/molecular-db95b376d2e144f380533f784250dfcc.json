@@ -1,0 +1,96 @@
+{
+  "job_id": "molecular-db95b376d2e144f380533f784250dfcc",
+  "experiment_record_id": "molecular-db95b376d2e144f380533f784250dfcc",
+  "candidate_id": "BENCHMARK-H2O",
+  "smiles": "O",
+  "input_sha256": "c4694f2e93d5c4e7d51f9c5deb75e6cc8be5e1114178c6a45b6fc2c566a0aa8c",
+  "basis": "sto3g",
+  "maxiter": 50,
+  "charge": 0,
+  "spin": 0,
+  "status": "completed",
+  "submitted_at": "2026-10-31T05:28:06.003277+00:00",
+  "request_fingerprint": "5326c847fabd72c4abb6da2cd9128bf4f1e1eeced1a9186d0e60a36464471794",
+  "started_at": "2026-10-31T05:28:06.009275+00:00",
+  "result": {
+    "status": "success",
+    "method": "VQE",
+    "basis": "sto3g",
+    "charge": 0,
+    "spin": 0,
+    "active_space": {
+      "electrons": 2,
+      "spatial_orbitals": 2,
+      "selected_orbitals": [
+        4,
+        5
+      ],
+      "selection_method": "HOMO-LUMO"
+    },
+    "molecular_system": {
+      "total_electrons": 10,
+      "spatial_orbitals": 7,
+      "spin_orbitals": 14
+    },
+    "homo": {
+      "orbital": 4,
+      "energy_hartree": -0.39090887432348886
+    },
+    "lumo": {
+      "orbital": 5,
+      "energy_hartree": 0.5949603554679657
+    },
+    "homo_lumo_gap_hartree": 0.9858692297914545,
+    "hamiltonian": {
+      "qubits": 4,
+      "pauli_terms": 15,
+      "mapping": "Jordan-Wigner"
+    },
+    "vqe": {
+      "electronic_energy_hartree": -84.04870912532134,
+      "raw_active_space_energy_hartree": -1.6619746123277328,
+      "total_molecular_energy_hartree": -74.96444709099131,
+      "active_space_correction_hartree": -82.3867345129936,
+      "nuclear_repulsion_energy_hartree": 9.08426203433002,
+      "optimizer": "SLSQP",
+      "ansatz": "n_local",
+      "max_iterations": 50,
+      "runtime_seconds": 1.419,
+      "optimizer_success": null,
+      "optimizer_message": "",
+      "optimizer_status_available": false
+    },
+    "stage_diagnostics": {
+      "resource_preflight": {
+        "status": "completed",
+        "elapsed_seconds": 0.001
+      },
+      "pyscf_driver": {
+        "status": "completed",
+        "elapsed_seconds": 0.498
+      },
+      "active_space_reduction": {
+        "status": "completed",
+        "elapsed_seconds": 0.012
+      },
+      "hamiltonian_mapping": {
+        "status": "completed",
+        "elapsed_seconds": 0.045
+      },
+      "vqe": {
+        "status": "completed",
+        "elapsed_seconds": 1.419
+      },
+      "total_elapsed_seconds": 9.397
+    },
+    "adapter_diagnostics": {
+      "attempts": 1,
+      "transient_service_retries": 0,
+      "elapsed_seconds": 21.506,
+      "timeout_seconds": 180
+    },
+    "elapsed_seconds": 21.514
+  },
+  "finished_at": "2026-10-31T05:28:27.515885+00:00",
+  "elapsed_seconds": 21.514
+}

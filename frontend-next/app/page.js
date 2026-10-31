@@ -14,7 +14,6 @@ import MoleculeDiscoveryWorkspace from "@/components/workspaces/MoleculeDiscover
 import QuantumLabWorkspace from "@/components/workspaces/QuantumLabWorkspace";
 import MolecularActivityWorkspace from "@/components/workspaces/MolecularActivityWorkspace";
 import BenchmarksWorkspace from "@/components/workspaces/BenchmarksWorkspace";
-import RiskEvidenceWorkspace from "@/components/workspaces/RiskEvidenceWorkspace";
 import ReportsProvenanceWorkspace from "@/components/workspaces/ReportsProvenanceWorkspace";
 import MolecularRiskDigitalTwinWorkspace from "@/components/workspaces/MolecularRiskDigitalTwinWorkspace";
 
@@ -33,7 +32,6 @@ const VALID_WORKSPACES = [
   "quantum-lab",
   "molecular-activity",
   "benchmarks",
-  "risk-evidence",
   "reports-provenance",
 ];
 
@@ -73,6 +71,9 @@ export default function Home() {
       const hash = window.location.hash.replace("#", "");
       if (VALID_WORKSPACES.includes(hash)) {
         setActiveWorkspace(hash);
+      } else if (hash === "risk-evidence") {
+        window.location.hash = "overview";
+        setActiveWorkspace("overview");
       }
     }
     handleHashChange();
@@ -601,11 +602,6 @@ export default function Home() {
                 <BenchmarksWorkspace />
               )}
 
-              {activeWorkspace === "risk-evidence" && (
-                <RiskEvidenceWorkspace
-                  derived={derived}
-                />
-              )}
 
               {activeWorkspace === "reports-provenance" && (
                 <ReportsProvenanceWorkspace

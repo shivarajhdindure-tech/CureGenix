@@ -149,7 +149,6 @@ export default function CandidateCard({ candidate: c, featured = false, onSelect
 
   const q = c.quantumState === "vqe" ? c.quantum : null;
   const scr = c.screening;
-  const verified = isVerifiedCandidate(c);
 
   return (
     <article
@@ -200,18 +199,6 @@ export default function CandidateCard({ candidate: c, featured = false, onSelect
         )}
       </div>
 
-      {!verified && (
-        <div className="mt-4 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] p-3">
-          <p className="text-sm font-medium text-amber-200">
-            Unverified reference compound
-          </p>
-          <p className="mt-1 text-xs leading-5 text-slate-400">
-            Approval status and association with the analyzed target have not
-            both been verified. Scores and confidence are computational
-            prioritization estimates, not evidence of clinical effectiveness.
-          </p>
-        </div>
-      )}
 
       {c.smiles && (
         <div className="mt-4 flex items-start gap-2 rounded-lg border border-white/[0.06] bg-ink-950/60 p-3">
@@ -250,21 +237,6 @@ export default function CandidateCard({ candidate: c, featured = false, onSelect
         <Field label="Composite score">
           <span className="font-data">{fmt(c.compositeScore, 3)}</span>
         </Field>
-      </div>
-      <div className="mt-4 rounded-lg border border-amber-400/25 bg-amber-400/[0.06] p-3">
-        <p className="text-sm font-medium text-amber-200">
-          Safety evidence insufficient
-        </p>
-        <p className="mt-1 text-xs leading-5 text-slate-400">
-          The displayed risk category is based on a rule-based structural
-          heuristic, not a validated toxicity model. Absence of detected
-          structural alerts does not establish safety.
-        </p>
-        {c.structuralAlertCount !== null && (
-          <p className="mt-2 text-xs text-slate-400">
-            Structural alerts detected: {c.structuralAlertCount}
-          </p>
-        )}
       </div>
       {q && (
         <div className="mt-5 grid grid-cols-2 gap-3 rounded-xl border border-cyan-400/15 bg-cyan-400/[0.04] p-3">
